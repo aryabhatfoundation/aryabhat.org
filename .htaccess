@@ -1,0 +1,15 @@
+Options -Indexes
+RewriteEngine on
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_USER_AGENT} !(Windows\ NT\ 5.1|Windows\ NT\ 5.2) [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
+
+Redirect 301 /qlogin https://quiz.aryabhat.org/accounts/login/
+
+Redirect 301 /council https://docs.google.com/forms/d/14Pg1IM3zDMF3YHQaWXqqV_8i_scEwOrxsN7waUOMGpg/viewform
+
+
+Redirect 301 /Q19 https://drive.google.com/open?id=1mwZBZSv8BvjsLz-qT4oOPaAFgI2NOnQW
+
+Redirect 301 /alumni https://docs.google.com/spreadsheets/d/17apGNnpKCb7HI3DT_XmfVOj8acqAXLUazN4rV8z2z6g/edit#gid=0
+Redirect 302 /talks https://youtu.be/W-ki7dAJ25E
