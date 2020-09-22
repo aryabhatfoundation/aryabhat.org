@@ -44,62 +44,110 @@
 					  padding: 8px;
 					}
 					</style>
-				<table class="result" id="result" border="1" style="visibility:hidden; border-collapse: collapse;margin-right: auto; margin-left: auto;">
-					<thead ><td>Merit</td><td>Name</td><td>School</td></thead>
-					<tr style="visibility:hidden"><td>1</td><td>Keshav Jhunjhunwala</td><td>The Scindia School, Gwalior</td></tr>
-					<tr style="visibility:hidden"><td>2</td><td>Siddhant Kumar</td><td>SICA School Scheme No 78, Indore</td></tr>
-					<tr style="visibility:hidden"><td>3</td><td>Utkarsh Singh </td><td>Jawahar Navoday Vidyalay, Umaria</td></tr>
-					<tr style="visibility:hidden"><td>4</td><td>Sufiyan Arif</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>5</td><td>Utkrishta Singoria</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>6</td><td>Nitya Thakre</td><td>St Joseph Co-Ed School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>7</td><td>Shikhraj Singh</td><td>Emerald Heights International School, Indore</td></tr>
-					<tr style="visibility:hidden"><td>8</td><td>Devashish Dixit</td><td>St Joseph Co-Ed School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>9</td><td>Dhairya Garg</td><td>Delhi Public School, Kolar, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>10</td><td>Shashwat Pandey</td><td>Delhi Public School Kolar, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>11</td><td>Advait Bhagwat</td><td>Mother Teresa School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>12</td><td>Anuj Parmar</td><td>Govt Model School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>13</td><td>Bhavya Sanghvi</td><td>Emerald Heights International School, Indore</td></tr>
-					<tr style="visibility:hidden"><td>14</td><td>Arjun Patil</td><td>Choithram School, Indore</td></tr>
-					<tr style="visibility:hidden"><td>15</td><td>Kajal Mahajan</td><td>Gyandeep H S School, Burhanpur</td></tr>
-					<tr style="visibility:hidden"><td>16</td><td>Akshat Bhalekar</td><td>NRI Global Discovery School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>17</td><td>Neeraj Singh</td><td>Jawahar Navoday Vidyalay, Umaria</td></tr>
-					<tr style="visibility:hidden"><td>18</td><td>Soumitra Joglekar</td><td>Emerald Heights International School, Indore</td></tr>
-					<tr style="visibility:hidden"><td>19</td><td>Aditya Tiwari</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>20</td><td>Ved Meshram</td><td>Sagar Public School, Saket Nagar, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>21</td><td>Hiyanahi Nema</td><td>St Raphael's H S School, Indore</td></tr>
-					<tr style="visibility:hidden"><td>22</td><td>Medha Srishti Abboju</td><td>Bal Bharati Public School, Gadarwara</td></tr>
-					<tr style="visibility:hidden"><td>23</td><td>Mohd Nazim Khan</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>24</td><td>Ritik Singh</td><td>Jawahar Navoday Vidyalay, Umaria</td></tr>
-					<tr style="visibility:hidden"><td>25</td><td>Krishna Garg</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>26</td><td>Madhav Gupta</td><td>Delhi Public School, Kolar, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>27</td><td>Atharv Tiwari</td><td>The Scindia School, Gwalior</td></tr>
-					<tr style="visibility:hidden"><td>28</td><td>Shubh Saratkar</td><td>International Public School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>29</td><td>Prerna Upadhyay</td><td>Jawaharlal Nehru School, Bhopal</td></tr>
-					<tr style="visibility:hidden"><td>30</td><td>Deepan Haridas</td><td>Jawahar Navoday Vidyalay, Narsinghpur</td></tr>
-		  		</table>
+				<table class="result" id="result" border="1" style="width: 60%; visibility:hidden; border-collapse: collapse;margin-right: auto; margin-left: auto;">
+          <thead>
+                <tr>
+                    <td>Merit</td>
+                    <td>Name</td>
+                    <td>School</td>
+                </tr>
+          </thead>
+          <tbody id="resbody"></tbody>
+        </table>
 		  		<script>
 		  			 function sleep(ms) {
 					      return new Promise(resolve => setTimeout(resolve, ms));
 					   }
 		  			console.log("in animate()");
-		  			async function showResults() {
-					  var table = document.getElementById("result");
-					  var rows = Array.from(table.rows).reverse();
-					  	await sleep(500);
-					  table.style.visibility='visible';
-						for (var i = 0, row; row = rows[i]; i++) {
-							row.style.visibility='visible';
-							await sleep(300);
-						   //iterate through rows
-						   //rows would be accessed using the "row" variable assigned in the for loop
-						   for (var j = 0, col; col = row.cells[j]; j++) {
-						     //iterate through columns
-						     //columns would be accessed using the "col" variable assigned in the for loop
-						   }  
-						}
-					}
+            async function banana() {
+            var nameData = [
+              "Keshav Jhunjhunwala",
+              "Utkarsh Singh",
+              "Sufiyan Arif",
+              "Utkrishta Singoria",
+              "Nitya Thakre",
+              "Shikhraj Singh",
+              "Devashish Dixit",
+              "Dhairya Garg",
+              "Shashwat Pandey",
+              "Advait Bhagwat",
+              "Sameep Modi",
+              "Anuj Parmar",
+              "Bhavya Sanghvi",
+              "Arjun Patil",
+              "Akshat Bhalekar",
+              "Neeraj Singh",
+              "Soumitra Joglekar",
+              "Dev Sethiya",
+              "Aditya Tiwari",
+              "Ved Meshram",
+              "Abhineet Bansal",
+              "Hiyanahi Nema",
+              "Medha Srishti Abboju",
+              "Mohd Nazim Khan",
+              "Ritik Singh",
+              "Krishna Garg",
+              "Madhav Gupta",
+              "Atharv Tiwari",
+              "Shubh Saratkar",
+              "Deepan Haridas"
+            ];
+            var schoolData = [
+              "The Scindia School, Gwalior",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Jawaharlal Nehru School, Bhopal",
+              "Jawaharlal Nehru School, Bhopal",
+              "St Joseph Co-Ed School, Bhopal",
+              "Emerald Heights International School, Indore",
+              "St Joseph Co-Ed School, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "Mother Teresa School, Bhopal",
+              "The Scindia School, Gwalior",
+              "Govt Model School, Bhopal",
+              "Emerald Heights International School, Indore",
+              "Choithram School, Indore",
+              "NRI Global Discovery School, Bhopal",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Emerald Heights International School, Indore",
+              "Kendriya Vidyalay Mandsaur",
+              "Jawaharlal Nehru School, Bhopal",
+              "Sagar Public School, Saket Nagar, Bhopal",
+              "Little Angels High School Gwalior",
+              "St Raphael's H S School, Indore",
+              "Bal Bharati Public School, Gadarwara",
+              "Jawaharlal Nehru School, Bhopal",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Jawaharlal Nehru School, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "The Scindia School, Gwalior",
+              "International Public School, Bhopal",
+              "Jawahar Navoday Vidyalay, Narsinghpur"
+            ];
+            const Tr = document.createElement('tr');
+            const Td = document.createElement('td');
+            await sleep(500);
+            var resultTable = document.querySelector('#result');
+            resultTable.style.visibility = 'visible';
+            for (var i = nameData.length - 1; i >= 0; i--) {
+                var tR = Tr.cloneNode();
+                var tD0 = Td.cloneNode();
+                tD0.innerText = i+1;
+                var tD1 = Td.cloneNode();
+                tD1.innerText = nameData[i];
+                var tD2 = Td.cloneNode();
+                tD2.innerText = schoolData[i];
 
-		  			showResults();
+                var toby = document.querySelector('#resbody');
+                tR.appendChild(tD0)
+                tR.appendChild(tD1);
+                tR.appendChild(tD2);
+                toby.prepend(tR);
+                await sleep(500);
+            }
+        }
+
+        banana();
 		  		</script>
 
 		 </div>
