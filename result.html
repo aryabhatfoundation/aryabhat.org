@@ -43,7 +43,7 @@
    <div class="main row">
 		<div class="nine columns" style="display: flex; flex-direction: column; align-items: center; text-align: justify;">
       <div style="width: 100%;">
-      <p>The result will be declared in the auspicious hands of Dr. Erika Hamden on September 26, 2020 at 8:30 PM IST.</p>
+      <p>The result was declared in the auspicious hands of Dr. Erika Hamden on September 26, 2020 at 8:30 PM IST.</p>
       <p>Dr. Erika Hamden is an eminent astrophysicist with a focus on Ultraviolet (UV) Detection, Spectroscopy, and Galaxy Evolution. She is an Assistant Professor of Astrophysics at the University of Arizona, US, and a 2019 TED fellow.</p>
       <p>Aryabhat Astronomy Quiz is in its 24th successful year today. In the current year's Quiz, the preliminary test was conducted online for a total of 3927 students from 248 schools from across the state of Madhya Pradesh, India.</p>
       </div>
@@ -54,8 +54,139 @@
 
 		<div class="three columns" >
 			<img class="value-img" src="files/2020/DrErika.jpeg" width="300" height="100">
-		</div>
+    </div>
 
+   </div>
+
+
+    <div class="main row">
+
+  
+ 
+    <h3 align="center"> Results - Online Aryabhat Astronomy Quiz 2020-21 </h3>
+
+
+					<style>
+					th, td {
+					  padding: 8px;
+					}
+					</style>
+				<table class="result" id="result" border="1" style="width: 60%; visibility:hidden; border-collapse: collapse;margin-right: auto; margin-left: auto;">
+          <thead>
+                <tr>
+                    <td>Merit</td>
+                    <td>Name</td>
+                    <td>School</td>
+                </tr>
+          </thead>
+          <tbody id="resbody"></tbody>
+        </table>
+		  		<script>
+		  			 function sleep(ms) {
+					      return new Promise(resolve => setTimeout(resolve, ms));
+					   }
+		  			console.log("in animate()");
+            async function ResultAnimation() {
+            var nameData = [
+              "Keshav Jhunjhunwala",
+              "Utkarsh Singh",
+              "Sufiyan Arif",
+              "Utkrishta Singoria",
+              "Nitya Thakre",
+              "Shikhraj Singh",
+              "Devashish Dixit",
+              "Dhairya Garg",
+              "Shashwat Pandey",
+              "Advait Bhagwat",
+              "Sameep Modi",
+              "Anuj Parmar",
+              "Bhavya Sanghvi",
+              "Arjun Patil",
+              "Akshat Bhalekar",
+              "Neeraj Singh",
+              "Soumitra Joglekar",
+              "Dev Sethiya",
+              "Aditya Tiwari",
+              "Ved Meshram",
+              "Abhineet Bansal",
+              "Hiyanahi Nema",
+              "Medha Srishti Abboju",
+              "Mohd Nazim Khan",
+              "Ritik Singh",
+              "Krishna Garg",
+              "Madhav Gupta",
+              "Atharv Tiwari",
+              "Shubh Saratkar",
+              "Deepan Haridas"
+            ];
+            var schoolData = [
+              "The Scindia School, Gwalior",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Jawaharlal Nehru School, Bhopal",
+              "Jawaharlal Nehru School, Bhopal",
+              "St Joseph Co-Ed School, Bhopal",
+              "Emerald Heights International School, Indore",
+              "St Joseph Co-Ed School, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "Mother Teresa School, Bhopal",
+              "The Scindia School, Gwalior",
+              "Govt Model School, Bhopal",
+              "Emerald Heights International School, Indore",
+              "Choithram School, Indore",
+              "NRI Global Discovery School, Bhopal",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Emerald Heights International School, Indore",
+              "Kendriya Vidyalay Mandsaur",
+              "Jawaharlal Nehru School, Bhopal",
+              "Sagar Public School, Saket Nagar, Bhopal",
+              "Little Angels High School Gwalior",
+              "St Raphael's H S School, Indore",
+              "Bal Bharati Public School, Gadarwara",
+              "Jawaharlal Nehru School, Bhopal",
+              "Jawahar Navoday Vidyalay, Umaria",
+              "Jawaharlal Nehru School, Bhopal",
+              "Delhi Public School, Kolar, Bhopal",
+              "The Scindia School, Gwalior",
+              "International Public School, Bhopal",
+              "Jawahar Navoday Vidyalay, Narsinghpur"
+            ];
+            const Tr = document.createElement('tr');
+            const Td = document.createElement('td');
+            // await sleep(500);
+            var resultTable = document.querySelector('#result');
+            resultTable.style.visibility = 'visible';
+            for (var i = nameData.length - 1; i >= 0; i--) {
+                var tR = Tr.cloneNode();
+                var tD0 = Td.cloneNode();
+                tD0.innerText = i+1;
+                var tD1 = Td.cloneNode();
+                tD1.innerText = nameData[i];
+                var tD2 = Td.cloneNode();
+                tD2.innerText = schoolData[i];
+
+                var toby = document.querySelector('#resbody');
+                tR.appendChild(tD0)
+                tR.appendChild(tD1);
+                tR.appendChild(tD2);
+                toby.prepend(tR);
+                // await sleep(500);
+            }
+        }
+
+          ResultAnimation();
+		  		</script>
+
+    </div>
+
+    <div class="main row" >
+    	<div class="six columns">
+    		<h4 align="center"><a target="_" class="button-primary button" href="files/2020/Participation_2020-21.pdf">Participation Summary</a></h4>
+	    	</div>
+    	<div class="six columns">
+    		<h4 align="center"><a target="_" class="button-primary button" href="files/2020/Merit-List.pdf">Preliminary Merit</a></h4>
+
+    	</div>
     </div>
     <div class="row" >
   		<p> &copy; Aryabhat Foundation &middot;</p>
