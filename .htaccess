@@ -18,4 +18,5 @@ Redirect 301 /Q19 https://drive.google.com/open?id=1mwZBZSv8BvjsLz-qT4oOPaAFgI2N
 
 Redirect 301 /alumni https://docs.google.com/spreadsheets/d/17apGNnpKCb7HI3DT_XmfVOj8acqAXLUazN4rV8z2z6g/edit#gid=0
 Redirect 302 /talks https://youtu.be/W-ki7dAJ25E
+Redirect 302 /qintro https://youtu.be/l-0mmcLsjM0
 
