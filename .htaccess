@@ -4,6 +4,11 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_USER_AGENT} !(Windows\ NT\ 5.1|Windows\ NT\ 5.2) [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
 
+Redirect 301 /study1 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study1.pdf
+Redirect 301 /study2 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study2.pdf
+Redirect 301 /study3 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study3.pdf
+Redirect 301 /glossary https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Glossary.pdf
+
 Redirect 301 /qlogin https://quiz.aryabhat.org/accounts/login/
 
 Redirect 301 /council https://docs.google.com/forms/d/14Pg1IM3zDMF3YHQaWXqqV_8i_scEwOrxsN7waUOMGpg/viewform
@@ -13,3 +18,4 @@ Redirect 301 /Q19 https://drive.google.com/open?id=1mwZBZSv8BvjsLz-qT4oOPaAFgI2N
 
 Redirect 301 /alumni https://docs.google.com/spreadsheets/d/17apGNnpKCb7HI3DT_XmfVOj8acqAXLUazN4rV8z2z6g/edit#gid=0
 Redirect 302 /talks https://youtu.be/W-ki7dAJ25E
+
