@@ -452,10 +452,10 @@ pre,blockquote,form,dl,figure,table,p,ul,ol,form {
 }
 
 hr {
-  margin-top: 3rem;
-  margin-bottom: 3.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
   border-width: 0;
-  border-top: 1px solid #E1E1E1;
+  border-top: 1px solid #666666;
 }
 
 .container:after,.row:after,.u-cf {
