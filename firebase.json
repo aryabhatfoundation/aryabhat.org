@@ -5,6 +5,89 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/study1",
+        "destination": "https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study1.pdf",
+        "type": 301
+      },
+      {
+        "source": "/study2",
+        "destination": "https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study2.pdf",
+        "type": 301
+      },
+      {
+        "source": "/study3",
+        "destination": "https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study3.pdf",
+        "type": 301
+      },
+      {
+        "source": "/glossary",
+        "destination": "https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Glossary.pdf",
+        "type": 301
+      },
+      {
+        "source": "/qlogin",
+        "destination": "https://quiz.aryabhat.org/accounts/login/",
+        "type": 301
+      },
+      
+      {
+        "source": "/qintro",
+        "destination": "https://youtu.be/l-0mmcLsjM0",
+        "type": 302
+      },
+      {
+        "source": "/requestevent",
+        "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfxU6bReItNXDLkE0ZSNcR-K1lkVrwrFd_ZcHeIoy5vDajABg/viewform",
+        "type": 302
+      },
+      {
+        "source": "/alumni",
+        "destination": "https://docs.google.com/spreadsheets/d/17apGNnpKCb7HI3DT_XmfVOj8acqAXLUazN4rV8z2z6g/edit#gid=0",
+        "type": 301
+      },
+      {
+        "source": "/talks",
+        "destination": "https://youtu.be/W-ki7dAJ25E",
+        "type": 302
+      },
+      {
+        "source": "/studyvideo",
+        "destination": "https://youtu.be/s5_1iDcbVrQ",
+        "type": 302
+      },
+      {
+        "source": "/quiztesting",
+        "destination": "https://demoquiz-service-52607773783.asia-south1.run.app/",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhatIsAstroQuiz",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=0s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ObjectiveOfQuiz",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=24s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhatisAryabhat",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=74s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhenWasFirstQuiz",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=102s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhoCanParticipate",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=116s",
+        "type": 302
+      }
     ]
   }
 }
