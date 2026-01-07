@@ -32,7 +32,6 @@
         "destination": "https://quiz.aryabhat.org/accounts/login/",
         "type": 301
       },
-      
       {
         "source": "/qintro",
         "destination": "https://youtu.be/l-0mmcLsjM0",
@@ -86,6 +85,181 @@
       {
         "source": "/faqs/WhoCanParticipate",
         "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=116s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/OustideMPStudents",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=137s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhatDoSelectedGet",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=150s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhenAreCamps",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=191s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/AnyEntryFees",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=203s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/SecondaryLevelFees",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=216s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ParentsStayAtAryabhat",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=252s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/KindOfQuestions",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=272s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/QuizSyllabus",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=309s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhereToStudy",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=342s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/HowToRegister",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=364s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/SchoolRegistration",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=399s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/MobileForRegistration",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=440s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ConfirmationOfRegistration",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=449s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ChangeOfMobile",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=466s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/MarkingPattern",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=476s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/DemoQuizRecommendedBooks",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=491s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/SecondaryExamWhen",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=536s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/SecondaryExamOutline",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=558s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/LastDateRegistration",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=588s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/QuizDates",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=597s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/HowWillIndividualsParticipate",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=623s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ComputersNeededForSchool",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=648s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/IsInternetRequiredForSchool",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=730s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/WhereIsSecondaryTraining",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=764s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/PreferredDatesForTraining",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=775s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/PrizeForWinners",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=793s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/VisitScheduleObsevatoryChoice",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=855s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/TripOrganizationAndEscorts",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=897s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/NoTADA",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=940s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ParticipateEveryYear",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=968s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/PassingMarks",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=995s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/ScoreImprovementAttempt",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1014s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/DoubleRegistration",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1040s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/QuizDateMissed",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1055s",
+        "type": 302
+      },
+      {
+        "source": "/faqs/MessageForParticipants",
+        "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1069s",
         "type": 302
       }
     ]

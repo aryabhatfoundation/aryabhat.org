@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Sky Map: Aryabhat</title>
+    <meta name="description" content="Sky Map for Bhopal, MP and Central India">
+    <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+
+    <!-- D3 Celestial Dependencies -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/d3-geo-projection/0.2.16/d3.geo.projection.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-celestial/celestial.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d3-celestial/celestial.css">
+
+    <!-- SunCalc -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
+    <style>
+        body {
+            background: none;
+        }
+
+        p.card {
+            padding: 8px;
+            margin: 8px;
+        }
+
+        /* Custom styles for the map */
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        #celestial-map {
+            width: 100%;
+        }
+
+        .cardinal {
+            position: absolute;
+            font-weight: bold;
+            color: #eeeeee;
+            font-size: 1.5em;
+            pointer-events: none;
+            z-index: 10;
+            font-family: sans-serif;
+        }
+
+        .north {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .south {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .east {
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%);
+        }
+
+        .west {
+            top: 50%;
+            right: 5px;
+            transform: translateY(-50%);
+        }
+
+        /* Calendar Styles */
+        #calendar-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(6, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            font-weight: bold;
+            padding: 5px;
+            background-color: #222;
+            border-radius: 4px;
+            color: #ddd;
+            margin-right: 15px;
+            /* Visual gap */
+        }
+
+        .calendar-day {
+            padding: 2px;
+            background-color: #000;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            min-height: 50px;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background-color: #333;
+        }
+
+        .calendar-day.selected {
+            border: 2px solid #33C3F0 !important;
+        }
+
+        .calendar-day.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        .moon-icon {
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+
+        .date-number {
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .phase-name {
+            font-size: 0.6em;
+            text-align: right;
+            color: #aaa;
+        }
+
+        .calendar-day.major-phase {
+            border: 1px solid #555;
+        }
+
+        .calendar-day.best-viewing {
+            border: 1px solid #66bb6a;
+        }
+
+        .calendar-day.major-phase .phase-name {
+            font-size: 0.75em;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .calendar-title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .cal-btn {
+            cursor: pointer;
+            padding: 5px 12px;
+            background: #eee;
+            color: #333;
+            border-radius: 4px;
+            border: none;
+            /* Override defaults and center content */
+            height: auto;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        #celestial-map canvas {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 auto;
+        }
+
+        .sky-controls {
+            text-align: center;
+        }
+
+        /* Force hide celestial form if generated */
+        /* Force hide celestial form if generated */
+        #celestial-form {
+            display: none !important;
+        }
+
+        /* Fix for .main padding causing overflow if not border-box */
+        .main {
+            box-sizing: border-box;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 550px) {
+            .calendar-grid {
+                gap: 2px;
+                grid-template-columns: 35px repeat(6, 1fr);
+            }
+
+            .calendar-day {
+                padding: 4px;
+                min-height: 40px;
+                font-size: 0.8em;
+            }
+
+            .moon-icon {
+                font-size: 1em;
+            }
+
+            .calendar-day-header {
+                font-size: 0.8em;
+                padding: 2px;
+                margin-right: 5px;
+                /* Smaller gap on mobile */
+            }
+
+            /* Reducing padding on map wrapper for small screens */
+            .map-wrapper {
+                padding: 10px;
+            }
+
+            /* Adjust cardinals for smaller padding */
+            .north {
+                top: -5px;
+            }
+
+            .south {
+                bottom: -5px;
+            }
+
+            .east {
+                left: 0;
+            }
+
+            .west {
+                right: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-68513114-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+    <div class="container">
+        <section class="header">
+            <!-- Injected by js/layout.js -->
+        </section>
+
+
+        <nav class="navbar">
+            <!-- Injected by js/layout.js -->
+        </nav>
+
+        <div class="main row">
+
+            <div class="row">
+                <div class="four columns sky-controls">
+                    <p id="selected-date-display" class="card"></p>
+                </div>
+                <div class="four columns sky-controls">
+                    <p id="sunset-info" class="card">Calculating sunset...</p>
+                </div>
+                <div class=" four columns sky-controls">
+                    <p class="card Highlight">📍 Central India</p>
+                </div>
+                <div class="twelve columns">
+                    <div id="calendar-container">
+                        <div class="calendar-header">
+                            <button class="cal-btn" onclick="changeMonth(-1)">&lt;</button>
+                            <span class="calendar-title" id="calendar-title">Month Year</span>
+                            <button class="cal-btn" onclick="changeMonth(1)">&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid">
+                            <!-- JS generates grid here -->
+                        </div>
+                    </div>
+                    <p class="center">✅ best dates for night sky viewing camp </p>
+                </div>
+            </div>
+
+            <div class="twelve columns">
+                <div class="map-wrapper">
+                    <div id="celestial-map"></div>
+                    <div class="cardinal north">N</div>
+                    <div class="cardinal south">S</div>
+                    <div class="cardinal east">E</div>
+                    <div class="cardinal west">W</div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <a class="button button-primary" onclick="saveMap()">💾 Save Map</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        function saveMap() {
+            var element = document.querySelector(".map-wrapper");
+            html2canvas(element, {
+                backgroundColor: null,
+                ignoreElements: function (el) {
+                    return el.id === 'celestial-zoomin' || el.id === 'celestial-zoomout';
+                }
+            }).then(function (canvas) {
+                var link = document.createElement('a');
+
+                var year = selectedDate.getFullYear();
+                var month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                var day = selectedDate.getDate().toString().padStart(2, '0');
+                link.download = 'aryabhat-sky-map-' + year + '-' + month + '-' + day + '.png';
+
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+
+    <div class="row">
+        <p> &copy; Aryabhat Foundation &middot;</p>
+    </div>
+    </div>
+
+    </div>
+
+    <script>
+        // Location: Bhopal, India
+        var LAT = 23.2599;
+        var LNG = 77.4126;
+
+        var config = {
+            location: false,
+            geopos: [LAT, LNG],
+            projection: "stereographic", // Circular projection
+            datapath: "https://ofrohn.github.io/data/", // Data path for stars/dsos
+            form: false, // Disable default form
+            background: { fill: "#0b1a26", stroke: "#0b1a26", opacity: 1 },
+            stars: {
+                show: true, limit: 4.5, designation: false, propername: true,
+                propernameStyle: {
+                    fill: "#dddddd", align: "center", baseline: "top",
+                    font: "12px Helvetica, Arial, sans-serif"
+                },
+
+            },
+            dsos: { show: false },
+            constellations: {
+                show: true, names: true, desig: true,
+                lineStyle: { stroke: "#aaaaaa", width: 1, opacity: 0.2 },
+                nameStyle: {
+                    fill: "#aaaaaa", align: "center", baseline: "middle",
+                    font: ["11px Helvetica, Arial, sans-serif",  // Style for constellations
+                        "10px Helvetica, Arial, sans-serif",  // Different fonts for diff.
+                        "9px Helvetica, Arial, sans-serif"]
+                },// ranked constellations
+            },
+            lines: {
+                graticule: false, equatorial: false,
+                ecliptic: { show: true, stroke: "#66cc66", width: 1, opacity: 0.2 },
+            },
+            mw: {
+                show: true, style: { fill: "#ffffff", opacity: 0.05 }
+            },  // Style for MW layers 
+            planets: { show: true, symbolType: "disk", names: true },
+            follow: "zenith", // Center on Zenith to show local sky
+            width: 0, // 0 = full parent width
+            interactive: false // Disable zoom/pan
+        };
+
+        Celestial.display(config);
+
+        // Function to update map and sunset time
+        function updateSky(date) {
+            // Get sunset time for the date
+            var times = SunCalc.getTimes(date, LAT, LNG);
+            var night = times.night;
+
+            // Update text
+            var timeStr = night.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('sunset-info').innerText = "night begins at " + timeStr;
+
+            // Update Celestial Map Date
+            Celestial.date(night);
+        }
+
+        // Initialize with Today
+        var today = new Date();
+        today.setHours(12, 0, 0, 0); // Normalize to noon
+
+        var selectedDate = new Date(today);
+        var currentCalendarDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        function updateDateDisplay() {
+            var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('selected-date-display').innerText = "📅 " + selectedDate.toLocaleDateString("en-US", options);
+        }
+
+        // Initialize Calendar
+        renderCalendar();
+        updateDateDisplay();
+
+        // Initial Update
+        updateSky(selectedDate);
+
+        // Calendar Logic
+        function changeMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+
+            // Auto-select 1st of the new month
+            var newDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1, 12, 0, 0);
+            selectedDate = newDate;
+
+            updateDateDisplay();
+            updateSky(newDate);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            var grid = document.getElementById('calendar-grid');
+            var title = document.getElementById('calendar-title');
+            grid.innerHTML = "";
+
+            var year = currentCalendarDate.getFullYear();
+            var month = currentCalendarDate.getMonth();
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            title.innerText = monthNames[month] + " " + year;
+
+            var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var firstDayIndex = new Date(year, month, 1).getDay();
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Iterate Rows (Days of Week)
+            for (var rw = 0; rw < 7; rw++) {
+                // 1. Header (First Column)
+                var dh = document.createElement('div');
+                dh.className = "calendar-day-header";
+                dh.innerText = days[rw];
+                // Center header text
+                dh.style.display = "flex";
+                dh.style.alignItems = "center";
+                dh.style.justifyContent = "center";
+                grid.appendChild(dh);
+
+                // 2. Weeks (Columns 1..6)
+                for (var wk = 0; wk < 6; wk++) {
+                    var d = (wk * 7 + rw) - firstDayIndex + 1;
+
+                    if (d > 0 && d <= daysInMonth) {
+                        var cell = document.createElement('div');
+                        cell.className = "calendar-day";
+
+                        var dateObj = new Date(year, month, d, 12, 0, 0);
+
+                        var moonIllum = SunCalc.getMoonIllumination(dateObj);
+                        var phase = moonIllum.phase;
+                        var fraction = moonIllum.fraction;
+                        var icon = getMoonIcon(phase);
+                        var phaseName = getMoonPhaseName(phase);
+
+                        var brightness = Math.floor(fraction * 50);
+                        cell.style.backgroundColor = "rgb(" + brightness + "," + brightness + "," + brightness + ")";
+
+                        if (phaseName === "New Moon" || phaseName === "Full Moon") {
+                            cell.classList.add('major-phase');
+                        }
+
+                        var bestView = "";
+                        if (phase >= 0.10 && phase <= 0.25) {
+                            bestView = "<span style='position:absolute; top:0px; right:2px; font-size: 0.8em;'>✅</span>";
+                            cell.classList.add('best-viewing');
+                        }
+
+                        cell.innerHTML = bestView + "<span class='date-number'>" + d + "</span><span class='moon-icon'>" + icon + "</span><span class='phase-name'>" + phaseName + "</span>";
+
+                        if (selectedDate.getDate() === d && selectedDate.getMonth() === month && selectedDate.getFullYear() === year) {
+                            cell.classList.add('selected');
+                        }
+
+                        cell.onclick = (function (yr, mo, dy) {
+                            return function () {
+                                var newDate = new Date(yr, mo, dy, 12, 0, 0);
+                                selectedDate = newDate;
+                                updateDateDisplay();
+                                updateSky(newDate);
+                                renderCalendar();
+                            }
+                        })(year, month, d);
+
+                        grid.appendChild(cell);
+                    } else {
+                        // Empty slot
+                        var empty = document.createElement('div');
+                        empty.className = "calendar-day empty";
+                        grid.appendChild(empty);
+                    }
+                }
+            }
+        }
+
+
+        function getMoonIcon(phase) {
+            // phase is 0 to 1. 0=New, 0.25=First Quarter, 0.5=Full, 0.75=Last Quarter
+            // Icons: 🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘
+            // Approximate ranges
+            if (phase < 0.03 || phase > 0.97) return "🌑";
+            if (phase < 0.22) return "🌒";
+            if (phase < 0.28) return "🌓";
+            if (phase < 0.47) return "🌔";
+            if (phase < 0.53) return "🌕";
+            if (phase < 0.72) return "🌖";
+            if (phase < 0.78) return "🌗";
+            return "🌘";
+        }
+
+        function getMoonPhaseName(phase) {
+            if (phase < 0.03 || phase > 0.97) return "New Moon";
+            if (phase < 0.22) return "Waxing Crescent";
+            if (phase < 0.28) return "First Quarter";
+            if (phase < 0.47) return "Waxing Gibbous";
+            if (phase < 0.53) return "Full Moon";
+            if (phase < 0.72) return "Waning Gibbous";
+            if (phase < 0.78) return "Last Quarter";
+            return "Waning Crescent";
+        }
+
+    </script>
+    <!-- Background Animation -->
+    <script src="js/background-stars.js"></script>
+    <script src="js/layout.js"></script>
+</body>
+
+</html>
