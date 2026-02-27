@@ -38,122 +38,183 @@
     </nav>
 
     <div class="main row">
-      <div class="six column">
-        <script>
-          function toggle(divId) {
-            var element = document.getElementById(divId);
-            if (element.style.display === "none") {
-              element.style.display = "block"; // Or "flex", "inline-block", etc., depending on desired display type
-            } else {
-              element.style.display = "none";
-            }
-          }
-        </script>
-        <a class="button button-primary" onclick="toggle('faqs')"> Quiz FAQs 👆🏻 </a>
+      <div class="four columns">
         <br>
-        <div class="card" id="faqs" style="display: none;">
-          <h4>Click on the Question to get a clarification</h4>
-          <ul>
-            <li><a href="https://aryabhat.org/faqs/WhatIsAstroQuiz">What is Aryabhat Astronomy Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/ObjectiveOfQuiz">What is the objective of the Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhatisAryabhat">What kind of Organization is Aryabhat ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhenWasFirstQuiz">When was this quiz first organized ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhoCanParticipate">Who can participate in quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/OustideMPStudents">Can students outside MP participate ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhatDoSelectedGet">What do selected students get after first level
-                ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhenAreCamps">When are these camps organized ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/AnyEntryFees">Is there any entry fees for the Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/SecondaryLevelFees">Any fees for the secondary level ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/ParentsStayAtAryabhat">Can teachers or parents stay
-                with students at Aryabhat ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/KindOfQuestions">What kind of questions are there in first level
-                ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/QuizSyllabus">What is the syllabus of the Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/WhereToStudy">Where can one study all this ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/HowToRegister">How can one register for the Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/SchoolRegistration">How can schools register for the Quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/MobileForRegistration">Can one use mobile for
-                registration ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/ConfirmationOfRegistration">How do we get confirmation of
-                registration ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/ChangeOfMobile">Can we change mobile number after registration ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/MarkingPattern">Is there negative marking ? What is marking pattern
-                ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/DemoQuizRecommendedBooks">is there any Demo Quiz ? Any
-                recommended books ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/SecondaryExamWhen">When will the Secondary Exam be held ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/SecondaryExamOutline">What is the outline of the Secondary level
-                examination ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/LastDateRegistration">What is the last date of registration ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/QuizDates">What are the dates of Quiz for Schools and Individuals
-                ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/HowWillIndividualsParticipate">Will there be any centre for
-                Individual Participants ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/ComputersNeededForSchool">How many computers needed in
-                school ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/IsInternetRequiredForSchool">How can we participate without
-                Internet ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/WhereIsSecondaryTraining">Where is the training held for
-                secondary level ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/PreferredDatesForTraining">Can students get preferred dates
-                for training ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/PrizeForWinners">What do the final winners get ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/VisitScheduleObsevatoryChoice">Can we choose our own
-                observatories ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/TripOrganizationAndEscorts">Can parents come along on these
-                trips ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/NoTADA">Will the students get any TA/DA ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/ParticipateEveryYear">Can one student participate in the quiz only
-                once
-                ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/PassingMarks">Are there any passing marks for the quiz ?</a></li>
-            <li><a href="https://aryabhat.org/faqs/ScoreImprovementAttempt">Will there be any chance to
-                better the score ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/DoubleRegistration">Can a student register both with school and
-                individually ?</a>
-            </li>
-            <li><a href="https://aryabhat.org/faqs/QuizDateMissed">What if the quiz date is missed ?
-            </li>
-            <li><a href="https://aryabhat.org/faqs/MessageForParticipants">What is your message for the
-                participants ?</a>
-            </li>
-          </ul>
-        </div>
+        <details class="card-container">
+          <summary>
+            <h5 id="studymaterial">📚 Notes</h5>
+          </summary>
+          <div class="card-content" id="card-studymaterial">
+            <a class="button button-primary" target="_blank"
+              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_1.pdf">Study
+              Material 1</a>
+            <a class="button button-primary" target="_blank"
+              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_2.pdf">Study
+              Material 2</a>
+            <a class="button button-primary" target="_blank"
+              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_3.pdf">Study
+              Material 3</a>
+            <a class="button button-primary" target="_blank"
+              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Glossary.pdf">Glossary</a>
+            <br>
+            <a class="button button-primary" target="_blank" href="https://youtu.be/s5_1iDcbVrQ">▶️ Video Lesson</a>
+            <br>Updated on 1 July 2025
+          </div>
+        </details>
+        <details class="card-container">
+          <summary>
+            <h5 id="institutional">🏫 Registration for Schools</h5>
+          </summary>
+          <div class="card-content" id="card-institutional">
+            <!--, for individual registration go
+            <a target="_blank" href="https://quiz.aryabhat.org">here</a> ) -->
+            <a class="button button-primary" target="_blank" href="files/2025/Flow.pdf">Flow Chart </a>
 
+            <a class="button button-primary" target="_blank"
+              href="files/2025/Forwarding_Letter_for_Entries.pdf">Forwarding
+              Letter </a>
+
+            <a class="button button-primary" target="_blank" href="files/Institutional_Format.xls">Format for Entries
+            </a>
+
+            <br>1 April 2026 to 25 July 2026
+          </div>
+        </details>
+        <details class="card-container">
+          <summary>
+            <h5>👤 Individual Registration</h5>
+          </summary>
+          <div class="card-content">
+            <p class="renfrew" style="margin: 0;">Registration opens on 20 June 2026</p>
+          </div>
+        </details>
+        <details class="card-container">
+          <summary>
+            <h5>📜 Government Circulars</h5>
+          </summary>
+          <div class="card-content" id="card-circulars">
+            <!--a class="button button-primary" target="_blank" href="files/2024/NVS_5354_15Mar2024.pdf">JNV Circular</a-->
+            <a class="button button-primary" target="_blank" href="files/2025/DPI_2025.pdf">DPI Circular</a>
+            <a class="button button-primary" target="_blank" href="files/2025/KVSBhopal.pdf">KV Circular</a>
+            <a class="button button-primary" target="_blank" href="files/2025/NVS_2025-26.pdf">JNV Circular</a>
+          </div>
+        </details>
+        <details class="card-container">
+          <summary>
+            <h5>❓ Quiz FAQs</h5>
+          </summary>
+          <div class="card-content" id="faqs">
+            <!--h4>Click on the Question to get a clarification</h4-->
+            <ul>
+              <li><a href="https://aryabhat.org/faqs/WhatIsAstroQuiz">What is Aryabhat Astronomy Quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/ObjectiveOfQuiz">What is the objective of the Quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhatisAryabhat">What kind of Organization is Aryabhat ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhenWasFirstQuiz">When was this quiz first organized ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhoCanParticipate">Who can participate in quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/OustideMPStudents">Can students outside MP participate ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhatDoSelectedGet">What do selected students get after first level
+                  ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhenAreCamps">When are these camps organized ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/AnyEntryFees">Is there any entry fees for the Quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/SecondaryLevelFees">Any fees for the secondary level ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/ParentsStayAtAryabhat">Can teachers or parents stay
+                  with students at Aryabhat ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/KindOfQuestions">What kind of questions are there in first level
+                  ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/QuizSyllabus">What is the syllabus of the Quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/WhereToStudy">Where can one study all this ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/HowToRegister">How can one register for the Quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/SchoolRegistration">How can schools register for the Quiz ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/MobileForRegistration">Can one use mobile for
+                  registration ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/ConfirmationOfRegistration">How do we get confirmation of
+                  registration ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/ChangeOfMobile">Can we change mobile number after registration
+                  ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/MarkingPattern">Is there negative marking ? What is marking pattern
+                  ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/DemoQuizRecommendedBooks">is there any Demo Quiz ? Any
+                  recommended books ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/SecondaryExamWhen">When will the Secondary Exam be held ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/SecondaryExamOutline">What is the outline of the Secondary level
+                  examination ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/LastDateRegistration">What is the last date of registration ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/QuizDates">What are the dates of Quiz for Schools and Individuals
+                  ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/HowWillIndividualsParticipate">Will there be any centre for
+                  Individual Participants ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/ComputersNeededForSchool">How many computers needed in
+                  school ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/IsInternetRequiredForSchool">How can we participate without
+                  Internet ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/WhereIsSecondaryTraining">Where is the training held for
+                  secondary level ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/PreferredDatesForTraining">Can students get preferred dates
+                  for training ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/PrizeForWinners">What do the final winners get ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/VisitScheduleObsevatoryChoice">Can we choose our own
+                  observatories ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/TripOrganizationAndEscorts">Can parents come along on these
+                  trips ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/NoTADA">Will the students get any TA/DA ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/ParticipateEveryYear">Can one student participate in the quiz only
+                  once
+                  ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/PassingMarks">Are there any passing marks for the quiz ?</a></li>
+              <li><a href="https://aryabhat.org/faqs/ScoreImprovementAttempt">Will there be any chance to
+                  better the score ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/DoubleRegistration">Can a student register both with school and
+                  individually ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/QuizDateMissed">What if the quiz date is missed ?</a>
+              </li>
+              <li><a href="https://aryabhat.org/faqs/MessageForParticipants">What is your message for the
+                  participants ?</a>
+              </li>
+            </ul>
+          </div>
+        </details>
+      </div>
+      <div class="eight columns">
         <h2>Details of the Quiz</h2>
         <h3> The Organisation :</h3>
         <p>Aryabhat Foundation is a dedicated endeavor for promotion of Astronomy and Basic Science. The movement
-          started in 1995, which took shape as a registered social service organisation. Backed by a group of people
+          started in 1995, which took the shape of a duly registered social service organisation. Backed by a group of
+          people
           dedicated to their duties towards society, the organisation is committed to make learning Basic Science
           enjoyable for youngsters, thus inculcating a science-based temperament in them.</p>
+
         <h3>The Program :</h3>
         <p>Astronomy is a thrilling hobby for all age groups. It also makes a strong platform for youngsters aspiring
-          for an exciting career in space technology. Aryabhat Astronomy Quiz is aimed at developing the interest of the
+          for an exciting career in space technology.</p>
+        <p>Aryabhat Astronomy Quiz is aimed at developing the interest of the
           school students in this field through practical exposure. The quiz is a two-tier competition consisting of a
           preliminary test followed by a practical examination. The preliminary test is a cream-separation exercise
-          conducted on a digital platform. Selected participants will qualify for the secondary level by merit in the
+          conducted on a digital platform.</p>
+        <p>Selected participants will qualify for the secondary level by merit in the
           preliminary test. These participants will be offered training in telescope-operation, sky reading and
           practical Astronomy at our Bhopal Centre. The lodging-boarding will be free for participants availing night
           camps, but no TA/DA will be paid at any stage. Those who fail to attend the training will not be included for
-          the secondary level. The secondary level examination will be held on Saturday 20 December 2025. This test is
+          the secondary level.</p>
+        <p>The secondary level examination will be held on Saturday 26 December 2026. This test is
           meant to examine the ability of the participants in practical Astronomy. Final winners will be selected on
           their overall performance.</p>
 
@@ -167,28 +228,15 @@
 
         <h3>Preliminary Test :</h3>
         <p>The preliminary Quiz consists of questions on basic Astronomy & Space Science. Each participant is offered 20
-          objective type questions to be answered in 180 seconds. A correct answer will fetch five marks and two marks
+          objective type questions to be answered in 180 seconds. A correct answer will fetch five marks, and two marks
           will be deducted for the wrong one. The final score will appear on-screen as soon as any participant finishes
-          the test. For individual participants, the preliminary Quiz will be available online on the allotted date and
+          the test.</p>
+        <p>For individual participants, the preliminary Quiz will be available online on the allotted date and
           time. For institutional participants, the Quiz will be offered on the school’s computers on a date and time
-          settled with the school. In addition, Aryabhat would also conduct the Preliminary Test at common test centres.
-          Any participant can take the Quiz only once.</p>
-
-        <h3> System Requirement </h3>
-        <p>
-          The quiz can run on all normal computers. Individual participants can also take the Quiz on touch screen
-          mobile phones.
-        </p>
-
-        <h3>The Prizes :</h3>
-        <p>The final winners of the quiz shall visit the observatory of their choice from those at Dongla, Kavalur,
-          Kodaikanal, Nainital and Udaipur & Mount Abu in small groups. Observatories will be allotted to winners based
-          on overall merit and their choice-options. The trips to Observatories shall proceed in next summers.</p>
-
-        <h3>How to prepare :</h3>
-        <p>The questions in the quiz are based on Astronomy, Space & related science. Participants must acquire a good
-          knowledge of the Solar System, Deep Sky Objects & General Astronomy. Senior students of Aryabhat have compiled
-          specific Study Material and Demo Quiz which will be available on our website.</p>
+          settled with the school, in presence of a person authorised by Aryabhat. In addition, Aryabhat would also
+          conduct the Preliminary Test at common test centres.
+          Participants taking the Quiz under Individual-mode will not be allowed to participate under
+          Institutional-mode, or vice-versa.</p>
 
         <h3>How to participate :</h3>
         <p>Institutions shall send the particulars of their students to us by email. The format for sending entries is
@@ -198,57 +246,74 @@
         <table border="1" style="border-collapse: collapse;margin-left: auto;margin-right: auto;">
           <tr>
             <td style="padding:12px;color:#ddd;">Institutional Registration</td>
-            <td style="padding:12px;color:#fff;"><b>1 April to 25 July 2025</b></td>
+            <td style="padding:12px;color:#fff;"><b>1 Apr to 25 Jul 2026</b></td>
           </tr>
           <tr>
             <td style="padding:12px;color:#ddd;">Individual Registration</td>
-            <td style="padding:12px;color:#fff;"><b>20 June to 25 July 2025</b></td>
+            <td style="padding:12px;color:#fff;"><b>20 Jun to 25 Jul 2026</b></td>
           </tr>
           <tr>
-            <td style="padding:12px;color:#ddd;">Attempting of Online Quiz</td>
-            <td style="padding:12px;color:#fff;"><b>1 August to 6 August 2025</b></td>
+            <td style="padding:12px;color:#ddd;">Online Quiz for individuals</td>
+            <td style="padding:12px;color:#fff;"><b>1 Aug to 6 Aug 2026</b></td>
           </tr>
           <tr>
             <td style="padding:12px;color:#ddd;">Conducting of Quiz for Institutions / Common Centres</td>
-            <td style="padding:12px;color:#fff;"><b>7 August to 3 September 2025</b></td>
+            <td style="padding:12px;color:#fff;"><b>7 Aug to 3 Sep 2026</b></td>
           </tr>
           <tr>
             <td style="padding:12px;color:#ddd;">Secondary Level Examination</td>
-            <td style="padding:12px;color:#fff;"><b>20 December 2025</b></td>
+            <td style="padding:12px;color:#fff;"><b>26 Dec 2026</b></td>
           </tr>
         </table>
-        </p>
         <p>The institutions will receive the list of Roll Numbers and date intimation by email. The schools, in turn,
           will inform their students accordingly. </p>
         <p>The individual participants will receive intimation by SMS and eMail upon submitting data on the portal. The
           date-time slots will be intimated to the individual participants by email / message.</p>
         <p>Participants can access the Study Material on our website. The participants shall attempt the Quiz on the
-          allotted date and time. </p>
+          allotted date and time. As already mentioned, participants excelling in preliminary level will receive
+          training in practical astronomy at our Bhopal Centre with free lodging–boarding.</p>
+
+        <h3> System Requirement :</h3>
+        <p>
+          The quiz can run on all normal computers. Individual participants can also take the Quiz on touch-screen
+          mobile phones.
+        </p>
+
+        <h3>How to prepare :</h3>
+        <p>The questions in the quiz are based on Astronomy, Space & related science. Participants must acquire a good
+          knowledge of the Solar System, Deep Sky Objects & General Astronomy. Senior students of Aryabhat have compiled
+          specific Study Material and Demo Quiz which will be available on our website.</p>
+
+        <h3>The Prizes :</h3>
+        <p>The final winners of the quiz shall visit the observatory of their choice from those at Kavalur,
+          Kodaikanal, Nainital and Udaipur & Mount Abu in small groups. Observatories will be allotted to winners based
+          on overall merit and their choice-options. The trips to Observatories shall proceed in subsequent summers. We
+          invite eligible students and institutions to participate in this activity. For any clarification, please
+          contact us by email or voice-call.</p>
 
 
         <h4>Contact information </h4>
-        <h2 style="text-align:center;"> <b>Aryabhat Foundation</b></h2>
-        <p style="text-align:center;">
-          S-1, Swapnil Apartment VIII
-          258, Trilanga, Shahpura, Bhopal 462039</p>
+        <div class="card">
+          <h2 style="text-align:center;"> <b>Aryabhat Foundation</b></h2>
+          <p style="text-align:center;">
+            S-1, Swapnil Apartment VIII
+            258, Trilanga, Shahpura, Bhopal 462039</p>
 
-        <p style="text-align:center;">
-          <b>Phone</b> : 9425674075, 9425631310
-        </p>
+          <p style="text-align:center;">
+            <b>Phone</b> : 9425674075, 9425631310
+          </p>
 
-        <!--p style="text-align:center;">
-     	Quiz link : <a href="https://quiz.aryabhat.org/">quiz.aryabhat.org</a>
-     </p-->
-        <p style="text-align:center;">
-          mail : <a href="mailto:aryabhat.foundation@gmail.com"> aryabhat.foundation@gmail.com</a>
-        </p>
-        <p style="text-align:center;">
-          website : <a href="www.aryabhat.org">www.aryabhat.org</a>
-        </p>
-        <p style="text-align:center;"><b>Quiz Coordinator</b><br>Alok Mandavgane +91 9425631310, +91 8225855428</p>
-
-        <p style="text-align:center;"></p>
-
+          <!--p style="text-align:center;">
+        Quiz link : <a href="https://quiz.aryabhat.org/">quiz.aryabhat.org</a>
+      </p-->
+          <p style="text-align:center;">
+            mail : <a href="mailto:aryabhat.foundation@gmail.com"> aryabhat.foundation@gmail.com</a>
+          </p>
+          <p style="text-align:center;">
+            website : <a href="www.aryabhat.org">www.aryabhat.org</a>
+          </p>
+          <p style="text-align:center;"><b>Quiz Coordinator</b><br>Alok Mandavgane +91 9425631310, +91 8225855428</p>
+        </div>
       </div>
 
     </div>
