@@ -971,3 +971,17 @@ p,
   color: #eee;
   text-align: center;
 }
+
+/* EmbedSocial Widget Container */
+.embedsocial-hashtag {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.embedsocial-hashtag iframe {
+  border-radius: 12px;
+}
+
+.embedsocial-hashtag a {
+  text-decoration: none;
+}
