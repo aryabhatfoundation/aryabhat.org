@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sky Map: Aryabhat</title>
     <meta name="description" content="Sky Map for Bhopal, MP and Central India">
     <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
@@ -17,10 +18,13 @@
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/d3-geo-projection/0.2.16/d3.geo.projection.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-celestial/celestial.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d3-celestial/celestial.css">
+    <!-- celestial.css removed: its min-width:720px breaks mobile layout -->
 
     <!-- SunCalc -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
+    <!-- Astronomy Engine — planet & DSO visibility calculations -->
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 
     <style>
         body {
@@ -78,6 +82,153 @@
             top: 50%;
             right: 5px;
             transform: translateY(-50%);
+        }
+
+        /* Sky Info Bar */
+        .sky-info-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: linear-gradient(135deg, #0d1b2a, #1b2a4a);
+            border: 1px solid #2a3a5a;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1em;
+            color: #e8e8e8;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .sky-info-sep {
+            color: #ffcc33;
+            font-weight: bold;
+        }
+
+        @media (max-width: 550px) {
+            .sky-info-bar {
+                font-size: 0.82em;
+                padding: 8px 10px;
+                gap: 4px;
+            }
+        }
+
+        /* Visibility Panel — Tabs */
+        #visibility-panel {
+            margin-bottom: 16px;
+        }
+
+        .vis-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+        }
+
+        .vis-tab {
+            flex: 1;
+            padding: 8px 0;
+            text-align: center;
+            cursor: pointer;
+            background: #0a0a1a;
+            color: #888;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: 1px solid #222;
+            border-bottom: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .vis-tab:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .vis-tab:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .vis-tab.active {
+            background: #112;
+            color: #ffcc33;
+            border-color: #334;
+        }
+
+        .vis-tab-content {
+            display: none;
+            background: #112;
+            border: 1px solid #334;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 10px 14px;
+        }
+
+        .vis-tab-content.active {
+            display: block;
+        }
+
+        .vis-tab-content h4 {
+            display: none;
+        }
+
+        .vis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .vis-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: #1a1a2e;
+            font-size: 0.85em;
+        }
+
+        .vis-item.visible {
+            background: #0d2818;
+            border-left: 3px solid #66bb6a;
+        }
+
+        .vis-item.not-visible {
+            background: #1a1a1a;
+            opacity: 0.5;
+            border-left: 3px solid #444;
+        }
+
+        .vis-item .vis-icon {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .vis-item .vis-name {
+            font-weight: bold;
+            color: #eee;
+        }
+
+        .vis-item .vis-time {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .vis-item.visible .vis-time {
+            color: #8fc;
+        }
+
+        @media (max-width: 550px) {
+            .vis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vis-item {
+                font-size: 0.8em;
+                padding: 4px 6px;
+            }
         }
 
         /* Calendar Styles */
@@ -193,10 +344,10 @@
             font-size: 1.2em;
         }
 
-        #celestial-map canvas {
+        #celestial-map canvas,
+        #celestial-map svg {
             display: block;
-            width: 100% !important;
-            height: auto !important;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -244,7 +395,11 @@
                 padding: 10px;
             }
 
-            /* Adjust cardinals for smaller padding */
+            /* Adjust cardinals for smaller screens */
+            .cardinal {
+                font-size: 0.8em;
+            }
+
             .north {
                 top: -5px;
             }
@@ -290,16 +445,47 @@
         <div class="main row">
 
             <div class="row">
-                <div class="four columns sky-controls">
-                    <p id="selected-date-display" class="card"></p>
-                </div>
-                <div class="four columns sky-controls">
-                    <p id="sunset-info" class="card">Calculating sunset...</p>
-                </div>
-                <div class=" four columns sky-controls">
-                    <p class="card Highlight">📍 Central India</p>
+                <div class="twelve columns">
+                    <div class="sky-info-bar">
+                        <span id="selected-date-display"></span>
+                        <span class="sky-info-sep">·</span>
+                        <span id="sunset-info">Calculating sunset...</span>
+                        <span class="sky-info-sep">·</span>
+                        <span>📍 Central India</span>
+                    </div>
                 </div>
                 <div class="twelve columns">
+                    <div id="visibility-panel">
+                        <div class="vis-tabs">
+                            <div class="vis-tab active" onclick="switchVisTab('planets')">Planets</div>
+                            <div class="vis-tab" onclick="switchVisTab('dso')">Deep Sky</div>
+                            <div class="vis-tab" onclick="switchVisTab('stars')">Stars</div>
+                        </div>
+                        <div class="vis-tab-content active" id="tab-planets">
+                            <div class="vis-grid" id="planets-grid">
+                                <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                            </div>
+                        </div>
+                        <div class="vis-tab-content" id="tab-dso">
+                            <p style="font-size:0.7em; color:#777; margin:0 0 8px;">Faint objects — best seen under dark skies away from city lights, with patience and sufficient time</p>
+                            <div class="vis-grid" id="dso-grid">
+                                <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                            </div>
+                        </div>
+                        <div class="vis-tab-content" id="tab-stars">
+                            <div class="vis-grid" id="stars-grid">
+                                <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        function switchVisTab(tab) {
+                            document.querySelectorAll('.vis-tab').forEach(function (t) { t.classList.remove('active'); });
+                            document.querySelectorAll('.vis-tab-content').forEach(function (c) { c.classList.remove('active'); });
+                            document.getElementById('tab-' + tab).classList.add('active');
+                            document.querySelector('.vis-tab[onclick*="' + tab + '"]').classList.add('active');
+                        }
+                    </script>
                     <div id="calendar-container">
                         <div class="calendar-header">
                             <button class="cal-btn" onclick="changeMonth(-1)">&lt;</button>
@@ -364,6 +550,38 @@
         var LAT = 23.2599;
         var LNG = 77.4126;
 
+        var screenW = window.innerWidth;
+        var isSmall = screenW < 400;
+        var isMobile = screenW < 550;
+
+        // Scale fonts to screen: on a 350px phone these need to be tiny on the canvas
+        var starFont, constellationFonts, planetNameFont;
+        if (isSmall) {
+            starFont = "4px Helvetica, Arial, sans-serif";
+            constellationFonts = [
+                "4px Helvetica, Arial, sans-serif",
+                "3.5px Helvetica, Arial, sans-serif",
+                "3px Helvetica, Arial, sans-serif"
+            ];
+            planetNameFont = "4px Helvetica, Arial, sans-serif";
+        } else if (isMobile) {
+            starFont = "6px Helvetica, Arial, sans-serif";
+            constellationFonts = [
+                "6px Helvetica, Arial, sans-serif",
+                "5px Helvetica, Arial, sans-serif",
+                "4px Helvetica, Arial, sans-serif"
+            ];
+            planetNameFont = "6px Helvetica, Arial, sans-serif";
+        } else {
+            starFont = "12px Helvetica, Arial, sans-serif";
+            constellationFonts = [
+                "11px Helvetica, Arial, sans-serif",
+                "10px Helvetica, Arial, sans-serif",
+                "9px Helvetica, Arial, sans-serif"
+            ];
+            planetNameFont = "12px Helvetica, Arial, sans-serif";
+        }
+
         var config = {
             location: false,
             geopos: [LAT, LNG],
@@ -372,23 +590,24 @@
             form: false, // Disable default form
             background: { fill: "#0b1a26", stroke: "#0b1a26", opacity: 1 },
             stars: {
-                show: true, limit: 4.5, designation: false, propername: true,
+                show: true,
+                limit: isSmall ? 3.5 : (isMobile ? 4 : 4.5),
+                size: isSmall ? 3 : (isMobile ? 4 : 7),
+                designation: false,
+                propername: true,
                 propernameStyle: {
                     fill: "#dddddd", align: "center", baseline: "top",
-                    font: "12px Helvetica, Arial, sans-serif"
+                    font: starFont
                 },
-
             },
             dsos: { show: false },
             constellations: {
-                show: true, names: true, desig: true,
-                lineStyle: { stroke: "#aaaaaa", width: 1, opacity: 0.2 },
+                show: true, names: !isSmall, desig: false,
+                lineStyle: { stroke: "#aaaaaa", width: isMobile ? 0.5 : 1, opacity: 0.2 },
                 nameStyle: {
                     fill: "#aaaaaa", align: "center", baseline: "middle",
-                    font: ["11px Helvetica, Arial, sans-serif",  // Style for constellations
-                        "10px Helvetica, Arial, sans-serif",  // Different fonts for diff.
-                        "9px Helvetica, Arial, sans-serif"]
-                },// ranked constellations
+                    font: constellationFonts
+                },
             },
             lines: {
                 graticule: false, equatorial: false,
@@ -396,14 +615,55 @@
             },
             mw: {
                 show: true, style: { fill: "#ffffff", opacity: 0.05 }
-            },  // Style for MW layers 
-            planets: { show: true, symbolType: "disk", names: true },
+            },
+            planets: {
+                show: true, symbolType: "disk",
+                names: true,
+                nameStyle: { fill: "#dddddd", font: planetNameFont, align: "center", baseline: "top" },
+                symbolStyle: { fill: "#ccc", opacity: 1 }
+            },
             follow: "zenith", // Center on Zenith to show local sky
             width: 0, // 0 = full parent width
             interactive: false // Disable zoom/pan
         };
 
-        Celestial.display(config);
+        // Defer display until layout is ready so we get the correct container width
+        function initCelestial() {
+            var container = document.getElementById('celestial-map');
+            var w = container.parentElement.clientWidth - 60; // account for .map-wrapper padding
+            if (w < 200) w = 200;
+            config.width = w;
+            Celestial.display(config);
+
+            // Fix any inline styles the library sets on the container
+            container.style.minWidth = '0';
+            container.style.height = 'auto';
+            container.style.overflow = 'hidden';
+
+            // Now that Celestial is initialized, do the first sky update
+            updateSky(selectedDate);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCelestial);
+        } else {
+            initCelestial();
+        }
+
+        // Redraw on resize
+        var resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                var container = document.getElementById('celestial-map');
+                var w = container.parentElement.clientWidth - 20;
+                if (w < 200) w = 200;
+                Celestial.resize({ width: w });
+                container.style.minWidth = '0';
+                container.style.height = 'auto';
+                container.style.overflow = 'hidden';
+            }, 300);
+        });
 
         // Function to update map and sunset time
         function updateSky(date) {
@@ -413,10 +673,13 @@
 
             // Update text
             var timeStr = night.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('sunset-info').innerText = "night begins at " + timeStr;
+            document.getElementById('sunset-info').innerText = "Night begins " + timeStr;
 
             // Update Celestial Map Date
-            Celestial.date(night);
+            if (typeof Celestial.date === 'function') Celestial.date(night);
+
+            // Update visibility panel
+            updateVisibility(date);
         }
 
         // Initialize with Today
@@ -428,15 +691,12 @@
 
         function updateDateDisplay() {
             var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('selected-date-display').innerText = "📅 " + selectedDate.toLocaleDateString("en-US", options);
+            document.getElementById('selected-date-display').innerText = selectedDate.toLocaleDateString("en-US", options);
         }
 
         // Initialize Calendar
         renderCalendar();
         updateDateDisplay();
-
-        // Initial Update
-        updateSky(selectedDate);
 
         // Calendar Logic
         function changeMonth(offset) {
@@ -558,6 +818,199 @@
             if (phase < 0.72) return "Waning Gibbous";
             if (phase < 0.78) return "Last Quarter";
             return "Waning Crescent";
+        }
+
+        // ── Evening Sky Visibility ──────────────────────────
+        var observer = new Astronomy.Observer(LAT, LNG, 500);
+
+        var planets = [
+            { body: 'Moon',    icon: '🌙', name: 'Moon' },
+            { body: 'Venus',   icon: '♀️', name: 'Venus' },
+            { body: 'Jupiter', icon: '♃',  name: 'Jupiter' },
+            { body: 'Saturn',  icon: '♄',  name: 'Saturn' },
+            { body: 'Mars',    icon: '♂️', name: 'Mars' },
+            { body: 'Mercury', icon: '☿',  name: 'Mercury' }
+        ];
+
+        var dsoList = [
+            { star: 'Star1', ra: 5.588,  dec: -5.39,  dist: 1344,    name: 'M42',  desc: 'Orion Nebula' },
+            { star: 'Star2', ra: 0.712,  dec: 41.27,  dist: 2537000, name: 'M31',  desc: 'Andromeda Galaxy' },
+            { star: 'Star3', ra: 3.791,  dec: 24.11,  dist: 444,     name: 'M45',  desc: 'Pleiades' },
+            { star: 'Star4', ra: 16.695, dec: 36.46,  dist: 22200,   name: 'M13',  desc: 'Hercules Cluster' },
+            { star: 'Star5', ra: 8.673,  dec: 19.67,  dist: 577,     name: 'M44',  desc: 'Beehive Cluster' },
+            { star: 'Star6', ra: 2.333,  dec: 57.13,  dist: 7500,    name: 'Double Cluster', desc: 'In Perseus' },
+            { star: 'Star7', ra: 18.607, dec: -23.90, dist: 10400,   name: 'M22',  desc: 'Sagittarius Cluster' },
+            { star: 'Star8', ra: 6.148,  dec: 24.33,  dist: 2800,    name: 'M35',  desc: 'Gemini Cluster' }
+        ];
+
+        // Register DSOs with astronomy-engine
+        dsoList.forEach(function (dso) {
+            Astronomy.DefineStar(dso.star, dso.ra, dso.dec, dso.dist);
+        });
+
+        var starList = [
+            { ra: 2.530,  dec: 89.264,  name: 'Polaris',          desc: 'North Star' },
+            { ra: 13.398, dec: 54.926,  name: 'Mizar & Alcor',    desc: 'Arundhati Vashisht' },
+            { ra: 6.752,  dec: -16.716, name: 'Sirius',           desc: 'Brightest star' },
+            { ra: 6.399,  dec: -52.696, name: 'Canopus',          desc: '2nd brightest' },
+            { ra: 14.261, dec: 19.182,  name: 'Arcturus',         desc: 'In Bootes' },
+            { ra: 18.615, dec: 38.784,  name: 'Vega',             desc: 'In Lyra' },
+            { ra: 5.278,  dec: 45.998,  name: 'Capella',          desc: 'In Auriga' },
+            { ra: 5.242,  dec: -8.202,  name: 'Rigel',            desc: 'In Orion' },
+            { ra: 5.919,  dec: 7.407,   name: 'Betelgeuse',       desc: 'Red supergiant' },
+            { ra: 7.655,  dec: 5.225,   name: 'Procyon',          desc: 'In Canis Minor' },
+            { ra: 4.599,  dec: 16.509,  name: 'Aldebaran',        desc: 'Eye of the Bull' },
+            { ra: 13.420, dec: -11.161, name: 'Spica',            desc: 'In Virgo' },
+            { ra: 16.490, dec: -26.432, name: 'Antares',          desc: 'Heart of Scorpion' },
+            { ra: 20.690, dec: 45.280,  name: 'Deneb',            desc: 'In Cygnus' },
+            { ra: 19.846, dec: 8.868,   name: 'Altair',           desc: 'In Aquila' },
+            { ra: 22.961, dec: -29.622, name: 'Fomalhaut',        desc: 'In Piscis Austrinus' }
+        ];
+
+        function fmtTime(d) {
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getAltitude(body, date) {
+            var equ = Astronomy.Equator(body, date, observer, true, true);
+            var hor = Astronomy.Horizon(date, observer, equ.ra, equ.dec, 'normal');
+            return hor.altitude;
+        }
+
+        // For stars using raw J2000 RA/Dec (no DefineStar needed)
+        function getStarAltitude(ra, dec, date) {
+            return Astronomy.Horizon(date, observer, ra, dec, 'normal').altitude;
+        }
+
+        // Scan for when a star drops below minAlt after being above it
+        function findStarSetTime(ra, dec, start, end, minAlt) {
+            var step = 15 * 60 * 1000; // 15-min steps
+            var wasUp = false;
+            for (var t = start.getTime(); t <= end.getTime(); t += step) {
+                var alt = getStarAltitude(ra, dec, new Date(t));
+                if (alt > minAlt) wasUp = true;
+                else if (wasUp) return new Date(t);
+            }
+            return null; // still up at end
+        }
+
+        // Scan for when a star rises above minAlt
+        function findStarRiseTime(ra, dec, start, end, minAlt) {
+            var step = 15 * 60 * 1000;
+            for (var t = start.getTime(); t <= end.getTime(); t += step) {
+                var alt = getStarAltitude(ra, dec, new Date(t));
+                if (alt > minAlt) return new Date(t);
+            }
+            return null;
+        }
+
+        function updateVisibility(date) {
+            var times = SunCalc.getTimes(date, LAT, LNG);
+            var sunset = times.sunset;
+            var nightStart = times.night;
+            // evening window: sunset to midnight
+            var midnight = new Date(date);
+            midnight.setHours(23, 59, 0, 0);
+
+            // ── Planets ──
+            var planetsHTML = '';
+            planets.forEach(function (p) {
+                var altAtSunset = getAltitude(p.body, sunset);
+                var altAtNight = getAltitude(p.body, nightStart);
+                var setEvt = Astronomy.SearchRiseSet(p.body, observer, -1, sunset, 1);
+                var riseEvt = Astronomy.SearchRiseSet(p.body, observer, +1, sunset, 1);
+
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtSunset > 5 || altAtNight > 5) {
+                    // Above horizon at sunset or night start
+                    isVisible = true;
+                    if (setEvt && setEvt.date < midnight) {
+                        timeText = 'till ' + fmtTime(setEvt.date);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else if (riseEvt && riseEvt.date < midnight) {
+                    // Rises during the evening
+                    isVisible = true;
+                    timeText = 'rises ' + fmtTime(riseEvt.date);
+                }
+
+                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
+                planetsHTML += '<div class="' + cls + '">'
+                    + '<span class="vis-icon">' + p.icon + '</span>'
+                    + '<span class="vis-name">' + p.name + '</span>'
+                    + '<span class="vis-time">' + timeText + '</span>'
+                    + '</div>';
+            });
+            document.getElementById('planets-grid').innerHTML = planetsHTML;
+
+            // ── Deep Sky Objects ──
+            var dsoHTML = '';
+            dsoList.forEach(function (dso) {
+                var altAtNight = getAltitude(dso.star, nightStart);
+                var setEvt = Astronomy.SearchRiseSet(dso.star, observer, -1, sunset, 1);
+                var riseEvt = Astronomy.SearchRiseSet(dso.star, observer, +1, sunset, 1);
+
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtNight > 10) {
+                    isVisible = true;
+                    if (setEvt && setEvt.date > nightStart && setEvt.date < midnight) {
+                        timeText = 'till ' + fmtTime(setEvt.date);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else if (riseEvt && riseEvt.date < midnight) {
+                    var altAfterRise = getAltitude(dso.star, new Date(riseEvt.date.getTime() + 3600000));
+                    if (altAfterRise > 10) {
+                        isVisible = true;
+                        timeText = 'rises ' + fmtTime(riseEvt.date);
+                    }
+                }
+
+                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
+                dsoHTML += '<div class="' + cls + '">'
+                    + '<span class="vis-icon">🔭</span>'
+                    + '<span class="vis-name">' + dso.name + '</span>'
+                    + '<span class="vis-time">' + dso.desc + ' · ' + timeText + '</span>'
+                    + '</div>';
+            });
+            document.getElementById('dso-grid').innerHTML = dsoHTML;
+
+            // ── Stars ──
+            var starsHTML = '';
+            starList.forEach(function (s) {
+                var altAtNight = getStarAltitude(s.ra, s.dec, nightStart);
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtNight > 5) {
+                    isVisible = true;
+                    var setTime = findStarSetTime(s.ra, s.dec, nightStart, midnight, 5);
+                    if (setTime) {
+                        timeText = 'till ' + fmtTime(setTime);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else {
+                    var riseTime = findStarRiseTime(s.ra, s.dec, nightStart, midnight, 5);
+                    if (riseTime) {
+                        isVisible = true;
+                        timeText = 'rises ' + fmtTime(riseTime);
+                    }
+                }
+
+                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
+                starsHTML += '<div class="' + cls + '">'
+                    + '<span class="vis-icon">⭐</span>'
+                    + '<span class="vis-name">' + s.name + '</span>'
+                    + '<span class="vis-time">' + s.desc + ' · ' + timeText + '</span>'
+                    + '</div>';
+            });
+            document.getElementById('stars-grid').innerHTML = starsHTML;
         }
 
     </script>

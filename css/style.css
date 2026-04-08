@@ -622,6 +622,7 @@ input[type="button"].button-primary:focus {
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+input,
 input[type="email"],
 input[type="search"],
 input[type="text"],
@@ -633,7 +634,7 @@ select {
   padding: 6px 10px;
   border-radius: 4px;
   box-shadow: none;
-  background: #fff;
+  background: #022d43;
 }
 
 input[type="email"],
@@ -664,7 +665,6 @@ select:focus {
 label,
 legend {
   display: block;
-  font-weight: 600;
   margin-bottom: .5rem;
 }
 
@@ -818,6 +818,7 @@ p,
 
 .current {
   background-color: #3c5077;
+  border-radius: 10px 10px 0px 0px;
 }
 
 
@@ -895,7 +896,6 @@ p,
 }
 
 .navbar-link {
-  text-transform: uppercase;
   font-size: 14px;
   letter-spacing: .1rem;
   margin-right: 20px;
@@ -907,6 +907,8 @@ p,
 
 .navbar-link.active {
   color: #ffcc33;
+  text-transform: capitalize;
+  font-family: 'renfrewregular', Arial, sans-serif;
 }
 
 .has-docked-nav .navbar {
