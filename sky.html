@@ -204,6 +204,12 @@
             flex-shrink: 0;
         }
 
+        .vis-item .vis-hindi {
+            color: #ffcc33;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
         .vis-item .vis-name {
             font-weight: bold;
             color: #eee;
@@ -824,12 +830,12 @@
         var observer = new Astronomy.Observer(LAT, LNG, 500);
 
         var planets = [
-            { body: 'Moon',    icon: '🌙', name: 'Moon' },
-            { body: 'Venus',   icon: '♀️', name: 'Venus' },
-            { body: 'Jupiter', icon: '♃',  name: 'Jupiter' },
-            { body: 'Saturn',  icon: '♄',  name: 'Saturn' },
-            { body: 'Mars',    icon: '♂️', name: 'Mars' },
-            { body: 'Mercury', icon: '☿',  name: 'Mercury' }
+            { body: 'Moon',    hindi: 'चन्द्रमा', name: 'Moon' },
+            { body: 'Venus',   hindi: 'शुक्र',   name: 'Venus' },
+            { body: 'Jupiter', hindi: 'बृहस्पति', name: 'Jupiter' },
+            { body: 'Saturn',  hindi: 'शनि',     name: 'Saturn' },
+            { body: 'Mars',    hindi: 'मंगल',     name: 'Mars' },
+            { body: 'Mercury', hindi: 'बुध',      name: 'Mercury' }
         ];
 
         var dsoList = [
@@ -939,7 +945,7 @@
 
                 var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
                 planetsHTML += '<div class="' + cls + '">'
-                    + '<span class="vis-icon">' + p.icon + '</span>'
+                    + '<span class="vis-hindi">' + p.hindi + '</span>'
                     + '<span class="vis-name">' + p.name + '</span>'
                     + '<span class="vis-time">' + timeText + '</span>'
                     + '</div>';
