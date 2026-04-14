@@ -81,11 +81,8 @@
           <div class="card-content" id="card-institutional">
             <!--, for individual registration go
             <a target="_blank" href="https://quiz.aryabhat.org">here</a> ) -->
-            <a class="button button-primary" target="_blank" href="files/2025/Flow.pdf">Flow Chart </a>
+            <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart </a>
 
-            <a class="button button-primary" target="_blank"
-              href="files/2025/Forwarding_Letter_for_Entries.pdf">Forwarding
-              Letter </a>
 
             <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Format for Entries
             </a>
@@ -329,6 +326,19 @@
   <!-- Background Animation -->
   <script src="js/background-stars.js"></script>
   <script src="js/layout.js"></script>
+  <script>
+    // Open details card and scroll to it when navigating via hash
+    if (location.hash) {
+      var target = document.querySelector(location.hash);
+      if (target) {
+        var details = target.closest('details');
+        if (details) {
+          details.open = true;
+        }
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
 </body>
 
 </html>
