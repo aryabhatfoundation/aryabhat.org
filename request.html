@@ -245,7 +245,7 @@
                     <div class="wizard-tab" id="tab-step-2" onclick="showStep(2)">2. About your organization</div>
                 </div>
 
-                <form action="#" method="POST" id="eventRequestForm">
+                <form action="#" method="POST" id="eventRequestForm" onsubmit="return submitToGoogleForm(event)">
 
                     <!-- Section 1: About Event -->
                     <div class="form-section" id="section-1">
@@ -282,12 +282,14 @@
                                         required>
                                 </div>
                                 <div class="date-card">
-                                    <span class="choice-label">Choice 2</span>
-                                    <input type="date" id="date2" name="date2" class="u-full-width date-picker">
+                                    <span class="choice-label">Choice 2 (Required)</span>
+                                    <input type="date" id="date2" name="date2" class="u-full-width date-picker"
+                                        required>
                                 </div>
                                 <div class="date-card">
-                                    <span class="choice-label">Choice 3</span>
-                                    <input type="date" id="date3" name="date3" class="u-full-width date-picker">
+                                    <span class="choice-label">Choice 3 (Required)</span>
+                                    <input type="date" id="date3" name="date3" class="u-full-width date-picker"
+                                        required>
                                 </div>
                             </div>
                         </div>
@@ -299,9 +301,9 @@
                         </div>
 
                         <div class="row">
-                            <label for="message">Message (Optional / Specify other activity)</label>
+                            <label for="message">Message (Specify other activity or additional details)</label>
                             <textarea id="message" name="message" class="u-full-width"
-                                placeholder="Any additional details..."></textarea>
+                                placeholder="Any additional details..." required></textarea>
                         </div>
                     </div>
 
@@ -400,10 +402,13 @@
                 // Optionally validate section 1 fields here before proceeding
                 const eventType = document.querySelector('input[name="event_type"]:checked');
                 const date1 = document.getElementById('date1').value;
+                const date2 = document.getElementById('date2').value;
+                const date3 = document.getElementById('date3').value;
                 const beneficiaries = document.getElementById('beneficiaries').value;
+                const message = document.getElementById('message').value.trim();
 
-                if (!eventType || !date1 || !beneficiaries) {
-                    alert('Please fill out all required fields in Step 1 (Event Type, Choice 1 Date, Expected Beneficiaries) before proceeding.');
+                if (!eventType || !date1 || !date2 || !date3 || !beneficiaries || !message) {
+                    alert('Please fill out all required fields in Step 1 (Event Type, all three date choices, Expected Beneficiaries, and Message) before proceeding.');
                     return;
                 }
 
@@ -428,6 +433,83 @@
                 quizInput.removeAttribute('required');
                 quizInput.value = '';
             }
+        }
+
+        function submitToGoogleForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalLabel = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfxU6bReItNXDLkE0ZSNcR-K1lkVrwrFd_ZcHeIoy5vDajABg/formResponse';
+            const DECLARATION_TEXT = 'We have read the terms and conditions of Aryabhat and we agree to abide by them. We also agree to provide the Transport arrangement and due hospitality for the Equipment and the team.';
+
+            const data = new FormData();
+            data.append('entry.2004549463', form.org_name.value);
+            data.append('entry.177831093', form.contact_name.value);
+            data.append('entry.1311425902', form.contact_mobile.value);
+
+            const orgStatus = (form.org_status.value || '').trim();
+            data.append('entry.887324177', orgStatus);
+
+            const eventType = (form.event_type.value || '').trim();
+            let pageHistory;
+            if (orgStatus === 'School in Madhya Pradesh') {
+                data.append('entry.1502852254', eventType);
+                if (form.quiz_students && form.quiz_students.value !== '') {
+                    data.append('entry.410486298', form.quiz_students.value);
+                }
+                pageHistory = '0,1';
+            } else if (orgStatus === 'College / Other organisation situated in Bhopal') {
+                data.append('entry.707527323', eventType);
+                pageHistory = '0,2,4';
+            } else if (orgStatus === 'Organisation situated outside Bhopal') {
+                data.append('entry.1341374603', eventType);
+                pageHistory = '0,3,4';
+            }
+
+            // Dates, beneficiaries, message, declaration are only reached on non-MP paths.
+            if (orgStatus !== 'School in Madhya Pradesh') {
+                const dateMap = {
+                    date1: 'entry.1800191993',
+                    date2: 'entry.1039685010',
+                    date3: 'entry.1389898607'
+                };
+                Object.keys(dateMap).forEach(key => {
+                    const val = form[key].value;
+                    if (val) {
+                        const [y, m, d] = val.split('-');
+                        data.append(dateMap[key] + '_year', y);
+                        data.append(dateMap[key] + '_month', m);
+                        data.append(dateMap[key] + '_day', d);
+                    }
+                });
+                data.append('entry.413558893', form.beneficiaries.value);
+                data.append('entry.1433939273', form.message.value);
+                data.append('entry.2117185552', DECLARATION_TEXT);
+            }
+
+            data.append('fvv', '1');
+            data.append('pageHistory', pageHistory);
+
+            fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: data })
+                .then(() => {
+                    alert('Thank you! Your request has been submitted. We will contact you soon.');
+                    form.reset();
+                    showStep(1);
+                    handleStatusChange();
+                })
+                .catch(() => {
+                    alert('Submission failed. Please check your connection and try again.');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalLabel;
+                });
+
+            return false;
         }
 
         // Set min date for date pickers to tomorrow

@@ -1,0 +1,57 @@
+<!-- SVG Canvas: Expanded the viewBox negatively on the Y-axis to make room for the higher curve -->
+<svg viewBox="0 -80 1500 500" xmlns="http://www.w3.org/2000/svg">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Yatra+One&amp;display=swap');
+        svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.15));
+        }
+    </style>
+
+    <defs>
+        <filter id="white-outline" x="-15%" y="-15%" width="130%" height="130%">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="20" result="expanded" />
+            <feFlood flood-color="white" result="white" />
+            <feComposite in="white" in2="expanded" operator="in" result="outline" />
+            <feMerge>
+                <feMergeNode in="outline" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- ICON ROW: Below the text, centered -->
+    <g id="icon-row" transform="translate(720, 220)" filter="url(#white-outline)">
+        <image href="fb.svg" x="-360" y="0" width="150" height="150" />
+        <image href="insta.svg" x="-120" y="0" width="150" height="150" />
+        <image href="yt.svg" x="120" y="0" width="150" height="150" />
+        <image href="x.svg" x="370" y="0" width="150" height="150" />
+    </g>
+
+
+    <!-- 
+        TEXT LAYER
+        Using 'Yatra One', shifted slightly down to allow the higher comet arc to breathe.
+    -->
+    <g id="text-layer" transform="translate(720, 130)" >
+        <!-- Back Layer: Thick White Outline -->
+        <text x="0" y="0" 
+                font-family="'Yatra One', cursive, sans-serif" 
+                font-size="200" 
+                text-anchor="middle" 
+                fill="lightblue" 
+                stroke="white" 
+                stroke-width="32" 
+                stroke-linejoin="round">@aryabhatorg</text>
+                
+        <!-- Front Layer: Solid Black Text -->
+        <text x="0" y="0" 
+                font-family="'Yatra One', cursive, sans-serif" 
+                font-size="200" 
+                text-anchor="middle" 
+                fill="#001166">@aryabhatorg</text>
+    </g>
+
+</svg>

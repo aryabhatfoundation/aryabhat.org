@@ -1,0 +1,55 @@
+<!-- SVG Canvas: Expanded the viewBox negatively on the Y-axis to make room for the higher curve -->
+<svg viewBox="0 -80 900 620" xmlns="http://www.w3.org/2000/svg">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Yatra+One&amp;display=swap');
+        svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.15));
+        }
+    </style>
+
+    <!-- COMET GRAPHIC BACKGROUND -->
+    <image href="comet.svg" x="50" y="-80" width="800" height="500" />
+
+    <!-- COMIC ACTION STARS (Sparkles) -->
+    <g id="sparkles" fill="black">
+        <g transform="translate(100, 130) scale(0.8)">
+            <path d="M 0 -20 Q 0 0 20 0 Q 0 0 0 20 Q 0 0 -20 0 Q 0 0 0 -20 Z" />
+        </g>
+        <g transform="translate(780, 20) scale(1.1)">
+            <path d="M 0 -20 Q 0 0 20 0 Q 0 0 0 20 Q 0 0 -20 0 Q 0 0 0 -20 Z" />
+        </g>
+        <g transform="translate(810, 310) scale(0.7)">
+            <path d="M 0 -20 Q 0 0 20 0 Q 0 0 0 20 Q 0 0 -20 0 Q 0 0 0 -20 Z" />
+        </g>
+        <g transform="translate(250, 480) scale(0.9)">
+            <path d="M 0 -20 Q 0 0 20 0 Q 0 0 0 20 Q 0 0 -20 0 Q 0 0 0 -20 Z" />
+        </g>
+    </g>
+
+    <!-- 
+        TEXT LAYER
+        Using 'Yatra One', shifted slightly down to allow the higher comet arc to breathe.
+    -->
+    <g id="text-layer" transform="translate(450, 430)">
+        <!-- Back Layer: Thick White Outline -->
+        <text x="0" y="0" 
+                font-family="'Yatra One', cursive, sans-serif" 
+                font-size="200" 
+                text-anchor="middle" 
+                fill="lightblue" 
+                stroke="white" 
+                stroke-width="32" 
+                stroke-linejoin="round">धूमकेतु</text>
+                
+        <!-- Front Layer: Solid Black Text -->
+        <text x="0" y="0" 
+                font-family="'Yatra One', cursive, sans-serif" 
+                font-size="200" 
+                text-anchor="middle" 
+                fill="#001166">धूमकेतु</text>
+    </g>
+
+</svg>
