@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Aryabhat Foundation — Look up. Wonder more.</title>
+  <meta name="description"
+    content="Aryabhat Foundation is an NGO that has been turning night skies into classrooms since 1995 — astronomy and basic science for every curious mind.">
+  <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       newindex.html — full redesign (scoped: this page only)
+       ========================================================== */
+
+    /* Hide layout.js-injected header; the hero section below
+       owns the brand presentation with the aryabhat.svg logo.  */
+    .container > .header {
+      display: none !important;
+    }
+
+    /* Prevent horizontal scroll from any overflowing child
+       (e.g., the floated navbar items from css/style.css). */
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — redesigned for the cosmic gold theme
+       (scoped to newindex.html; other pages keep the default)
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 3.4rem;
+      background: linear-gradient(180deg, rgba(10, 19, 28, 0.92) 0%, rgba(10, 19, 28, 0.78) 100%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      border-bottom: 1px solid transparent;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      /* Hide scrollbar cross-browser without losing scroll ability */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    /* Gold gradient underline */
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.10) 18%,
+          rgba(255, 204, 51, 0.55) 50%,
+          rgba(255, 204, 51, 0.10) 82%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 3.4rem;
+      padding: 0 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 2px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    /* Neutralize the base "tab" treatment for the current page */
+    .navbar-item.current {
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .88rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink-dim);
+      margin: 0 2px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--ink);
+      background: rgba(255, 204, 51, 0.06);
+      outline: 0;
+    }
+
+    /* Active page pill — gold tint + 1px gold inner border */
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 600px) {
+      .navbar,
+      .navbar > .container {
+        min-height: 3rem;
+      }
+      .navbar > .container {
+        padding: 0 4px;
+      }
+      .navbar-link {
+        font-size: .82rem;
+        padding: 6px 12px;
+        letter-spacing: .03em;
+      }
+    }
+
+    /* ---------- Fluid type scale ---------- */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      --font-body: 'Inter', 'Space Grotesk', Tahoma, Verdana, sans-serif;
+    }
+
+    /* Page-scoped typography: Space Grotesk for display/UI,
+       Inter for body. Overrides the site's Tahoma + renfrew stack. */
+    html,
+    body {
+      font-family: var(--font-body);
+    }
+
+    .main h1,
+    .main h2,
+    .main h3,
+    .main h4,
+    .main h5,
+    .main h6,
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — modern pill treatment replacing the site's
+       extruded 3D default (scoped to this page)
+       ============================================================ */
+    .main .button,
+    .main button,
+    .hero .button,
+    .cta-row .button,
+    .card-content .button,
+    .join-banner .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease,
+        border-color .25s ease, box-shadow .3s ease,
+        transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus,
+    .main button:hover,
+    .main button:focus,
+    .hero .button:hover,
+    .cta-row .button:hover,
+    .card-content .button:hover,
+    .join-banner .button:hover {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active,
+    .main button:active,
+    .hero .button:active,
+    .cta-row .button:active,
+    .card-content .button:active,
+    .join-banner .button:active {
+      transform: translateY(0);
+      background: rgba(255, 204, 51, 0.14);
+      box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+      margin-bottom: 1rem;
+      /* neutralize the base CSS's active-state shift */
+    }
+
+    /* Primary: warm gold gradient with dark text — the hero CTA */
+    .main .button.button-primary,
+    .main button.button-primary,
+    .hero .button.button-primary,
+    .cta-row .button.button-primary,
+    .card-content .button.button-primary,
+    .join-banner .button.button-primary {
+      color: #0a131c;
+      font-weight: 600;
+      letter-spacing: .02em;
+      background: linear-gradient(135deg, #ffd655 0%, #ffa41b 100%);
+      background-image: linear-gradient(135deg, #ffd655 0%, #ffa41b 100%);
+      border-color: transparent;
+      box-shadow:
+        0 6px 22px rgba(255, 164, 27, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      text-shadow: none;
+    }
+
+    .main .button.button-primary:hover,
+    .main .button.button-primary:focus,
+    .main button.button-primary:hover,
+    .hero .button.button-primary:hover,
+    .cta-row .button.button-primary:hover,
+    .card-content .button.button-primary:hover,
+    .join-banner .button.button-primary:hover {
+      color: #0a131c;
+      background: linear-gradient(135deg, #ffe079 0%, #ffb23d 100%);
+      background-image: linear-gradient(135deg, #ffe079 0%, #ffb23d 100%);
+      border-color: transparent;
+      box-shadow:
+        0 10px 30px rgba(255, 164, 27, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active,
+    .main button.button-primary:active,
+    .hero .button.button-primary:active,
+    .cta-row .button.button-primary:active,
+    .card-content .button.button-primary:active,
+    .join-banner .button.button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 3px 12px rgba(255, 164, 27, 0.35),
+        inset 0 2px 4px rgba(0, 0, 0, 0.12);
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       HERO — aryabhat.svg as the hero centerpiece
+       ============================================================ */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 3rem 1rem 2.5rem;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 25%, rgba(255, 204, 51, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 70%, rgba(30, 174, 219, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 60%, rgba(170, 110, 255, 0.06) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* --- Logo stage: boy-with-telescope on the left looking
+           at a live cosmos scene on the right --- */
+    .logo-stage {
+      position: relative;
+      width: clamp(320px, 70vw, 560px);
+      height: clamp(220px, 42vw, 340px);
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Soft "eyepiece glow" where the telescope is pointing */
+    .logo-stage::before {
+      content: "";
+      position: absolute;
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 58%;
+      height: 90%;
+      background:
+        radial-gradient(ellipse at 55% 50%, rgba(255, 204, 51, 0.10) 0%, transparent 45%),
+        radial-gradient(ellipse at 30% 40%, rgba(30, 174, 219, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-logo {
+      position: relative;
+      flex: 0 0 auto;
+      width: 44%;
+      max-width: 240px;
+      height: auto;
+      margin-left: 2%;
+      filter:
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.85))
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.4))
+        drop-shadow(0 0 28px rgba(255, 255, 255, 0.2))
+        drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.55));
+      animation: logo-float 6s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    /* ---- The cosmos on the right — what the boy is looking at ---- */
+    .cosmos {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 62%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    /* Saturn — the focal planet. The planet body lives in ::after
+       (which paints on top of child elements), so the .saturn-ring
+       child renders BEHIND the planet body and only its outer arcs
+       poke out either side. */
+    .saturn {
+      position: absolute;
+      top: 28%;
+      right: 20%;
+      width: 22%;
+      max-width: 78px;
+      aspect-ratio: 1;
+      animation: planet-bob 9s ease-in-out infinite;
+    }
+
+    .saturn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 30%,
+          #ffe79b 0%,
+          #f4b942 32%,
+          #c47a1e 72%,
+          #5e350c 100%);
+      box-shadow:
+        inset -6px -8px 18px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(255, 204, 51, 0.28);
+    }
+
+    .saturn-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200%;
+      height: 34%;
+      border: 2px solid rgba(255, 220, 150, 0.75);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) rotate(-18deg);
+      box-shadow:
+        0 0 14px rgba(255, 204, 51, 0.3),
+        inset 0 0 6px rgba(0, 0, 0, 0.25);
+      animation: ring-breathe 9s ease-in-out infinite;
+    }
+
+    /* A small moon drifting in a gentle loop near Saturn */
+    .moon {
+      position: absolute;
+      top: 58%;
+      right: 52%;
+      width: 11%;
+      max-width: 32px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%,
+          #e3eef9 0%,
+          #9bb5d1 55%,
+          #3f5a7a 100%);
+      box-shadow:
+        inset -3px -4px 7px rgba(0, 0, 0, 0.45),
+        0 0 10px rgba(150, 200, 255, 0.4);
+      animation: moon-orbit 14s ease-in-out infinite;
+    }
+
+    /* Twinkling stars scattered across the right sky */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 6px #fff, 0 0 12px rgba(255, 255, 255, 0.55);
+    }
+
+    .star-1 {
+      top: 12%;
+      right: 10%;
+      width: 4px;
+      height: 4px;
+      animation: twinkle 2.5s ease-in-out .2s infinite;
+    }
+
+    .star-2 {
+      top: 78%;
+      right: 14%;
+      width: 3px;
+      height: 3px;
+      animation: twinkle 3.1s ease-in-out .9s infinite;
+    }
+
+    .star-3 {
+      top: 22%;
+      right: 72%;
+      width: 2px;
+      height: 2px;
+      animation: twinkle 2s ease-in-out 1.6s infinite;
+    }
+
+    .star-4 {
+      top: 82%;
+      right: 58%;
+      width: 3px;
+      height: 3px;
+      animation: twinkle 3.4s ease-in-out .4s infinite;
+    }
+
+    .star-5 {
+      top: 6%;
+      right: 42%;
+      width: 4px;
+      height: 4px;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold), 0 0 14px rgba(255, 204, 51, 0.65);
+      animation: twinkle 2.8s ease-in-out 1.8s infinite;
+    }
+
+    .star-6 {
+      top: 48%;
+      right: 6%;
+      width: 2px;
+      height: 2px;
+      animation: twinkle 2.3s ease-in-out 1.1s infinite;
+    }
+
+    /* Occasional shooting comet streaking from upper-right down-left.
+       Motion goes down-left, so the bright head is on the LEFT end
+       of the element and the tail trails UP-RIGHT behind it. */
+    .comet {
+      position: absolute;
+      top: 14%;
+      right: 2%;
+      width: 72px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          #fff 0%,
+          rgba(255, 229, 138, 0.85) 20%,
+          rgba(255, 204, 51, 0.25) 60%,
+          transparent 100%);
+      transform: rotate(-22deg);
+      transform-origin: left center;
+      filter: blur(0.3px);
+      opacity: 0;
+      animation: comet-streak 11s ease-in infinite;
+    }
+
+    .comet::after {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #fff, 0 0 14px rgba(255, 204, 51, 0.85);
+    }
+
+    .hero-wordmark {
+      display: block;
+      max-width: min(420px, 75%);
+      width: auto;
+      height: auto;
+      margin: 0.4rem auto 1.8rem;
+      filter:
+        drop-shadow(2px 4px 3px rgba(0, 0, 80, 0.8))
+        drop-shadow(0 0 12px rgba(30, 174, 219, 0.3));
+    }
+
+    /* --- Mega display typography --- */
+    .hero-tag {
+      margin: 0 auto 1rem;
+      font-family: var(--font-display);
+      font-weight: 300;
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-tag .line {
+      display: block;
+    }
+
+    .hero-tag .line-1 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-tag .line-2 {
+      font-size: clamp(3rem, 10vw, 6.5rem);
+      color: var(--gold);
+      letter-spacing: -0.03em;
+      text-shadow:
+        0 2px 18px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 204, 51, 0.35);
+      margin: -.15em 0 -.15em;
+    }
+
+    .hero-tag .line-2 em {
+      font-style: italic;
+      color: #fff;
+    }
+
+    .hero-tag .line-3 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      opacity: 0.9;
+    }
+
+    .hero-lede {
+      max-width: 620px;
+      margin: 1.2rem auto 1.6rem;
+      font-size: clamp(1rem, 1.6vw, 1.15rem);
+      line-height: 1.7;
+      color: var(--ink);
+    }
+
+    .hero-lede b {
+      color: var(--gold-soft);
+      font-weight: 500;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       SCROLLING MARQUEE OF VALUES
+       ============================================================ */
+    .marquee {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, #0f1a26 0%, #16243a 50%, #0f1a26 100%);
+      margin: 1rem 0 2rem;
+      padding: 12px 0;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 48px;
+      width: max-content;
+      animation: marquee 40s linear infinite;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+
+    .marquee-track span {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .marquee-track span::before {
+      content: "✦";
+      color: var(--gold);
+      margin-right: 48px;
+      font-size: 0.8em;
+    }
+
+    /* ============================================================
+       BIG NUMBER / SINCE 1995 CALLOUT
+       ============================================================ */
+    .since {
+      text-align: center;
+      margin: 2rem auto 2.5rem;
+      max-width: 900px;
+      padding: 1.5rem 1rem;
+    }
+
+    .since-num {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 18vw, 11rem);
+      line-height: 0.9;
+      color: var(--gold);
+      letter-spacing: -0.05em;
+      display: block;
+      text-shadow: 0 4px 30px rgba(255, 204, 51, 0.25);
+    }
+
+    .since-num sup {
+      font-size: 0.4em;
+      vertical-align: super;
+      color: var(--ink-dim);
+    }
+
+    .since-label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-top: -0.2rem;
+    }
+
+    .since-sub {
+      color: var(--ink-dim);
+      max-width: 560px;
+      margin: 1rem auto 0;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       SECTION HEADING STYLE
+       ============================================================ */
+    .section-label {
+      text-align: center;
+      margin: 0 0 1.5rem;
+    }
+
+    .section-label .kicker {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-label h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .section-label h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* ============================================================
+       WHAT WE DO — asymmetric tiles
+       ============================================================ */
+    .do-wrap {
+      max-width: 1000px;
+      margin: 0 auto 3rem;
+      padding: 0 12px;
+    }
+
+    .do-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 700px) {
+      .do-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .do-tile {
+      position: relative;
+      background:
+        linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 18px 18px;
+      text-align: left;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+    }
+
+    .do-tile:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 204, 51, 0.15);
+    }
+
+    .do-tile .num {
+      position: absolute;
+      top: 6px;
+      right: 14px;
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: rgba(255, 204, 51, 0.12);
+      line-height: 1;
+    }
+
+    .do-tile h3 {
+      margin: 0 0 .4rem;
+      color: var(--gold);
+      font-size: 1.25rem;
+    }
+
+    .do-tile p {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    /* ============================================================
+       TWO-COLUMN LAYOUT: STORY + UPDATES
+       ============================================================ */
+    .body-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    @media (min-width: 800px) {
+      .body-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
+
+    /* ---------- STORY ---------- */
+    .story-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+    }
+
+    .story-wrap .section-label {
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+
+    .story-wrap .section-label .kicker {
+      letter-spacing: 0.3em;
+    }
+
+    .story-wrap .section-label h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+    }
+
+    .story-wrap p {
+      color: var(--ink);
+      line-height: 1.8;
+      text-align: justify;
+      margin: 0 0 1.1rem;
+      font-size: 1rem;
+    }
+
+    /* Drop cap on the first paragraph */
+    .story-wrap .story-first::first-letter {
+      float: left;
+      font-family: var(--font-display);
+      font-size: 4.6rem;
+      line-height: 0.9;
+      color: var(--gold);
+      margin: 0.1em 0.15em 0 0;
+      text-shadow: 0 2px 10px rgba(255, 204, 51, 0.35);
+    }
+
+    .pull-quote {
+      border-left: 3px solid var(--gold);
+      background: linear-gradient(90deg, rgba(255, 204, 51, 0.08), transparent);
+      padding: 14px 18px;
+      margin: 1.5rem 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      line-height: 1.35;
+      color: var(--gold-soft);
+      font-style: italic;
+      border-radius: 0 10px 10px 0;
+    }
+
+    /* ---------- UPDATES PANEL ---------- */
+    .updates-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .updates-col h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      margin: 0 0 .4rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Override the default .card-container bg for contrast inside col */
+    .updates-col details.card-container {
+      margin-bottom: 0;
+    }
+
+    /* ============================================================
+       JOIN CTA — big call to action banner
+       ============================================================ */
+    .join-banner {
+      position: relative;
+      margin: 3rem auto 2rem;
+      padding: 3rem 1.5rem 2.4rem;
+      max-width: 1000px;
+      border-radius: 22px;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(255, 204, 51, 0.15), transparent 55%),
+        radial-gradient(ellipse at 80% 70%, rgba(30, 174, 219, 0.12), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid var(--border);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .join-banner::before {
+      content: "✦";
+      position: absolute;
+      top: 18px;
+      left: 24px;
+      color: rgba(255, 204, 51, 0.4);
+      font-size: 1.2rem;
+    }
+
+    .join-banner::after {
+      content: "✦";
+      position: absolute;
+      bottom: 18px;
+      right: 24px;
+      color: rgba(30, 174, 219, 0.5);
+      font-size: 1.2rem;
+    }
+
+    .join-banner h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.1;
+      color: #fff;
+      margin: 0 0 .8rem;
+    }
+
+    .join-banner h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .join-banner p {
+      color: var(--ink);
+      max-width: 640px;
+      margin: 0 auto 1.4rem;
+      line-height: 1.65;
+    }
+
+    /* ============================================================
+       SOCIALS
+       ============================================================ */
+    .socials {
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
+
+    .socials .kicker {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .socials a {
+      display: inline-block;
+      margin: 0 10px;
+      transition: transform .2s ease, filter .2s ease;
+      filter: grayscale(0.2);
+    }
+
+    .socials a:hover {
+      transform: translateY(-3px) scale(1.12);
+      filter: grayscale(0) drop-shadow(0 0 8px rgba(255, 204, 51, 0.5));
+    }
+
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2rem 0 1rem;
+    }
+
+    /* ============================================================
+       KEYFRAMES
+       ============================================================ */
+    @keyframes logo-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes planet-bob {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2px, -4px); }
+    }
+
+    @keyframes ring-breathe {
+      0%, 100% {
+        transform: translate(-50%, -50%) rotate(-18deg) scaleX(1);
+        border-color: rgba(255, 220, 150, 0.75);
+      }
+      50% {
+        transform: translate(-50%, -50%) rotate(-14deg) scaleX(0.97);
+        border-color: rgba(255, 220, 150, 0.9);
+      }
+    }
+
+    @keyframes moon-orbit {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-18px, -14px); }
+      50%  { transform: translate(-32px, -2px); }
+      75%  { transform: translate(-18px, 14px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.55); }
+      50%      { opacity: 1;    transform: scale(1.35); }
+    }
+
+    /* Comet: idle most of the loop, then quick streak from
+       upper-right down-left, then vanish. */
+    @keyframes comet-streak {
+      0%, 72% {
+        opacity: 0;
+        transform: translate(30px, -30px) rotate(-22deg);
+      }
+      74% {
+        opacity: 0;
+        transform: translate(30px, -30px) rotate(-22deg);
+      }
+      76% {
+        opacity: 0.9;
+        transform: translate(20px, -22px) rotate(-22deg);
+      }
+      92% {
+        opacity: 1;
+        transform: translate(-190px, 70px) rotate(-22deg);
+      }
+      98%, 100% {
+        opacity: 0;
+        transform: translate(-210px, 78px) rotate(-22deg);
+      }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-tag,
+    .hero-wordmark,
+    .hero-lede,
+    .cta-row {
+      animation: fadeUp .8s ease-out both;
+    }
+
+    .hero-wordmark { animation-delay: .05s; }
+    .hero-tag      { animation-delay: .15s; }
+    .hero-lede     { animation-delay: .3s; }
+    .cta-row       { animation-delay: .45s; }
+
+    /* ============================================================
+       MOBILE — 600px and below
+       ============================================================ */
+    @media (max-width: 600px) {
+
+      .hero {
+        padding: 1.8rem 0.5rem 1.6rem;
+      }
+
+      .logo-stage {
+        width: min(94vw, 420px);
+        height: min(58vw, 240px);
+        margin-bottom: .6rem;
+      }
+
+      .hero-logo {
+        width: 44%;
+        margin-left: 1%;
+      }
+
+      .saturn { max-width: 60px; }
+      .moon { max-width: 24px; }
+
+      .comet { width: 56px; }
+
+      .hero-wordmark {
+        max-width: 82%;
+        margin: .2rem auto 1rem;
+      }
+
+      .hero-tag {
+        margin-bottom: .6rem;
+      }
+
+      .hero-tag .line-1,
+      .hero-tag .line-3 {
+        font-size: clamp(1.5rem, 7vw, 2rem);
+      }
+
+      .hero-tag .line-2 {
+        font-size: clamp(2.6rem, 13vw, 3.6rem);
+        margin: -.1em 0 -.1em;
+      }
+
+      .hero-lede {
+        font-size: .98rem;
+        line-height: 1.6;
+        margin: .8rem auto 1.2rem;
+        padding: 0 .25rem;
+      }
+
+      .cta-row {
+        width: 100%;
+      }
+
+      .main .button,
+      .main button,
+      .cta-row .button,
+      .card-content .button,
+      .join-banner .button {
+        font-size: .85rem;
+        height: 40px;
+        padding: 0 18px;
+      }
+
+      .main .button.button-primary,
+      .cta-row .button.button-primary,
+      .card-content .button.button-primary,
+      .join-banner .button.button-primary {
+        font-size: .9rem;
+      }
+
+      .marquee {
+        padding: 9px 0;
+        margin: .6rem 0 1.5rem;
+      }
+
+      .marquee-track {
+        gap: 28px;
+        font-size: .95rem;
+        letter-spacing: .1em;
+      }
+
+      .marquee-track span::before {
+        margin-right: 28px;
+      }
+
+      .since {
+        margin: 1.2rem auto 1.8rem;
+        padding: 1rem .5rem;
+      }
+
+      .since-num {
+        font-size: clamp(4.2rem, 28vw, 7rem);
+      }
+
+      .since-label {
+        font-size: .85rem;
+        letter-spacing: .22em;
+      }
+
+      .since-sub {
+        font-size: .95rem;
+        padding: 0 .25rem;
+      }
+
+      .section-label .kicker {
+        font-size: .68rem;
+        letter-spacing: .3em;
+      }
+
+      .section-label h2 {
+        font-size: clamp(1.5rem, 5.5vw, 2rem);
+      }
+
+      .do-wrap {
+        padding: 0 .5rem;
+        margin-bottom: 2rem;
+      }
+
+      .do-grid {
+        gap: 12px;
+      }
+
+      .do-tile {
+        padding: 18px 16px 14px;
+      }
+
+      .do-tile .num {
+        font-size: 2.4rem;
+      }
+
+      .do-tile h3 {
+        font-size: 1.1rem;
+      }
+
+      .do-tile p {
+        font-size: .92rem;
+      }
+
+      .body-grid {
+        padding: 0 .5rem;
+        gap: 18px;
+      }
+
+      .story-wrap {
+        padding: 20px 16px;
+        border-radius: 14px;
+      }
+
+      .story-wrap .section-label h2 {
+        font-size: 1.5rem;
+      }
+
+      .story-wrap p {
+        font-size: .95rem;
+        line-height: 1.7;
+        text-align: left;
+      }
+
+      /* Drop it down a size and reduce the gap so the first
+         paragraph stops wrapping into a narrow column to the right */
+      .story-wrap .story-first::first-letter {
+        font-size: 3.2rem;
+        margin: .1em .08em 0 0;
+      }
+
+      .pull-quote {
+        font-size: 1.05rem;
+        padding: 10px 14px;
+        margin: 1.1rem 0;
+      }
+
+      .updates-col h3 {
+        font-size: 1.05rem;
+        letter-spacing: .2em;
+      }
+
+      .join-banner {
+        padding: 2rem .9rem 1.6rem;
+        margin: 2rem .5rem 1.4rem;
+        border-radius: 16px;
+      }
+
+      .join-banner h2 {
+        font-size: clamp(1.55rem, 6vw, 2rem);
+      }
+
+      .join-banner p {
+        font-size: .95rem;
+      }
+
+      .socials {
+        margin: 1.2rem 0 .4rem;
+      }
+
+      .socials .kicker {
+        font-size: .68rem;
+        letter-spacing: .3em;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.2rem 0 1rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-logo, .saturn, .saturn-ring, .moon, .star, .comet,
+      .marquee-track, .hero-tag, .hero-wordmark, .hero-lede, .cta-row {
+        animation: none !important;
+      }
+      .comet { opacity: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <div class="container">
+    <section class="header">
+      <!-- Injected by js/layout.js — hidden on this page; hero below owns the brand -->
+    </section>
+    <nav class="navbar">
+      <!-- Injected by js/layout.js -->
+    </nav>
+
+    <div class="main">
+
+      <!-- ============================================================
+           HERO
+           ============================================================ -->
+      <section class="hero">
+        <div class="logo-stage">
+          <img class="hero-logo" src="images/aryabhat.svg" alt="Aryabhat Foundation logo">
+          <div class="cosmos" aria-hidden="true">
+            <div class="saturn">
+              <div class="saturn-ring"></div>
+            </div>
+            <div class="moon"></div>
+            <div class="star star-1"></div>
+            <div class="star star-2"></div>
+            <div class="star star-3"></div>
+            <div class="star star-4"></div>
+            <div class="star star-5"></div>
+            <div class="star star-6"></div>
+            <div class="comet"></div>
+          </div>
+        </div>
+
+        <img class="hero-wordmark" src="images/title.svg" alt="Aryabhat Foundation">
+
+        <h1 class="hero-tag">
+          <span class="line line-1">Look up.</span>
+          <span class="line line-2">Wonder <em>more</em>.</span>
+          <span class="line line-3">Fear less.</span>
+        </h1>
+
+        <p class="hero-lede">
+          <b>Aryabhat Foundation</b> turns the night sky into a classroom. Since 1995, we've helped students,
+          teachers, and the simply-curious fall in love with astronomy and basic science — <b>without the jargon,
+            without the superstition.</b>
+        </p>
+
+        <div class="cta-row">
+          <a class="button button-primary" href="quiz.html#institutional">Join Astro Quiz 2026-27</a>
+          <a class="button" href="https://aryabhat.org/requestevent">Request an Event</a>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SCROLLING MARQUEE
+           ============================================================ -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>Astronomy</span>
+          <span>Basic Science</span>
+          <span>Wonder</span>
+          <span>Curiosity</span>
+          <span>Sky Nights</span>
+          <span>Olympiads</span>
+          <span>Since 1995</span>
+          <span>Astronomy</span>
+          <span>Basic Science</span>
+          <span>Wonder</span>
+          <span>Curiosity</span>
+          <span>Sky Nights</span>
+          <span>Olympiads</span>
+          <span>Since 1995</span>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SINCE 1995 — BIG NUMBER
+           ============================================================ -->
+      <section class="since">
+        <span class="since-num">30<sup>+</sup></span>
+        <span class="since-label">Years of outreach</span>
+        <p class="since-sub">
+          What began as a group of sky-loving friends in 1995 has grown into a registered NGO, whose students
+          have represented India on the world stage — and whose sky-nights still draw crowds of wide-eyed kids
+          (and adults who forgot how to look up).
+        </p>
+      </section>
+
+      <!-- ============================================================
+           WHAT WE DO — tiles
+           ============================================================ -->
+      <section class="do-wrap">
+        <div class="section-label">
+          <span class="kicker">What we do</span>
+          <h2>Science, <em>made tasty</em></h2>
+        </div>
+
+        <div class="do-grid">
+          <div class="do-tile">
+            <span class="num">01</span>
+            <h3>Sky Nights</h3>
+            <p>Free telescope sessions where galaxies stop being pictures in a book and become real, right above
+              your head.</p>
+          </div>
+          <div class="do-tile">
+            <span class="num">02</span>
+            <h3>Astro Quiz</h3>
+            <p>An annual challenge that has groomed India's International Astronomy Olympiad medallists — four Gold,
+              one Silver, and counting.</p>
+          </div>
+          <div class="do-tile">
+            <span class="num">03</span>
+            <h3>School Workshops</h3>
+            <p>We come to your school, your society, your club — and the stars come with us. No jargon, no fees,
+              no fear.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           BODY GRID: STORY + UPDATES
+           ============================================================ -->
+      <div class="body-grid">
+
+        <!-- ---- STORY ---- -->
+        <article class="story-wrap">
+          <div class="section-label">
+            <span class="kicker">About the Foundation</span>
+            <h2>The <em>mother</em> of all sciences, served warm.</h2>
+          </div>
+
+          <p class="story-first">
+            Aryabhat foundation is a special endeavor for promotion of Basic Science. The movement started in 1995,
+            which has now taken a shape of a duly registered social service organisation. Supported by a group of
+            people dedicated to their duties towards the society, the organisation is committed to serving Basic
+            Science in a tasty way to the youngsters. This will inculcate a science-based temperament in them.
+          </p>
+
+          <p class="pull-quote">
+            "The celestial bodies had always been objects of anxiety in the minds of the people —
+            we help replace that fear with wonder."
+          </p>
+
+          <p>
+            The celestial bodies had always been objects of anxiety in the minds of the people through olden days.
+            Fortunes &amp; evils were widely associated with the appearance of these bodies in the sky; some of
+            which were looked at with fear that their shadows cause disasters. The emergence of scientific
+            information has enabled people to understand their origin &amp; structure and thus come out of the
+            feeling of trepidation about them. We study them under Astronomy, which is considered to be the mother
+            of all science streams.
+          </p>
+
+          <p>
+            Astronomy is not only a constructive hobby for the children but also a pathway to bright future for
+            youngsters aspiring for a challenging career in space technology. In a scenario where the traditional
+            educational streams have reached saturation, it becomes almost mandatory for all to think of new fields
+            wherein children can find good prospects for their career as well.
+          </p>
+
+          <p>
+            Under our special drive for popularising Astronomy, we conduct several programs, which broaden the
+            outlook of people through scientific and authentic information about celestial objects. These programs
+            have also been helpful in eradicating myths &amp; superstitions from amongst the society. The objective
+            of this endeavor has been well justified with excelling of our students at National and International
+            levels. In yesteryears, students groomed at Aryabhat have added several feathers to the cap of the
+            Nation. These include four Gold and one Silver Medals in the International Astronomy Olympiads,
+            distinctions in RRGTM Project of NASA and other International forums.
+          </p>
+
+          <p>
+            We look for cooperation from the students, teachers, school authorities and parents for bringing our
+            small effort to a great success.
+          </p>
+        </article>
+
+        <!-- ---- UPDATES ---- -->
+        <aside class="updates-col">
+          <h3>Updates</h3>
+          <details class="card-container" open>
+            <summary>
+              <h4>Astro Quiz 2026-27</h4>
+            </summary>
+            <div class="card-content" style="text-align: center;">
+              <a target="_" class="button-primary button" href="quiz.html#institutional">Institutional Registration
+                Open</a>
+              <!--br>
+              <a target="_"  class="button-primary button"  href="files/2025/Short_Summ_2025.pdf">Summary of Participation</a>
+              <br-->
+            </div>
+          </details>
+          <details class="card-container" open>
+            <summary>
+              <h4>Request Event</h4>
+            </summary>
+            <div class="card-content" style="text-align: center;">
+              <a class="button button-primary" href="https://aryabhat.org/requestevent">Submit request for event</a>
+            </div>
+          </details>
+
+          <!--h4>Aryabhat Astronomy Quiz 2023-24 </!h4>
+          <p>Proposed dates for Observatory Trips</p>
+          <table style="border:1px solid white;">
+            <tr>
+              <td>Dongla</td>
+              <td style="color:#ffcc33">Revised dates to be declared</td>
+            </tr>
+            <tr>
+              <td>Kavalur</td>
+              <td>27 Apr to 5 May 2024</td>
+            </tr>
+            <tr>
+              <td>Kodaikanal</td>
+              <td>27 Apr to 5 May 2024</td>
+            </tr>
+            <tr>
+              <td>Nainital</td>
+              <td>11 May to 17 May 2024</td>
+            </tr>
+            <tr>
+              <td>Udaipur</td>
+              <td>18 May to 24 May 2024</td>
+            </tr>
+          </table-->
+        </aside>
+      </div>
+
+      <!-- ============================================================
+           JOIN CTA
+           ============================================================ -->
+      <section class="join-banner">
+        <h2>Bring the <em>sky</em> to your school or city.</h2>
+        <p>
+          We look for cooperation from students, teachers, school authorities and parents for bringing our small
+          effort to a great success.
+        </p>
+        <div class="cta-row">
+          <a class="button button-primary" href="https://aryabhat.org/requestevent">Request an Event</a>
+          <a class="button" href="contact.html">Contact Us</a>
+          <a class="button" href="sky.html">Open Sky Map</a>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SOCIALS
+           ============================================================ -->
+      <section class="socials">
+        <span class="kicker">Follow the journey</span>
+        <p>
+          <a href="https://instagram.com/aryabhatorg"><img width="32" src="images/insta.svg" alt="Instagram" /></a>
+          <a href="https://youtube.com/aryabhatorg"><img width="32" src="images/yt.svg" alt="YouTube" /></a>
+          <a href="https://www.facebook.com/aryabhatorg"><img width="32" src="images/fb.svg" alt="Facebook" /></a>
+          <a href="https://x.com/aryabhatorg"><img width="32" src="images/x.svg" alt="X" /></a>
+        </p>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+    </div>
+  </div>
+
+  <!-- Background Animation -->
+  <script src="js/background-stars.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+
+</html>
