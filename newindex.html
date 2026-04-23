@@ -155,6 +155,23 @@
       background: rgba(255, 204, 51, 0.18);
     }
 
+    /* Right-edge fade: hints that the navbar scrolls horizontally
+       without resurrecting a scrollbar. The mask applies to the
+       navbar's own frame (not the scrolled content), so it stays
+       anchored to the right edge regardless of scroll position. */
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg,
+            #000 0%,
+            #000 calc(100% - 56px),
+            transparent 100%);
+        mask-image: linear-gradient(90deg,
+            #000 0%,
+            #000 calc(100% - 56px),
+            transparent 100%);
+      }
+    }
+
     @media (max-width: 600px) {
       .navbar,
       .navbar > .container {
@@ -350,226 +367,39 @@
       z-index: 1;
     }
 
-    /* --- Logo stage: boy-with-telescope on the left looking
-           at a live cosmos scene on the right --- */
+    /* --- Logo stage: hero-logo (telescope boy) + hero-wordmark
+           side-by-side, stays horizontal on every viewport. --- */
     .logo-stage {
-      position: relative;
-      width: clamp(320px, 70vw, 560px);
-      height: clamp(220px, 42vw, 340px);
-      margin: 0 auto 1rem;
       display: flex;
       align-items: center;
-      justify-content: flex-start;
-    }
-
-    /* Soft "eyepiece glow" where the telescope is pointing */
-    .logo-stage::before {
-      content: "";
-      position: absolute;
-      right: 6%;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 58%;
-      height: 90%;
-      background:
-        radial-gradient(ellipse at 55% 50%, rgba(255, 204, 51, 0.10) 0%, transparent 45%),
-        radial-gradient(ellipse at 30% 40%, rgba(30, 174, 219, 0.08) 0%, transparent 55%);
-      pointer-events: none;
-      z-index: 0;
+      justify-content: center;
+      gap: clamp(10px, 2.5vw, 28px);
+      margin: 0 auto 2.8rem;
+      padding: 0 10px;
+      max-width: 100%;
+      flex-wrap: nowrap;
     }
 
     .hero-logo {
-      position: relative;
       flex: 0 0 auto;
-      width: 44%;
-      max-width: 240px;
-      height: auto;
-      margin-left: 2%;
+      height: clamp(80px, 14vw, 140px);
+      width: auto;
       filter:
-        drop-shadow(0 0 6px rgba(255, 255, 255, 0.85))
-        drop-shadow(0 0 18px rgba(255, 255, 255, 0.4))
-        drop-shadow(0 0 28px rgba(255, 255, 255, 0.2))
-        drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.55));
+        drop-shadow(0 0 4px rgba(255, 255, 255, 0.7))
+        drop-shadow(0 0 12px rgba(255, 255, 255, 0.22))
+        drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.5));
       animation: logo-float 6s ease-in-out infinite;
-      z-index: 2;
-    }
-
-    /* ---- The cosmos on the right — what the boy is looking at ---- */
-    .cosmos {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 62%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-      overflow: visible;
-    }
-
-    /* Saturn — the focal planet. The planet body lives in ::after
-       (which paints on top of child elements), so the .saturn-ring
-       child renders BEHIND the planet body and only its outer arcs
-       poke out either side. */
-    .saturn {
-      position: absolute;
-      top: 28%;
-      right: 20%;
-      width: 22%;
-      max-width: 78px;
-      aspect-ratio: 1;
-      animation: planet-bob 9s ease-in-out infinite;
-    }
-
-    .saturn::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: radial-gradient(circle at 32% 30%,
-          #ffe79b 0%,
-          #f4b942 32%,
-          #c47a1e 72%,
-          #5e350c 100%);
-      box-shadow:
-        inset -6px -8px 18px rgba(0, 0, 0, 0.55),
-        0 0 24px rgba(255, 204, 51, 0.28);
-    }
-
-    .saturn-ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 200%;
-      height: 34%;
-      border: 2px solid rgba(255, 220, 150, 0.75);
-      border-radius: 50%;
-      transform: translate(-50%, -50%) rotate(-18deg);
-      box-shadow:
-        0 0 14px rgba(255, 204, 51, 0.3),
-        inset 0 0 6px rgba(0, 0, 0, 0.25);
-      animation: ring-breathe 9s ease-in-out infinite;
-    }
-
-    /* A small moon drifting in a gentle loop near Saturn */
-    .moon {
-      position: absolute;
-      top: 58%;
-      right: 52%;
-      width: 11%;
-      max-width: 32px;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%,
-          #e3eef9 0%,
-          #9bb5d1 55%,
-          #3f5a7a 100%);
-      box-shadow:
-        inset -3px -4px 7px rgba(0, 0, 0, 0.45),
-        0 0 10px rgba(150, 200, 255, 0.4);
-      animation: moon-orbit 14s ease-in-out infinite;
-    }
-
-    /* Twinkling stars scattered across the right sky */
-    .star {
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 6px #fff, 0 0 12px rgba(255, 255, 255, 0.55);
-    }
-
-    .star-1 {
-      top: 12%;
-      right: 10%;
-      width: 4px;
-      height: 4px;
-      animation: twinkle 2.5s ease-in-out .2s infinite;
-    }
-
-    .star-2 {
-      top: 78%;
-      right: 14%;
-      width: 3px;
-      height: 3px;
-      animation: twinkle 3.1s ease-in-out .9s infinite;
-    }
-
-    .star-3 {
-      top: 22%;
-      right: 72%;
-      width: 2px;
-      height: 2px;
-      animation: twinkle 2s ease-in-out 1.6s infinite;
-    }
-
-    .star-4 {
-      top: 82%;
-      right: 58%;
-      width: 3px;
-      height: 3px;
-      animation: twinkle 3.4s ease-in-out .4s infinite;
-    }
-
-    .star-5 {
-      top: 6%;
-      right: 42%;
-      width: 4px;
-      height: 4px;
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold), 0 0 14px rgba(255, 204, 51, 0.65);
-      animation: twinkle 2.8s ease-in-out 1.8s infinite;
-    }
-
-    .star-6 {
-      top: 48%;
-      right: 6%;
-      width: 2px;
-      height: 2px;
-      animation: twinkle 2.3s ease-in-out 1.1s infinite;
-    }
-
-    /* Occasional shooting comet streaking from upper-right down-left.
-       Motion goes down-left, so the bright head is on the LEFT end
-       of the element and the tail trails UP-RIGHT behind it. */
-    .comet {
-      position: absolute;
-      top: 14%;
-      right: 2%;
-      width: 72px;
-      height: 2px;
-      background: linear-gradient(90deg,
-          #fff 0%,
-          rgba(255, 229, 138, 0.85) 20%,
-          rgba(255, 204, 51, 0.25) 60%,
-          transparent 100%);
-      transform: rotate(-22deg);
-      transform-origin: left center;
-      filter: blur(0.3px);
-      opacity: 0;
-      animation: comet-streak 11s ease-in infinite;
-    }
-
-    .comet::after {
-      content: "";
-      position: absolute;
-      left: -3px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 5px;
-      height: 5px;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #fff, 0 0 14px rgba(255, 204, 51, 0.85);
     }
 
     .hero-wordmark {
-      display: block;
-      max-width: min(420px, 75%);
+      flex: 0 1 auto;
       width: auto;
       height: auto;
-      margin: 0.4rem auto 1.8rem;
+      max-width: min(62%, 400px);
+      max-height: clamp(54px, 11vw, 110px);
       filter:
-        drop-shadow(2px 4px 3px rgba(0, 0, 80, 0.8))
-        drop-shadow(0 0 12px rgba(30, 174, 219, 0.3));
+        drop-shadow(1px 2px 3px rgba(0, 0, 60, 0.7))
+        drop-shadow(0 0 10px rgba(30, 174, 219, 0.25));
     }
 
     /* --- Mega display typography --- */
@@ -833,6 +663,8 @@
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 28px 24px;
+      max-width: 860px;
+      margin: 0 auto 2rem;
     }
 
     .story-wrap .section-label {
@@ -880,28 +712,51 @@
       border-radius: 0 10px 10px 0;
     }
 
-    /* ---------- UPDATES PANEL ---------- */
-    .updates-col {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    /* ---------- UPDATES — full-width section near the top ---------- */
+    .updates-section {
+      max-width: 1000px;
+      margin: 0 auto 2.4rem;
+      padding: 0 12px;
     }
 
-    .updates-col h3 {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--gold);
+    .updates-section .section-label {
       text-align: center;
-      margin: 0 0 .4rem;
-      padding-bottom: .6rem;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.2rem;
     }
 
-    /* Override the default .card-container bg for contrast inside col */
-    .updates-col details.card-container {
+    .updates-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 700px) {
+      .updates-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Non-collapsible update cards on this page (replace <details>
+       to drop the toggle behaviour while keeping the card look). */
+    .update-card {
+      background-color: #223;
+      border-radius: 16px;
+      overflow: hidden;
       margin-bottom: 0;
+    }
+
+    .update-card-head {
+      padding: 8px 14px;
+      background-color: #334;
+    }
+
+    .update-card-head h4 {
+      margin: 0;
+    }
+
+    .update-card .card-content {
+      padding: 16px 16px 8px;
+      border-top: 1px solid #445;
     }
 
     /* ============================================================
@@ -995,7 +850,8 @@
       font-size: 0.85rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      margin: 2rem 0 1rem;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
     }
 
     /* ============================================================
@@ -1004,60 +860,6 @@
     @keyframes logo-float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
-    }
-
-    @keyframes planet-bob {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(-2px, -4px); }
-    }
-
-    @keyframes ring-breathe {
-      0%, 100% {
-        transform: translate(-50%, -50%) rotate(-18deg) scaleX(1);
-        border-color: rgba(255, 220, 150, 0.75);
-      }
-      50% {
-        transform: translate(-50%, -50%) rotate(-14deg) scaleX(0.97);
-        border-color: rgba(255, 220, 150, 0.9);
-      }
-    }
-
-    @keyframes moon-orbit {
-      0%   { transform: translate(0, 0); }
-      25%  { transform: translate(-18px, -14px); }
-      50%  { transform: translate(-32px, -2px); }
-      75%  { transform: translate(-18px, 14px); }
-      100% { transform: translate(0, 0); }
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.25; transform: scale(0.55); }
-      50%      { opacity: 1;    transform: scale(1.35); }
-    }
-
-    /* Comet: idle most of the loop, then quick streak from
-       upper-right down-left, then vanish. */
-    @keyframes comet-streak {
-      0%, 72% {
-        opacity: 0;
-        transform: translate(30px, -30px) rotate(-22deg);
-      }
-      74% {
-        opacity: 0;
-        transform: translate(30px, -30px) rotate(-22deg);
-      }
-      76% {
-        opacity: 0.9;
-        transform: translate(20px, -22px) rotate(-22deg);
-      }
-      92% {
-        opacity: 1;
-        transform: translate(-190px, 70px) rotate(-22deg);
-      }
-      98%, 100% {
-        opacity: 0;
-        transform: translate(-210px, 78px) rotate(-22deg);
-      }
     }
 
     @keyframes marquee {
@@ -1071,16 +873,22 @@
     }
 
     .hero-tag,
-    .hero-wordmark,
     .hero-lede,
     .cta-row {
       animation: fadeUp .8s ease-out both;
     }
 
-    .hero-wordmark { animation-delay: .05s; }
-    .hero-tag      { animation-delay: .15s; }
-    .hero-lede     { animation-delay: .3s; }
-    .cta-row       { animation-delay: .45s; }
+    /* Wordmark rides the same gentle float as the logo, so the
+       two move as a unit. Entry fade is layered alongside. */
+    .hero-wordmark {
+      animation:
+        fadeUp .8s ease-out .05s both,
+        logo-float 6s ease-in-out infinite;
+    }
+
+    .hero-tag  { animation-delay: .15s; }
+    .hero-lede { animation-delay: .3s; }
+    .cta-row   { animation-delay: .45s; }
 
     /* ============================================================
        MOBILE — 600px and below
@@ -1092,24 +900,18 @@
       }
 
       .logo-stage {
-        width: min(94vw, 420px);
-        height: min(58vw, 240px);
-        margin-bottom: .6rem;
+        gap: 10px;
+        padding: 0 6px;
+        margin-bottom: 1.8rem;
       }
 
       .hero-logo {
-        width: 44%;
-        margin-left: 1%;
+        height: clamp(72px, 18vw, 100px);
       }
 
-      .saturn { max-width: 60px; }
-      .moon { max-width: 24px; }
-
-      .comet { width: 56px; }
-
       .hero-wordmark {
-        max-width: 82%;
-        margin: .2rem auto 1rem;
+        max-width: 62%;
+        max-height: clamp(48px, 13vw, 80px);
       }
 
       .hero-tag {
@@ -1255,9 +1057,9 @@
         margin: 1.1rem 0;
       }
 
-      .updates-col h3 {
-        font-size: 1.05rem;
-        letter-spacing: .2em;
+      .updates-section {
+        padding: 0 .5rem;
+        margin-bottom: 1.8rem;
       }
 
       .join-banner {
@@ -1286,16 +1088,16 @@
       .footer-line {
         font-size: .75rem;
         letter-spacing: .12em;
-        margin: 1.2rem 0 1rem;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .hero-logo, .saturn, .saturn-ring, .moon, .star, .comet,
-      .marquee-track, .hero-tag, .hero-wordmark, .hero-lede, .cta-row {
+      .hero-logo, .marquee-track,
+      .hero-tag, .hero-wordmark, .hero-lede, .cta-row {
         animation: none !important;
       }
-      .comet { opacity: 0; }
     }
   </style>
 </head>
@@ -1329,22 +1131,8 @@
       <section class="hero">
         <div class="logo-stage">
           <img class="hero-logo" src="images/aryabhat.svg" alt="Aryabhat Foundation logo">
-          <div class="cosmos" aria-hidden="true">
-            <div class="saturn">
-              <div class="saturn-ring"></div>
-            </div>
-            <div class="moon"></div>
-            <div class="star star-1"></div>
-            <div class="star star-2"></div>
-            <div class="star star-3"></div>
-            <div class="star star-4"></div>
-            <div class="star star-5"></div>
-            <div class="star star-6"></div>
-            <div class="comet"></div>
-          </div>
+          <img class="hero-wordmark" src="images/title.svg" alt="Aryabhat Foundation">
         </div>
-
-        <img class="hero-wordmark" src="images/title.svg" alt="Aryabhat Foundation">
 
         <h1 class="hero-tag">
           <span class="line line-1">Look up.</span>
@@ -1385,6 +1173,72 @@
           <span>Since 1995</span>
         </div>
       </div>
+
+      <!-- ============================================================
+           UPDATES — pulled up from sidebar so the most actionable
+           content sits near the top of the page.
+           ============================================================ -->
+      <section class="updates-section">
+        <div class="section-label">
+          <span class="kicker">What's happening</span>
+          <h2>Latest <em>Updates</em></h2>
+        </div>
+        <div class="updates-grid">
+          <div class="update-card">
+            <div class="update-card-head">
+              <h4>Astro Quiz 2026-27</h4>
+            </div>
+            <div class="card-content" style="text-align: center;">
+              <a target="_" class="button-primary button" href="quiz.html#institutional">Institutional Registration
+                Open</a>
+              <!--br>
+              <a target="_"  class="button-primary button"  href="files/2025/Short_Summ_2025.pdf">Summary of Participation</a>
+              <br-->
+            </div>
+          </div>
+
+          <!--h4>Aryabhat Astronomy Quiz 2023-24 </!h4>
+          <p>Proposed dates for Observatory Trips</p>
+          <table style="border:1px solid white;">
+            <tr>
+              <td>Dongla</td>
+              <td style="color:#ffcc33">Revised dates to be declared</td>
+            </tr>
+            <tr>
+              <td>Kavalur</td>
+              <td>27 Apr to 5 May 2024</td>
+            </tr>
+            <tr>
+              <td>Kodaikanal</td>
+              <td>27 Apr to 5 May 2024</td>
+            </tr>
+            <tr>
+              <td>Nainital</td>
+              <td>11 May to 17 May 2024</td>
+            </tr>
+            <tr>
+              <td>Udaipur</td>
+              <td>18 May to 24 May 2024</td>
+            </tr>
+          </table-->
+        </div>
+      </section>
+
+      <!-- ============================================================
+           JOIN CTA — pulled up alongside the Updates
+           ============================================================ -->
+      <section class="join-banner">
+        <h2>Bring the <em>sky</em> to your school or city.</h2>
+        <p>
+          We look for cooperation from students, teachers, school authorities and parents for bringing our small
+          effort to a great success.
+        </p>
+        <div class="cta-row">
+          <a class="button button-primary" href="https://aryabhat.org/requestevent">Request an Event</a>
+          <a class="button" href="contact.html">Contact Us</a>
+          <a class="button" href="sky.html">Open Sky Map</a>
+        </div>
+      </section>
 
       <!-- ============================================================
            SINCE 1995 — BIG NUMBER
@@ -1431,127 +1285,58 @@
       </section>
 
       <!-- ============================================================
-           BODY GRID: STORY + UPDATES
+           ABOUT — standalone story (was previously in a 2-col grid
+           with Updates; now full-width since Updates moved up)
            ============================================================ -->
-      <div class="body-grid">
-
-        <!-- ---- STORY ---- -->
-        <article class="story-wrap">
-          <div class="section-label">
-            <span class="kicker">About the Foundation</span>
-            <h2>The <em>mother</em> of all sciences, served warm.</h2>
-          </div>
-
-          <p class="story-first">
-            Aryabhat foundation is a special endeavor for promotion of Basic Science. The movement started in 1995,
-            which has now taken a shape of a duly registered social service organisation. Supported by a group of
-            people dedicated to their duties towards the society, the organisation is committed to serving Basic
-            Science in a tasty way to the youngsters. This will inculcate a science-based temperament in them.
-          </p>
-
-          <p class="pull-quote">
-            "The celestial bodies had always been objects of anxiety in the minds of the people —
-            we help replace that fear with wonder."
-          </p>
-
-          <p>
-            The celestial bodies had always been objects of anxiety in the minds of the people through olden days.
-            Fortunes &amp; evils were widely associated with the appearance of these bodies in the sky; some of
-            which were looked at with fear that their shadows cause disasters. The emergence of scientific
-            information has enabled people to understand their origin &amp; structure and thus come out of the
-            feeling of trepidation about them. We study them under Astronomy, which is considered to be the mother
-            of all science streams.
-          </p>
-
-          <p>
-            Astronomy is not only a constructive hobby for the children but also a pathway to bright future for
-            youngsters aspiring for a challenging career in space technology. In a scenario where the traditional
-            educational streams have reached saturation, it becomes almost mandatory for all to think of new fields
-            wherein children can find good prospects for their career as well.
-          </p>
-
-          <p>
-            Under our special drive for popularising Astronomy, we conduct several programs, which broaden the
-            outlook of people through scientific and authentic information about celestial objects. These programs
-            have also been helpful in eradicating myths &amp; superstitions from amongst the society. The objective
-            of this endeavor has been well justified with excelling of our students at National and International
-            levels. In yesteryears, students groomed at Aryabhat have added several feathers to the cap of the
-            Nation. These include four Gold and one Silver Medals in the International Astronomy Olympiads,
-            distinctions in RRGTM Project of NASA and other International forums.
-          </p>
-
-          <p>
-            We look for cooperation from the students, teachers, school authorities and parents for bringing our
-            small effort to a great success.
-          </p>
-        </article>
-
-        <!-- ---- UPDATES ---- -->
-        <aside class="updates-col">
-          <h3>Updates</h3>
-          <details class="card-container" open>
-            <summary>
-              <h4>Astro Quiz 2026-27</h4>
-            </summary>
-            <div class="card-content" style="text-align: center;">
-              <a target="_" class="button-primary button" href="quiz.html#institutional">Institutional Registration
-                Open</a>
-              <!--br>
-              <a target="_"  class="button-primary button"  href="files/2025/Short_Summ_2025.pdf">Summary of Participation</a>
-              <br-->
-            </div>
-          </details>
-          <details class="card-container" open>
-            <summary>
-              <h4>Request Event</h4>
-            </summary>
-            <div class="card-content" style="text-align: center;">
-              <a class="button button-primary" href="https://aryabhat.org/requestevent">Submit request for event</a>
-            </div>
-          </details>
-
-          <!--h4>Aryabhat Astronomy Quiz 2023-24 </!h4>
-          <p>Proposed dates for Observatory Trips</p>
-          <table style="border:1px solid white;">
-            <tr>
-              <td>Dongla</td>
-              <td style="color:#ffcc33">Revised dates to be declared</td>
-            </tr>
-            <tr>
-              <td>Kavalur</td>
-              <td>27 Apr to 5 May 2024</td>
-            </tr>
-            <tr>
-              <td>Kodaikanal</td>
-              <td>27 Apr to 5 May 2024</td>
-            </tr>
-            <tr>
-              <td>Nainital</td>
-              <td>11 May to 17 May 2024</td>
-            </tr>
-            <tr>
-              <td>Udaipur</td>
-              <td>18 May to 24 May 2024</td>
-            </tr>
-          </table-->
-        </aside>
-      </div>
-
-      <!-- ============================================================
-           JOIN CTA
-           ============================================================ -->
-      <section class="join-banner">
-        <h2>Bring the <em>sky</em> to your school or city.</h2>
-        <p>
-          We look for cooperation from students, teachers, school authorities and parents for bringing our small
-          effort to a great success.
-        </p>
-        <div class="cta-row">
-          <a class="button button-primary" href="https://aryabhat.org/requestevent">Request an Event</a>
-          <a class="button" href="contact.html">Contact Us</a>
-          <a class="button" href="sky.html">Open Sky Map</a>
+      <article class="story-wrap">
+        <div class="section-label">
+          <span class="kicker">About the Foundation</span>
+          <h2>The <em>mother</em> of all sciences, served warm.</h2>
         </div>
-      </section>
+
+        <p class="story-first">
+          Aryabhat foundation is a special endeavor for promotion of Basic Science. The movement started in 1995,
+          which has now taken a shape of a duly registered social service organisation. Supported by a group of
+          people dedicated to their duties towards the society, the organisation is committed to serving Basic
+          Science in a tasty way to the youngsters. This will inculcate a science-based temperament in them.
+        </p>
+
+        <p class="pull-quote">
+          "The celestial bodies had always been objects of anxiety in the minds of the people —
+          we help replace that fear with wonder."
+        </p>
+
+        <p>
+          The celestial bodies had always been objects of anxiety in the minds of the people through olden days.
+          Fortunes &amp; evils were widely associated with the appearance of these bodies in the sky; some of
+          which were looked at with fear that their shadows cause disasters. The emergence of scientific
+          information has enabled people to understand their origin &amp; structure and thus come out of the
+          feeling of trepidation about them. We study them under Astronomy, which is considered to be the mother
+          of all science streams.
+        </p>
+
+        <p>
+          Astronomy is not only a constructive hobby for the children but also a pathway to bright future for
+          youngsters aspiring for a challenging career in space technology. In a scenario where the traditional
+          educational streams have reached saturation, it becomes almost mandatory for all to think of new fields
+          wherein children can find good prospects for their career as well.
+        </p>
+
+        <p>
+          Under our special drive for popularising Astronomy, we conduct several programs, which broaden the
+          outlook of people through scientific and authentic information about celestial objects. These programs
+          have also been helpful in eradicating myths &amp; superstitions from amongst the society. The objective
+          of this endeavor has been well justified with excelling of our students at National and International
+          levels. In yesteryears, students groomed at Aryabhat have added several feathers to the cap of the
+          Nation. These include four Gold and one Silver Medals in the International Astronomy Olympiads,
+          distinctions in RRGTM Project of NASA and other International forums.
+        </p>
+
+        <p>
+          We look for cooperation from the students, teachers, school authorities and parents for bringing our
+          small effort to a great success.
+        </p>
+      </article>
 
       <!-- ============================================================
            SOCIALS
@@ -1570,8 +1355,8 @@
     </div>
   </div>
 
-  <!-- Background Animation -->
-  <script src="js/background-stars.js"></script>
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
 </body>
 
