@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.github.com/repos/cosinekitty/astronomy/contents/demo/browser\")",
+      "Bash(python3 -m json.tool)"
+    ]
+  }
+}

@@ -12,6 +12,670 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       quiz.html — design-system port (scoped: this page only)
+       Content unchanged from the original (all FAQ items, prose,
+       dates table, links, contact info preserved verbatim);
+       only presentation follows newindex.html / design.md.
+       ========================================================== */
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — lifted from newindex.html
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current { background: transparent; border-radius: 0; }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+    }
+
+    html, body {
+      font-family: var(--font-body);
+    }
+
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 1.5rem 0 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — lifted from newindex.html
+       ============================================================ */
+    .main .button,
+    .main button,
+    .card-content .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease, border-color .25s ease, box-shadow .3s ease, transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus,
+    .card-content .button:hover {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active,
+    .card-content .button:active {
+      transform: translateY(0);
+      background: rgba(255, 204, 51, 0.14);
+      box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* Primary: gold-on-dark with halo. See design.md §2.2. */
+    .main .button.button-primary,
+    .card-content .button.button-primary {
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: .03em;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+      text-shadow: none;
+    }
+
+    .main .button.button-primary:hover,
+    .card-content .button.button-primary:hover {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active,
+    .card-content .button.button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 16px rgba(255, 204, 51, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       PAGE LAYOUT — sidebar (details cards) + main (prose)
+       ============================================================ */
+    .quiz-layout {
+      max-width: 1100px;
+      margin: 0 auto 2rem;
+      padding: 0 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    @media (min-width: 900px) {
+      .quiz-layout {
+        grid-template-columns: minmax(280px, 1fr) 2fr;
+        align-items: start;
+      }
+    }
+
+    .quiz-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Each card holds its natural height — without this, expanding
+       any one card (especially the long FAQ list) flex-squeezes the
+       siblings. */
+    .quiz-sidebar > details.card-container {
+      flex: 0 0 auto;
+    }
+
+    /* ============================================================
+       DETAILS cards in the sidebar — same family as download.html
+       ============================================================ */
+    details.card-container {
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+    details.card-container:hover {
+      border-color: rgba(255, 204, 51, 0.35);
+    }
+
+    details.card-container[open] {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    details.card-container summary {
+      padding: 14px 18px;
+      background: transparent;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid transparent;
+    }
+
+    details.card-container[open] summary {
+      border-bottom-color: rgba(255, 204, 51, 0.15);
+    }
+
+    details.card-container summary:hover {
+      background: rgba(255, 204, 51, 0.04);
+    }
+
+    details.card-container summary::-webkit-details-marker { display: none; }
+
+    details.card-container summary::after {
+      content: "▾";
+      font-size: 1.05rem;
+      color: var(--gold);
+      transition: transform 0.3s ease;
+      line-height: 1;
+    }
+
+    details.card-container[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    details.card-container summary h5 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    details.card-container .card-content {
+      padding: 16px 18px 14px;
+      border-top: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--ink);
+      font-size: .92rem;
+      line-height: 1.55;
+    }
+
+    details.card-container .card-content > br + a,
+    details.card-container .card-content > br {
+      flex-basis: 100%;
+      height: 0;
+    }
+
+    details.card-container .card-content .button {
+      margin-bottom: 0;
+      font-size: .82rem;
+      height: 38px;
+      padding: 0 16px;
+    }
+
+    /* FAQ list — text-link style, gold accent on hover */
+    .card-content ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-size: .9rem;
+    }
+
+    .card-content ul li {
+      margin: 0;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 204, 51, 0.15);
+      line-height: 1.45;
+    }
+
+    .card-content ul li:last-child {
+      border-bottom: none;
+    }
+
+    .card-content ul li a {
+      color: var(--ink);
+      text-decoration: none;
+      transition: color .2s ease;
+      display: block;
+    }
+
+    .card-content ul li a::before {
+      content: "→ ";
+      color: var(--gold);
+      opacity: .6;
+      margin-right: 4px;
+    }
+
+    .card-content ul li a:hover {
+      color: var(--gold-soft);
+    }
+
+    .card-content ul li a:hover::before {
+      opacity: 1;
+    }
+
+    /* ============================================================
+       QUIZ CONTENT — long-form prose
+       ============================================================ */
+    .quiz-content {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 28px 22px;
+    }
+
+    .quiz-content h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0 0 1.4rem;
+      letter-spacing: 0;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid rgba(255, 204, 51, 0.2);
+    }
+
+    .quiz-content h3 {
+      font-family: var(--font-display);
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 1.8rem 0 .6rem;
+    }
+
+    .quiz-content h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 1.8rem 0 .8rem;
+      text-align: center;
+    }
+
+    .quiz-content p {
+      color: var(--ink);
+      line-height: 1.7;
+      margin: 0 0 .9rem;
+      font-size: 1rem;
+    }
+
+    /* Dates table — restyled, content unchanged */
+    .quiz-content table {
+      width: 100%;
+      max-width: 640px;
+      margin: 1.2rem auto;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.6), rgba(15, 26, 38, 0.6));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .quiz-content table td {
+      padding: 12px 18px;
+      border-top: 1px solid rgba(255, 204, 51, 0.08);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+
+    .quiz-content table tr:first-child td {
+      border-top: none;
+    }
+
+    .quiz-content table tr td:first-child {
+      color: var(--ink-dim);
+    }
+
+    .quiz-content table tr td:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .quiz-content table tr td:last-child b {
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    /* Contact card in main content */
+    .quiz-content .card {
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 22px 14px;
+      margin-top: .6rem;
+    }
+
+    .quiz-content .card h2 {
+      font-family: var(--font-brand);
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin: 0 0 .6rem;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .quiz-content .card h2 b {
+      color: var(--gold);
+      font-weight: inherit;
+    }
+
+    .quiz-content .card p {
+      margin: 0 0 .8rem;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .quiz-content .card p b {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .quiz-content .card a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 204, 51, 0.45);
+      transition: color .2s ease, border-color .2s ease;
+      word-break: break-word;
+    }
+
+    .quiz-content .card a:hover {
+      color: var(--gold-soft);
+      border-bottom-color: var(--gold);
+    }
+
+    .quiz-content .renfrew {
+      font-family: var(--font-brand);
+      color: var(--gold-soft);
+      font-size: 1.1rem;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .main { padding-top: 1rem; }
+
+      .quiz-layout {
+        padding: 0 .5rem;
+        gap: 16px;
+        margin-bottom: 1.6rem;
+      }
+
+      .quiz-sidebar { gap: 10px; }
+
+      details.card-container { border-radius: 14px; }
+
+      details.card-container summary { padding: 12px 16px; }
+
+      details.card-container summary h5 {
+        font-size: .82rem;
+        letter-spacing: .14em;
+      }
+
+      details.card-container .card-content {
+        padding: 14px 16px 10px;
+        gap: 8px;
+      }
+
+      details.card-container .card-content .button {
+        font-size: .78rem;
+        height: 34px;
+        padding: 0 14px;
+      }
+
+      .quiz-content {
+        padding: 22px 18px 16px;
+        border-radius: 14px;
+      }
+
+      .quiz-content h2 {
+        font-size: 1.6rem;
+      }
+
+      .quiz-content h3 {
+        font-size: .78rem;
+        letter-spacing: .22em;
+      }
+
+      .quiz-content p {
+        font-size: .95rem;
+        line-height: 1.65;
+      }
+
+      .quiz-content table td {
+        padding: 10px 12px;
+        font-size: .9rem;
+      }
+
+      .quiz-content .card {
+        padding: 18px 16px 12px;
+      }
+
+      .quiz-content .card h2 {
+        font-size: 1.4rem;
+      }
+
+      .main .button,
+      .card-content .button {
+        font-size: .85rem;
+        height: 40px;
+        padding: 0 18px;
+      }
+
+      .main .button.button-primary,
+      .card-content .button.button-primary {
+        font-size: .9rem;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -37,294 +701,301 @@
       <!-- Injected by js/layout.js -->
     </nav>
 
-    <div class="main row">
-      <div class="four columns">
-        <br>
-        <details class="card-container">
-          <summary>
-            <h5>📜 Circulars</h5>
-          </summary>
-          <div class="card-content" id="card-circulars">
-            <!--a class="button button-primary" target="_blank" href="files/2024/NVS_5354_15Mar2024.pdf">JNV Circular</a-->
-            <a class="button button-primary" target="_blank" href="files/2026/Circular_AstroQuiz_2026-27.pdf">Our
-              Circular</a>
-            <a class="button button-primary" target="_blank" href="files/2025/DPI_2025.pdf">DPI Circular</a>
-            <a class="button button-primary" target="_blank" href="files/2025/KVSBhopal.pdf">KV Circular</a>
-            <a class="button button-primary" target="_blank" href="files/2025/NVS_2025-26.pdf">JNV Circular</a>
-          </div>
-        </details>
-        <details class="card-container">
-          <summary>
-            <h5 id="studymaterial">📚 Notes</h5>
-          </summary>
-          <div class="card-content" id="card-studymaterial">
-            <a class="button button-primary" target="_blank"
-              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_1.pdf">Study
-              Material 1</a>
-            <a class="button button-primary" target="_blank"
-              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_2.pdf">Study
-              Material 2</a>
-            <a class="button button-primary" target="_blank"
-              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_3.pdf">Study
-              Material 3</a>
-            <a class="button button-primary" target="_blank"
-              href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Glossary.pdf">Glossary</a>
-            <br>
-            <a class="button button-primary" target="_blank" href="https://youtu.be/s5_1iDcbVrQ">▶️ Video Lesson</a>
-            <br>Updated on 1 July 2025
-          </div>
-        </details>
-        <details class="card-container">
-          <summary>
-            <h5 id="institutional">🏫 Registration for Schools</h5>
-          </summary>
-          <div class="card-content" id="card-institutional">
-            <!--, for individual registration go
-            <a target="_blank" href="https://quiz.aryabhat.org">here</a> ) -->
-            <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart </a>
+    <div class="main">
+
+      <div class="quiz-layout">
+
+        <aside class="quiz-sidebar">
+
+          <details class="card-container">
+            <summary>
+              <h5>📜 Circulars</h5>
+            </summary>
+            <div class="card-content" id="card-circulars">
+              <!--a class="button button-primary" target="_blank" href="files/2024/NVS_5354_15Mar2024.pdf">JNV Circular</a-->
+              <a class="button button-primary" target="_blank" href="files/2026/Circular_AstroQuiz_2026-27.pdf">Our
+                Circular</a>
+              <a class="button button-primary" target="_blank" href="files/2025/DPI_2025.pdf">DPI Circular</a>
+              <a class="button button-primary" target="_blank" href="files/2025/KVSBhopal.pdf">KV Circular</a>
+              <a class="button button-primary" target="_blank" href="files/2025/NVS_2025-26.pdf">JNV Circular</a>
+            </div>
+          </details>
+
+          <details class="card-container">
+            <summary>
+              <h5 id="studymaterial">📚 Notes</h5>
+            </summary>
+            <div class="card-content" id="card-studymaterial">
+              <a class="button button-primary" target="_blank"
+                href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_1.pdf">Study
+                Material 1</a>
+              <a class="button button-primary" target="_blank"
+                href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_2.pdf">Study
+                Material 2</a>
+              <a class="button button-primary" target="_blank"
+                href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study_Material_3.pdf">Study
+                Material 3</a>
+              <a class="button button-primary" target="_blank"
+                href="https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Glossary.pdf">Glossary</a>
+              <br>
+              <a class="button button-primary" target="_blank" href="https://youtu.be/s5_1iDcbVrQ">▶️ Video Lesson</a>
+              <br>Updated on 1 July 2025
+            </div>
+          </details>
+
+          <details class="card-container">
+            <summary>
+              <h5 id="institutional">🏫 Registration for Schools</h5>
+            </summary>
+            <div class="card-content" id="card-institutional">
+              <!--, for individual registration go
+              <a target="_blank" href="https://quiz.aryabhat.org">here</a> ) -->
+              <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart </a>
 
 
-            <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Format for Entries
-            </a>
+              <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Format for Entries
+              </a>
 
-            <br>1 April 2026 to 25 July 2026
-          </div>
-        </details>
-        <details class="card-container">
-          <summary>
-            <h5>👤 Individual Registration</h5>
-          </summary>
-          <div class="card-content">
-            <p class="renfrew" style="margin: 0;">Registration opens on 20 June 2026</p>
-          </div>
-        </details>
+              <br>1 April 2026 to 25 July 2026
+            </div>
+          </details>
 
-        <details class="card-container">
-          <summary>
-            <h5>❓ Quiz FAQs</h5>
-          </summary>
-          <div class="card-content" id="faqs">
-            <!--h4>Click on the Question to get a clarification</h4-->
-            <ul>
-              <li><a href="https://aryabhat.org/faqs/WhatIsAstroQuiz">What is Aryabhat Astronomy Quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/ObjectiveOfQuiz">What is the objective of the Quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhatisAryabhat">What kind of Organization is Aryabhat ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhenWasFirstQuiz">When was this quiz first organized ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhoCanParticipate">Who can participate in quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/OustideMPStudents">Can students outside MP participate ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhatDoSelectedGet">What do selected students get after first level
-                  ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhenAreCamps">When are these camps organized ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/AnyEntryFees">Is there any entry fees for the Quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/SecondaryLevelFees">Any fees for the secondary level ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/ParentsStayAtAryabhat">Can teachers or parents stay
-                  with students at Aryabhat ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/KindOfQuestions">What kind of questions are there in first level
-                  ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/QuizSyllabus">What is the syllabus of the Quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/WhereToStudy">Where can one study all this ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/HowToRegister">How can one register for the Quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/SchoolRegistration">How can schools register for the Quiz ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/MobileForRegistration">Can one use mobile for
-                  registration ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/ConfirmationOfRegistration">How do we get confirmation of
-                  registration ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/ChangeOfMobile">Can we change mobile number after registration
-                  ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/MarkingPattern">Is there negative marking ? What is marking pattern
-                  ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/DemoQuizRecommendedBooks">is there any Demo Quiz ? Any
-                  recommended books ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/SecondaryExamWhen">When will the Secondary Exam be held ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/SecondaryExamOutline">What is the outline of the Secondary level
-                  examination ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/LastDateRegistration">What is the last date of registration ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/QuizDates">What are the dates of Quiz for Schools and Individuals
-                  ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/HowWillIndividualsParticipate">Will there be any centre for
-                  Individual Participants ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/ComputersNeededForSchool">How many computers needed in
-                  school ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/IsInternetRequiredForSchool">How can we participate without
-                  Internet ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/WhereIsSecondaryTraining">Where is the training held for
-                  secondary level ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/PreferredDatesForTraining">Can students get preferred dates
-                  for training ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/PrizeForWinners">What do the final winners get ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/VisitScheduleObsevatoryChoice">Can we choose our own
-                  observatories ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/TripOrganizationAndEscorts">Can parents come along on these
-                  trips ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/NoTADA">Will the students get any TA/DA ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/ParticipateEveryYear">Can one student participate in the quiz only
-                  once
-                  ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/PassingMarks">Are there any passing marks for the quiz ?</a></li>
-              <li><a href="https://aryabhat.org/faqs/ScoreImprovementAttempt">Will there be any chance to
-                  better the score ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/DoubleRegistration">Can a student register both with school and
-                  individually ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/QuizDateMissed">What if the quiz date is missed ?</a>
-              </li>
-              <li><a href="https://aryabhat.org/faqs/MessageForParticipants">What is your message for the
-                  participants ?</a>
-              </li>
-            </ul>
+          <details class="card-container">
+            <summary>
+              <h5>👤 Individual Registration</h5>
+            </summary>
+            <div class="card-content">
+              <p class="renfrew" style="margin: 0;">Registration opens on 20 June 2026</p>
+            </div>
+          </details>
+
+          <details class="card-container">
+            <summary>
+              <h5>❓ Quiz FAQs</h5>
+            </summary>
+            <div class="card-content" id="faqs">
+              <!--h4>Click on the Question to get a clarification</h4-->
+              <ul>
+                <li><a href="https://aryabhat.org/faqs/WhatIsAstroQuiz">What is Aryabhat Astronomy Quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/ObjectiveOfQuiz">What is the objective of the Quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhatisAryabhat">What kind of Organization is Aryabhat ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhenWasFirstQuiz">When was this quiz first organized ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhoCanParticipate">Who can participate in quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/OustideMPStudents">Can students outside MP participate ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhatDoSelectedGet">What do selected students get after first level
+                    ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhenAreCamps">When are these camps organized ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/AnyEntryFees">Is there any entry fees for the Quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/SecondaryLevelFees">Any fees for the secondary level ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/ParentsStayAtAryabhat">Can teachers or parents stay
+                    with students at Aryabhat ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/KindOfQuestions">What kind of questions are there in first level
+                    ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/QuizSyllabus">What is the syllabus of the Quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/WhereToStudy">Where can one study all this ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/HowToRegister">How can one register for the Quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/SchoolRegistration">How can schools register for the Quiz ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/MobileForRegistration">Can one use mobile for
+                    registration ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/ConfirmationOfRegistration">How do we get confirmation of
+                    registration ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/ChangeOfMobile">Can we change mobile number after registration
+                    ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/MarkingPattern">Is there negative marking ? What is marking pattern
+                    ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/DemoQuizRecommendedBooks">is there any Demo Quiz ? Any
+                    recommended books ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/SecondaryExamWhen">When will the Secondary Exam be held ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/SecondaryExamOutline">What is the outline of the Secondary level
+                    examination ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/LastDateRegistration">What is the last date of registration ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/QuizDates">What are the dates of Quiz for Schools and Individuals
+                    ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/HowWillIndividualsParticipate">Will there be any centre for
+                    Individual Participants ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/ComputersNeededForSchool">How many computers needed in
+                    school ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/IsInternetRequiredForSchool">How can we participate without
+                    Internet ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/WhereIsSecondaryTraining">Where is the training held for
+                    secondary level ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/PreferredDatesForTraining">Can students get preferred dates
+                    for training ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/PrizeForWinners">What do the final winners get ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/VisitScheduleObsevatoryChoice">Can we choose our own
+                    observatories ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/TripOrganizationAndEscorts">Can parents come along on these
+                    trips ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/NoTADA">Will the students get any TA/DA ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/ParticipateEveryYear">Can one student participate in the quiz only
+                    once
+                    ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/PassingMarks">Are there any passing marks for the quiz ?</a></li>
+                <li><a href="https://aryabhat.org/faqs/ScoreImprovementAttempt">Will there be any chance to
+                    better the score ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/DoubleRegistration">Can a student register both with school and
+                    individually ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/QuizDateMissed">What if the quiz date is missed ?</a>
+                </li>
+                <li><a href="https://aryabhat.org/faqs/MessageForParticipants">What is your message for the
+                    participants ?</a>
+                </li>
+              </ul>
+            </div>
+          </details>
+
+        </aside>
+
+        <article class="quiz-content">
+          <h2>Details of the Quiz</h2>
+          <h3> The Organisation :</h3>
+          <p>Aryabhat Foundation is a dedicated endeavor for promotion of Astronomy and Basic Science. The movement
+            started in 1995, which took the shape of a duly registered social service organisation. Backed by a group of
+            people
+            dedicated to their duties towards society, the organisation is committed to make learning Basic Science
+            enjoyable for youngsters, thus inculcating a science-based temperament in them.</p>
+
+          <h3>The Program :</h3>
+          <p>Astronomy is a thrilling hobby for all age groups. It also makes a strong platform for youngsters aspiring
+            for an exciting career in space technology.</p>
+          <p>Aryabhat Astronomy Quiz is aimed at developing the interest of the
+            school students in this field through practical exposure. The quiz is a two-tier competition consisting of a
+            preliminary test followed by a practical examination. The preliminary test is a cream-separation exercise
+            conducted on a digital platform.</p>
+          <p>Selected participants will qualify for the secondary level by merit in the
+            preliminary test. These participants will be offered training in telescope-operation, sky reading and
+            practical Astronomy at our Bhopal Centre. The lodging-boarding will be free for participants availing night
+            camps, but no TA/DA will be paid at any stage. Those who fail to attend the training will not be included for
+            the secondary level.</p>
+          <p>The secondary level examination will be held on Saturday 26 December 2026. This test is
+            meant to examine the ability of the participants in practical Astronomy. Final winners will be selected on
+            their overall performance.</p>
+
+          <h3>Eligibility :</h3>
+          <p>Students from class 6 to class 9 (both inclusive) from any school situated in Madhya Pradesh are eligible to
+            take part in the quiz. Students availing home-schooling in the given class range and permanently residing in
+            Madhya Pradesh are also eligible.</p>
+
+          <h3>Entry Fee :</h3>
+          <p>Waived for all participants. No charges will be there for practical training as well.</p>
+
+          <h3>Preliminary Test :</h3>
+          <p>The preliminary Quiz consists of questions on basic Astronomy & Space Science. Each participant is offered 20
+            objective type questions to be answered in 180 seconds. A correct answer will fetch five marks, and two marks
+            will be deducted for the wrong one. The final score will appear on-screen as soon as any participant finishes
+            the test.</p>
+          <p>For individual participants, the preliminary Quiz will be available online on the allotted date and
+            time. For institutional participants, the Quiz will be offered on the school’s computers on a date and time
+            settled with the school, in presence of a person authorised by Aryabhat. In addition, Aryabhat would also
+            conduct the Preliminary Test at common test centres.
+            Participants taking the Quiz under Individual-mode will not be allowed to participate under
+            Institutional-mode, or vice-versa.</p>
+
+          <h3>How to participate :</h3>
+          <p>Institutions shall send the particulars of their students to us by email. The format for sending entries is
+            available on our website. Individual participants shall register for the Quiz using their mobile number and
+            email ID on the Portal given on our website. For individual participants, the mobile number will be used as
+            login-ID, hence cannot be changed. The relevant date-line is given below :-</p>
+          <table>
+            <tr>
+              <td>Institutional Registration</td>
+              <td><b>1 Apr to 25 Jul 2026</b></td>
+            </tr>
+            <tr>
+              <td>Individual Registration</td>
+              <td><b>20 Jun to 25 Jul 2026</b></td>
+            </tr>
+            <tr>
+              <td>Online Quiz for individuals</td>
+              <td><b>1 Aug to 6 Aug 2026</b></td>
+            </tr>
+            <tr>
+              <td>Conducting of Quiz for Institutions / Common Centres</td>
+              <td><b>7 Aug to 3 Sep 2026</b></td>
+            </tr>
+            <tr>
+              <td>Secondary Level Examination</td>
+              <td><b>26 Dec 2026</b></td>
+            </tr>
+          </table>
+          <p>The institutions will receive the list of Roll Numbers and date intimation by email. The schools, in turn,
+            will inform their students accordingly. </p>
+          <p>The individual participants will receive intimation by SMS and eMail upon submitting data on the portal. The
+            date-time slots will be intimated to the individual participants by email / message.</p>
+          <p>Participants can access the Study Material on our website. The participants shall attempt the Quiz on the
+            allotted date and time. As already mentioned, participants excelling in preliminary level will receive
+            training in practical astronomy at our Bhopal Centre with free lodging–boarding.</p>
+
+          <h3> System Requirement :</h3>
+          <p>
+            The quiz can run on all normal computers. Individual participants can also take the Quiz on touch-screen
+            mobile phones.
+          </p>
+
+          <h3>How to prepare :</h3>
+          <p>The questions in the quiz are based on Astronomy, Space & related science. Participants must acquire a good
+            knowledge of the Solar System, Deep Sky Objects & General Astronomy. Senior students of Aryabhat have compiled
+            specific Study Material and Demo Quiz which will be available on our website.</p>
+
+          <h3>The Prizes :</h3>
+          <p>The final winners of the quiz shall visit the observatory of their choice from those at Kavalur,
+            Kodaikanal, Nainital and Udaipur & Mount Abu in small groups. Observatories will be allotted to winners based
+            on overall merit and their choice-options. The trips to Observatories shall proceed in subsequent summers. We
+            invite eligible students and institutions to participate in this activity. For any clarification, please
+            contact us by email or voice-call.</p>
+
+
+          <h4>Contact information </h4>
+          <div class="card">
+            <h2 style="text-align:center;"> <b>Aryabhat Foundation</b></h2>
+            <p style="text-align:center;">
+              S-1, Swapnil Apartment VIII
+              258, Trilanga, Shahpura, Bhopal 462039</p>
+
+            <p style="text-align:center;">
+              <b>Phone</b> : 9425674075, 9425631310
+            </p>
+
+            <!--p style="text-align:center;">
+          Quiz link : <a href="https://quiz.aryabhat.org/">quiz.aryabhat.org</a>
+        </p-->
+            <p style="text-align:center;">
+              mail : <a href="mailto:aryabhat.foundation@gmail.com"> aryabhat.foundation@gmail.com</a>
+            </p>
+            <p style="text-align:center;">
+              website : <a href="www.aryabhat.org">www.aryabhat.org</a>
+            </p>
+            <p style="text-align:center;"><b>Quiz Coordinator</b><br>Alok Mandavgane +91 9425631310, +91 8225855428</p>
           </div>
-        </details>
+        </article>
+
       </div>
-      <div class="eight columns">
-        <h2>Details of the Quiz</h2>
-        <h3> The Organisation :</h3>
-        <p>Aryabhat Foundation is a dedicated endeavor for promotion of Astronomy and Basic Science. The movement
-          started in 1995, which took the shape of a duly registered social service organisation. Backed by a group of
-          people
-          dedicated to their duties towards society, the organisation is committed to make learning Basic Science
-          enjoyable for youngsters, thus inculcating a science-based temperament in them.</p>
 
-        <h3>The Program :</h3>
-        <p>Astronomy is a thrilling hobby for all age groups. It also makes a strong platform for youngsters aspiring
-          for an exciting career in space technology.</p>
-        <p>Aryabhat Astronomy Quiz is aimed at developing the interest of the
-          school students in this field through practical exposure. The quiz is a two-tier competition consisting of a
-          preliminary test followed by a practical examination. The preliminary test is a cream-separation exercise
-          conducted on a digital platform.</p>
-        <p>Selected participants will qualify for the secondary level by merit in the
-          preliminary test. These participants will be offered training in telescope-operation, sky reading and
-          practical Astronomy at our Bhopal Centre. The lodging-boarding will be free for participants availing night
-          camps, but no TA/DA will be paid at any stage. Those who fail to attend the training will not be included for
-          the secondary level.</p>
-        <p>The secondary level examination will be held on Saturday 26 December 2026. This test is
-          meant to examine the ability of the participants in practical Astronomy. Final winners will be selected on
-          their overall performance.</p>
-
-        <h3>Eligibility :</h3>
-        <p>Students from class 6 to class 9 (both inclusive) from any school situated in Madhya Pradesh are eligible to
-          take part in the quiz. Students availing home-schooling in the given class range and permanently residing in
-          Madhya Pradesh are also eligible.</p>
-
-        <h3>Entry Fee :</h3>
-        <p>Waived for all participants. No charges will be there for practical training as well.</p>
-
-        <h3>Preliminary Test :</h3>
-        <p>The preliminary Quiz consists of questions on basic Astronomy & Space Science. Each participant is offered 20
-          objective type questions to be answered in 180 seconds. A correct answer will fetch five marks, and two marks
-          will be deducted for the wrong one. The final score will appear on-screen as soon as any participant finishes
-          the test.</p>
-        <p>For individual participants, the preliminary Quiz will be available online on the allotted date and
-          time. For institutional participants, the Quiz will be offered on the school’s computers on a date and time
-          settled with the school, in presence of a person authorised by Aryabhat. In addition, Aryabhat would also
-          conduct the Preliminary Test at common test centres.
-          Participants taking the Quiz under Individual-mode will not be allowed to participate under
-          Institutional-mode, or vice-versa.</p>
-
-        <h3>How to participate :</h3>
-        <p>Institutions shall send the particulars of their students to us by email. The format for sending entries is
-          available on our website. Individual participants shall register for the Quiz using their mobile number and
-          email ID on the Portal given on our website. For individual participants, the mobile number will be used as
-          login-ID, hence cannot be changed. The relevant date-line is given below :-</p>
-        <table border="1" style="border-collapse: collapse;margin-left: auto;margin-right: auto;">
-          <tr>
-            <td style="padding:12px;color:#ddd;">Institutional Registration</td>
-            <td style="padding:12px;color:#fff;"><b>1 Apr to 25 Jul 2026</b></td>
-          </tr>
-          <tr>
-            <td style="padding:12px;color:#ddd;">Individual Registration</td>
-            <td style="padding:12px;color:#fff;"><b>20 Jun to 25 Jul 2026</b></td>
-          </tr>
-          <tr>
-            <td style="padding:12px;color:#ddd;">Online Quiz for individuals</td>
-            <td style="padding:12px;color:#fff;"><b>1 Aug to 6 Aug 2026</b></td>
-          </tr>
-          <tr>
-            <td style="padding:12px;color:#ddd;">Conducting of Quiz for Institutions / Common Centres</td>
-            <td style="padding:12px;color:#fff;"><b>7 Aug to 3 Sep 2026</b></td>
-          </tr>
-          <tr>
-            <td style="padding:12px;color:#ddd;">Secondary Level Examination</td>
-            <td style="padding:12px;color:#fff;"><b>26 Dec 2026</b></td>
-          </tr>
-        </table>
-        <p>The institutions will receive the list of Roll Numbers and date intimation by email. The schools, in turn,
-          will inform their students accordingly. </p>
-        <p>The individual participants will receive intimation by SMS and eMail upon submitting data on the portal. The
-          date-time slots will be intimated to the individual participants by email / message.</p>
-        <p>Participants can access the Study Material on our website. The participants shall attempt the Quiz on the
-          allotted date and time. As already mentioned, participants excelling in preliminary level will receive
-          training in practical astronomy at our Bhopal Centre with free lodging–boarding.</p>
-
-        <h3> System Requirement :</h3>
-        <p>
-          The quiz can run on all normal computers. Individual participants can also take the Quiz on touch-screen
-          mobile phones.
-        </p>
-
-        <h3>How to prepare :</h3>
-        <p>The questions in the quiz are based on Astronomy, Space & related science. Participants must acquire a good
-          knowledge of the Solar System, Deep Sky Objects & General Astronomy. Senior students of Aryabhat have compiled
-          specific Study Material and Demo Quiz which will be available on our website.</p>
-
-        <h3>The Prizes :</h3>
-        <p>The final winners of the quiz shall visit the observatory of their choice from those at Kavalur,
-          Kodaikanal, Nainital and Udaipur & Mount Abu in small groups. Observatories will be allotted to winners based
-          on overall merit and their choice-options. The trips to Observatories shall proceed in subsequent summers. We
-          invite eligible students and institutions to participate in this activity. For any clarification, please
-          contact us by email or voice-call.</p>
-
-
-        <h4>Contact information </h4>
-        <div class="card">
-          <h2 style="text-align:center;"> <b>Aryabhat Foundation</b></h2>
-          <p style="text-align:center;">
-            S-1, Swapnil Apartment VIII
-            258, Trilanga, Shahpura, Bhopal 462039</p>
-
-          <p style="text-align:center;">
-            <b>Phone</b> : 9425674075, 9425631310
-          </p>
-
-          <!--p style="text-align:center;">
-        Quiz link : <a href="https://quiz.aryabhat.org/">quiz.aryabhat.org</a>
-      </p-->
-          <p style="text-align:center;">
-            mail : <a href="mailto:aryabhat.foundation@gmail.com"> aryabhat.foundation@gmail.com</a>
-          </p>
-          <p style="text-align:center;">
-            website : <a href="www.aryabhat.org">www.aryabhat.org</a>
-          </p>
-          <p style="text-align:center;"><b>Quiz Coordinator</b><br>Alok Mandavgane +91 9425631310, +91 8225855428</p>
-        </div>
-      </div>
-
-    </div>
-    <div class="row">
-      <p> &copy; Aryabhat Foundation &middot;</p>
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
     </div>
   </div>
 
-  </div>
-  <!-- Background Animation -->
-  <script src="js/background-stars.js"></script>
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
   <script>
     // Open details card and scroll to it when navigating via hash

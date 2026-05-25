@@ -77,6 +77,32 @@ Sections breathe more than they crowd. Rough scale:
 
 Use `clamp()` instead of media-query font sizes wherever possible — see how [`.section-label h2`](newindex.html#L566) scales fluidly between breakpoints.
 
+### 1.6 Logo treatment
+
+The `aryabhat.svg` logo and the `title.svg` wordmark are always drop-shadowed with **white**, layered over a dark depth shadow. Never gold, never cool blue, never warm amber.
+
+```
+Tight halo  drop-shadow(0 0 4–8px  rgba(255,255,255,0.6–0.8))
+Soft wash   drop-shadow(0 0 12–20px rgba(255,255,255,0.2–0.3))
+Depth       drop-shadow(2–4px 3–6px 5–7px rgba(0,0,0,0.45–0.55))
+```
+
+Scale by placement:
+
+| Placement | Layers |
+|---|---|
+| Hero centerpiece (`.hero-logo`) | all three, fuller values — see [newindex.html](newindex.html#L383) |
+| Header logo (injected by [js/layout.js](js/layout.js)) | tight halo + soft wash + depth |
+| Header wordmark (`title.svg`) | tight halo + depth only (skip the soft wash — the wordmark is wider, more wash makes it look smudged) |
+
+**Why white:**
+
+1. The logo art is white/cream-toned itself — a white glow lets it self-illuminate rather than impose a foreign hue.
+2. White stays out of the brand-gold lane. Gold is reserved for *interactive* affordances (kickers, headlines, active states, buttons). If the logo also glowed gold, gold would stop meaning "look here / act here."
+3. White reads as starlight on the dark sky — on-theme without trying. Cool tints drift toward sci-fi-metallic; warm tints toward amber-lamp.
+
+The inline filter on the layout.js-injected `.value-img` SVGs is the single source of truth for the header treatment. Don't override per-page unless the page has a genuinely different background (none currently do).
+
 ---
 
 ## 2. Components
@@ -102,18 +128,33 @@ The recurring structural unit. Every section starts with a kicker + headline pai
 
 ### 2.2 Buttons
 
+Both variants are **gold-on-dark**. Hierarchy is carried by mass (fill + border weight) and a halo on the primary — not by inverting colour. See *Rationale* at the bottom of this section.
+
 ```html
 <a class="button button-primary" href="...">Primary action</a>
 <a class="button" href="...">Ghost action</a>
 ```
 
-- **Primary**: warm gold gradient `linear-gradient(135deg, #ffd655 0%, #ffa41b 100%)`, near-black text `#0a131c`, 600 weight.
-- **Ghost** (default): transparent fill, gold border `rgba(255,204,51,0.5)`, gold text.
-- Both use `--brand-shape` and `height: 44px` (40px on mobile).
-- Hover: 1px lift + warm gold glow (24px on ghost, 30px on primary).
-- Active: settles back, tightens shadow. Uses `margin-bottom: 1rem` to neutralise the base CSS's "prevent layout shift" hack.
+| Property | Ghost (secondary) | Primary |
+|---|---|---|
+| Background | transparent | `linear-gradient(180deg, #1a2638 0%, #0d1722 100%)` |
+| Border | `1px solid rgba(255,204,51,0.5)` | `1.5px solid var(--gold)` |
+| Text | `var(--gold)`, 500 weight | `var(--gold)`, 600 weight |
+| Glow | none | outer `0 0 22px rgba(255,204,51,0.18)` + inset highlight `0 1px 0 rgba(255,204,51,0.12)` |
+| Hover | `rgba(255,204,51,0.08)` wash, border → `var(--gold)`, 24px glow, lift 1px | gradient brightens, border → `var(--gold-soft)`, 32px glow, lift 2px, text → `var(--gold-soft)` |
+| Active | settles back, tightens shadow | settles back, tightens shadow (also clears the legacy `margin-bottom: 1rem` hack from [css/style.css](css/style.css)) |
 
-Use a primary + 1–2 ghosts in any CTA row (`.cta-row` is `display: flex; gap: 12px; flex-wrap: wrap; justify-content: center`).
+Both use `--brand-shape` and `height: 44px` (40px on mobile). Use a primary + 1–2 ghosts in any CTA row (`.cta-row` is `display: flex; gap: 12px; flex-wrap: wrap; justify-content: center`).
+
+#### Rationale: why we don't use a gold-filled primary
+
+An earlier iteration used a saturated gold gradient (`#ffd655 → #ffa41b`) with near-black text. The contrast ratio is fine (≈12:1, well above WCAG AAA), but it had three real-world readability problems:
+
+1. **Saturated-yellow vibration** — high-chroma backgrounds with dark text create perceptual micro-vibration even at high contrast (cf. the Bezold–Brücke effect). The eye doesn't settle.
+2. **Pattern break** — every other gold accent on the page is *pigment on a dark surface* (kickers, headline `<em>`s, the active nav pill, drop-cap, pull-quote, etc.). A gold-filled button reads as foreign rather than as the loudest member of the same visual family.
+3. **Mobile glare** — on bright OLED screens outdoors the saturated gold panel becomes a literal glare source. Light-on-dark fares better in those conditions.
+
+So the rule is: **gold on dark, always**. Hierarchy through mass and halo, not through colour inversion.
 
 ### 2.3 Cards
 

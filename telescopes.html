@@ -12,10 +12,269 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <style>
-    img {}
-  </style>
   <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       telescopes.html — design-system port (scoped: this page only)
+       Content unchanged from the original; only presentation
+       follows newindex.html / design.md.
+       ========================================================== */
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — lifted from newindex.html
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current { background: transparent; border-radius: 0; }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+    }
+
+    html, body {
+      font-family: var(--font-body);
+    }
+
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 1.5rem 0 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       TELESCOPES — image + Google Sheet iframe
+       ============================================================ */
+    .telescopes-wrap {
+      max-width: 1100px;
+      margin: 0 auto 2.4rem;
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .telescopes-image-frame {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      background: var(--panel-solid);
+    }
+
+    .telescopes-image-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+    }
+
+    .sheet-frame {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      background: #fff;
+      /* Google sheets render on white; let the sheet's bg show */
+    }
+
+    .sheet-frame iframe {
+      display: block;
+      width: 100%;
+      height: 1000px;
+      border: 0;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .main { padding-top: 1rem; }
+
+      .telescopes-wrap {
+        padding: 0 .5rem;
+        gap: 16px;
+        margin-bottom: 1.6rem;
+      }
+
+      .telescopes-image-frame,
+      .sheet-frame {
+        border-radius: 14px;
+      }
+
+      .sheet-frame iframe {
+        height: 700px;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -40,22 +299,24 @@
       <!-- Injected by js/layout.js -->
     </nav>
 
-    <div class="main row">
-      <div class="six column">
+    <div class="main">
 
-        <img class="value-img" src="images/alltelescopes.webp">
-        <iframe style="width: 100%; height: 1000px; border: none;"
-          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQsicqPFoGJwAllbRDgyUi6k7F7yGDMXBF7qYGKw9puts4RrZ1AtDX1_pUwqqdldc400_GUL6zLiguP/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <p> &copy; Aryabhat Foundation &middot;</p>
+      <section class="telescopes-wrap">
+        <div class="telescopes-image-frame">
+          <img class="value-img" src="images/alltelescopes.webp">
+        </div>
+        <div class="sheet-frame">
+          <iframe
+            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQsicqPFoGJwAllbRDgyUi6k7F7yGDMXBF7qYGKw9puts4RrZ1AtDX1_pUwqqdldc400_GUL6zLiguP/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+        </div>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
     </div>
   </div>
 
-  </div>
-  <!-- Background Animation -->
-  <script src="js/background-stars.js"></script>
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
 </body>
 

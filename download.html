@@ -12,6 +12,459 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       download.html — design-system port (scoped: this page only)
+       Content unchanged from the original; only presentation
+       follows newindex.html / design.md.
+       ========================================================== */
+
+    /* Prevent horizontal scroll from any overflowing child
+       (e.g., the floated navbar items from css/style.css). */
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — lifted from newindex.html
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current {
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg,
+            #000 0%,
+            #000 calc(100% - 56px),
+            transparent 100%);
+        mask-image: linear-gradient(90deg,
+            #000 0%,
+            #000 calc(100% - 56px),
+            transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar,
+      .navbar > .container {
+        min-height: 3.5rem;
+      }
+      .navbar > .container {
+        padding: 0 6px;
+      }
+      .navbar-list {
+        gap: 4px;
+      }
+      .navbar-link {
+        font-size: .88rem;
+        padding: 8px 14px;
+        letter-spacing: .04em;
+      }
+    }
+
+    /* ============================================================
+       TOKENS (mirror of newindex.html — see design.md §1)
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+    }
+
+    html,
+    body {
+      font-family: var(--font-body);
+    }
+
+    .main h1,
+    .main h2,
+    .main h3,
+    .main h4,
+    .main h5,
+    .main h6 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 1.5rem 0 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — lifted from newindex.html
+       ============================================================ */
+    .main .button,
+    .main button,
+    .card-content .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease,
+        border-color .25s ease, box-shadow .3s ease,
+        transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus,
+    .card-content .button:hover {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active,
+    .card-content .button:active {
+      transform: translateY(0);
+      background: rgba(255, 204, 51, 0.14);
+      box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* Primary: gold-on-dark with halo. See design.md §2.2. */
+    .main .button.button-primary,
+    .card-content .button.button-primary {
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: .03em;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+      text-shadow: none;
+    }
+
+    .main .button.button-primary:hover,
+    .card-content .button.button-primary:hover {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active,
+    .card-content .button.button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 16px rgba(255, 204, 51, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       DOWNLOAD CARDS — restyled <details> (still collapsible
+       like the original; just dressed in the new theme).
+       Overrides the base details.card-container rules from
+       css/style.css since this <style> loads after the link.
+       ============================================================ */
+    .downloads-wrap {
+      max-width: 900px;
+      margin: 0 auto 2.4rem;
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    details.card-container {
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 0;
+      transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+    details.card-container:hover {
+      border-color: rgba(255, 204, 51, 0.35);
+    }
+
+    details.card-container[open] {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    details.card-container summary {
+      padding: 18px 24px;
+      background: transparent;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid transparent;
+    }
+
+    details.card-container[open] summary {
+      border-bottom-color: rgba(255, 204, 51, 0.15);
+    }
+
+    details.card-container summary:hover {
+      background: rgba(255, 204, 51, 0.04);
+    }
+
+    details.card-container summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.card-container summary::after {
+      content: "▾";
+      font-size: 1.1rem;
+      color: var(--gold);
+      transition: transform 0.3s ease;
+      line-height: 1;
+    }
+
+    details.card-container[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    details.card-container summary h5 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: .95rem;
+      font-weight: 600;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* Card content — laid out as a wrapping flex row of buttons */
+    details.card-container .card-content {
+      padding: 20px 24px 14px;
+      border-top: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Buttons inside card-content drop the bottom margin from the
+       global rule so the flex-gap is the only spacing in play. */
+    details.card-container .card-content .button {
+      margin-bottom: 0;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .main {
+        padding-top: 1rem;
+      }
+
+      .downloads-wrap {
+        padding: 0 .5rem;
+        gap: 14px;
+        margin-bottom: 1.6rem;
+      }
+
+      details.card-container {
+        border-radius: 14px;
+      }
+
+      details.card-container summary {
+        padding: 14px 18px;
+      }
+
+      details.card-container summary h5 {
+        font-size: .85rem;
+        letter-spacing: .22em;
+      }
+
+      details.card-container .card-content {
+        padding: 16px 18px 10px;
+        gap: 10px;
+      }
+
+      .main .button,
+      .card-content .button {
+        font-size: .85rem;
+        height: 40px;
+        padding: 0 18px;
+      }
+
+      .main .button.button-primary,
+      .card-content .button.button-primary {
+        font-size: .9rem;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -36,9 +489,10 @@
       <!-- Injected by js/layout.js -->
     </nav>
 
-    <div class="main row">
-      <div class="twelve columns">
-        <br><br>
+    <div class="main">
+
+      <!-- Original 2 sections, restyled — content unchanged -->
+      <section class="downloads-wrap">
 
         <details class="card-container" open>
           <summary>
@@ -46,7 +500,7 @@
           </summary>
           <div class="card-content" id="card-information">
             <!--a class="button button-primary" target="_blank" href="files/2021/AstroQuiz2021-22.pdf">Astronomy Quiz Details</a-->
-            <a class="button button-primary" target="_blank" href="files/Offered Activities.pdf">Offered Activities</a>
+            <a class="button button-primary" target="_blank" href="files/Offered_Activities.pdf">Offered Activities</a>
             <a class="button button-primary" target="_blank" href="files/Aryabhat_Hindi_Profile.pdf">आर्यभट फाउंडेशन :
               एक
               परिचय</a>
@@ -68,14 +522,15 @@
               Form</a>
           </div>
         </details>
-      </div>
-    </div>
-    <div class="row">
-      <p> &copy; Aryabhat Foundation &middot;</p>
+
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
     </div>
   </div>
-  <!-- Background Animation -->
-  <script src="js/background-stars.js"></script>
+
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
 </body>
 

@@ -271,29 +271,30 @@
       margin-bottom: 1rem;
     }
 
+    /* Primary: gold-on-dark with halo. See design.md §2.2. */
     .main .button.button-primary,
     .contact-card .button.button-primary {
-      color: #0a131c;
+      color: var(--gold);
       font-weight: 600;
-      letter-spacing: .02em;
-      background: linear-gradient(135deg, #ffd655 0%, #ffa41b 100%);
-      background-image: linear-gradient(135deg, #ffd655 0%, #ffa41b 100%);
-      border-color: transparent;
+      letter-spacing: .03em;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
       box-shadow:
-        0 6px 22px rgba(255, 164, 27, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
       text-shadow: none;
     }
 
     .main .button.button-primary:hover,
     .contact-card .button.button-primary:hover {
-      color: #0a131c;
-      background: linear-gradient(135deg, #ffe079 0%, #ffb23d 100%);
-      background-image: linear-gradient(135deg, #ffe079 0%, #ffb23d 100%);
-      border-color: transparent;
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
       box-shadow:
-        0 10px 30px rgba(255, 164, 27, 0.45),
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
       transform: translateY(-2px);
     }
 
@@ -301,8 +302,8 @@
     .contact-card .button.button-primary:active {
       transform: translateY(0);
       box-shadow:
-        0 3px 12px rgba(255, 164, 27, 0.35),
-        inset 0 2px 4px rgba(0, 0, 0, 0.12);
+        0 0 16px rgba(255, 204, 51, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.25);
       margin-bottom: 1rem;
     }
 
@@ -332,7 +333,7 @@
       background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 22px 22px 20px;
+      padding: 28px 26px 24px;
       transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
     }
 
@@ -343,24 +344,35 @@
     }
 
     .contact-card h4 {
-      margin: 0 0 .6rem;
+      margin: 0 0 .9rem;
       font-family: var(--font-display);
-      font-size: .82rem;
+      font-size: .95rem;
       font-weight: 600;
-      letter-spacing: 0.3em;
+      letter-spacing: 0.26em;
       text-transform: uppercase;
       color: var(--gold);
     }
 
     .contact-card p {
-      margin: 0 0 .6rem;
+      margin: 0 0 .8rem;
       color: var(--ink);
-      font-size: 1rem;
-      line-height: 1.6;
+      font-size: 1.15rem;
+      line-height: 1.55;
     }
 
     .contact-card p:last-child {
       margin-bottom: 0;
+    }
+
+    /* Brand emphasis on <em> — the renfrew Aryabhat brand face,
+       gold, non-italic, slightly larger to match Outfit's x-height. */
+    .contact-card em {
+      font-family: var(--font-brand);
+      font-style: normal;
+      font-weight: 300;
+      font-size: 1.25em;
+      color: var(--gold);
+      letter-spacing: 0.01em;
     }
 
     .contact-card a:not(.button) {
@@ -377,7 +389,7 @@
     }
 
     .contact-card .button {
-      margin-top: .2rem;
+      margin-top: .4rem;
       margin-bottom: 0;
     }
 
@@ -463,17 +475,19 @@
       }
 
       .contact-card {
-        padding: 18px 18px 16px;
+        padding: 22px 20px 20px;
         border-radius: 14px;
       }
 
       .contact-card h4 {
-        font-size: .78rem;
-        letter-spacing: .26em;
+        font-size: .88rem;
+        letter-spacing: .22em;
+        margin-bottom: .8rem;
       }
 
       .contact-card p {
-        font-size: .98rem;
+        font-size: 1.05rem;
+        line-height: 1.55;
       }
 
       .map-wrap {
@@ -539,7 +553,7 @@
 
           <div class="contact-card">
             <h4>Address</h4>
-            <p>Aryabhat Foundation
+            <p><em>Aryabhat Foundation</em>
               <br>
               S-1, Swapnil Apartment VIII
               <br>258, Trilanga, Shahpura, Bhopal 462039
@@ -555,7 +569,7 @@
 
           <div class="contact-card">
             <h4>Phone</h4>
-            <p>📞 +91 9425674075 &nbsp; <a class="button button-primary" href="https://wa.me/9425674075">💬 whatsapp </a>
+            <p>📞 <a href="tel:+919425674075">+91 9425674075</a> &nbsp; <a class="button button-primary" href="https://wa.me/9425674075">💬 whatsapp </a>
             </p>
           </div>
 

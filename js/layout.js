@@ -1,13 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
     // 1. Inject Header
+    // Logo + wordmark drop-shadows follow design.md §1.6:
+    // layered WHITE halo + dark depth shadow. Never gold (reserved
+    // for interactive accents), never cool/warm tints (drift toward
+    // metallic / amber).
     var headerHTML = `
     <div class="row">
         <div class="six columns offset-by-two ">
-          <img class="value-img" style="filter: drop-shadow(4px 4px 2px rgba(0, 0,100, 1));" src="images/title.svg">
+          <img class="value-img" style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)) drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.5));" src="images/title.svg">
         </div>
         <div class="six columns logo">
           <img class="value-img" width="300" height="100"
-            style="filter: drop-shadow(1px 2px 2px rgba(205, 205, 255, 1));" src="images/aryabhat.svg">
+            style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.22)) drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));" src="images/aryabhat.svg">
         </div>
     </div>`;
 
