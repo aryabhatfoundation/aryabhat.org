@@ -23,12 +23,6 @@
        newindex.html — full redesign (scoped: this page only)
        ========================================================== */
 
-    /* Hide layout.js-injected header; the hero section below
-       owns the brand presentation with the aryabhat.svg logo.  */
-    .container > .header {
-      display: none !important;
-    }
-
     /* Prevent horizontal scroll from any overflowing child
        (e.g., the floated navbar items from css/style.css). */
     html,
@@ -234,8 +228,7 @@
     .main h3,
     .main h4,
     .main h5,
-    .main h6,
-    .hero h1 {
+    .main h6 {
       font-family: var(--font-display);
       font-weight: 500;
       letter-spacing: -0.01em;
@@ -389,81 +382,47 @@
       z-index: 1;
     }
 
-    /* --- Logo stage: hero-logo (telescope boy) + hero-wordmark
-           side-by-side, stays horizontal on every viewport. --- */
-    .logo-stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(10px, 2.5vw, 28px);
-      margin: 0 auto 2.8rem;
-      padding: 0 10px;
-      max-width: 100%;
-      flex-wrap: nowrap;
+    /* Visually-hidden utility — content readable by screen readers
+       and indexed by search engines, invisible on screen. Used for
+       the page <h1> since there is no on-screen headline. */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    .hero-logo {
-      flex: 0 0 auto;
-      height: clamp(140px, 28vw, 240px);
-      width: auto;
-      filter:
-        drop-shadow(0 0 6px rgba(255, 255, 255, 0.75))
-        drop-shadow(0 0 16px rgba(255, 255, 255, 0.28))
-        drop-shadow(2px 4px 7px rgba(0, 0, 0, 0.55));
-      animation: logo-float 6s ease-in-out infinite;
-    }
-
-    /* --- Mega display typography (Aryabhat brand font) --- */
-    .hero-tag {
-      margin: 0 auto 1rem;
-      font-family: var(--font-brand);
-      font-weight: 300;
-      line-height: 0.95;
-      letter-spacing: 0;
-      color: #fff;
-      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
-    }
-
-    .hero-tag .line {
-      display: block;
-    }
-
-    .hero-tag .line-1 {
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      color: var(--ink);
-    }
-
-    .hero-tag .line-2 {
-      font-size: clamp(3rem, 10vw, 6.5rem);
-      color: var(--gold);
-      text-shadow:
-        0 2px 18px rgba(0, 0, 0, 0.6),
-        0 0 40px rgba(255, 204, 51, 0.35);
-      margin: -.05em 0 -.05em;
-    }
-
-    .hero-tag .line-2 em {
-      color: #fff;
-      font-style: normal;
-    }
-
-    .hero-tag .line-3 {
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      color: var(--ink);
-      opacity: 0.9;
-    }
-
+    /* Hero lede — promoted to a lead statement now that it stands
+       alone in the hero (no big tagline above it anymore). */
     .hero-lede {
-      max-width: 620px;
-      margin: 1.2rem auto 1.6rem;
-      font-size: clamp(1rem, 1.6vw, 1.15rem);
-      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto 1.8rem;
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      line-height: 1.6;
       color: var(--ink);
+      text-align: center;
     }
 
     .hero-lede b {
-      color: var(--gold-soft);
-      font-weight: 500;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* Inline brand mention — renfrew, gold, non-italic, slightly
+       larger to balance renfrew's smaller x-height against Outfit.
+       Same convention as .contact-card em on contact.html. */
+    .hero-lede em {
+      font-family: var(--font-brand);
+      font-style: normal;
+      font-weight: 300;
+      font-size: 1.2em;
+      color: var(--gold);
+      letter-spacing: 0.01em;
     }
 
     .cta-row {
@@ -865,11 +824,6 @@
     /* ============================================================
        KEYFRAMES
        ============================================================ */
-    @keyframes logo-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-
     @keyframes marquee {
       from { transform: translateX(0); }
       to { transform: translateX(-50%); }
@@ -880,15 +834,13 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .hero-tag,
     .hero-lede,
     .cta-row {
       animation: fadeUp .8s ease-out both;
     }
 
-    .hero-tag  { animation-delay: .15s; }
-    .hero-lede { animation-delay: .3s; }
-    .cta-row   { animation-delay: .45s; }
+    .hero-lede { animation-delay: .15s; }
+    .cta-row   { animation-delay: .3s; }
 
     /* ============================================================
        MOBILE — 600px and below
@@ -899,34 +851,10 @@
         padding: 1.8rem 0.5rem 1.6rem;
       }
 
-      .logo-stage {
-        gap: 10px;
-        padding: 0 6px;
-        margin-bottom: 1.8rem;
-      }
-
-      .hero-logo {
-        height: clamp(130px, 36vw, 200px);
-      }
-
-      .hero-tag {
-        margin-bottom: .6rem;
-      }
-
-      .hero-tag .line-1,
-      .hero-tag .line-3 {
-        font-size: clamp(1.5rem, 7vw, 2rem);
-      }
-
-      .hero-tag .line-2 {
-        font-size: clamp(2.6rem, 13vw, 3.6rem);
-        margin: -.1em 0 -.1em;
-      }
-
       .hero-lede {
-        font-size: .98rem;
-        line-height: 1.6;
-        margin: .8rem auto 1.2rem;
+        font-size: clamp(1rem, 4.2vw, 1.2rem);
+        line-height: 1.55;
+        margin: 0 auto 1.3rem;
         padding: 0 .25rem;
       }
 
@@ -1089,8 +1017,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .hero-logo, .marquee-track,
-      .hero-tag, .hero-lede, .cta-row {
+      .marquee-track, .hero-lede, .cta-row {
         animation: none !important;
       }
     }
@@ -1112,7 +1039,7 @@
   </script>
   <div class="container">
     <section class="header">
-      <!-- Injected by js/layout.js — hidden on this page; hero below owns the brand -->
+      <!-- Injected by js/layout.js -->
     </section>
     <nav class="navbar">
       <!-- Injected by js/layout.js -->
@@ -1124,19 +1051,14 @@
            HERO
            ============================================================ -->
       <section class="hero">
-        
-        <div class="logo-stage">
-          <img class="hero-logo" src="images/aryabhat.svg" alt="Aryabhat Foundation logo">
-        </div>
 
-        <h1 class="hero-tag">
-          <span class="line line-1">Look up.</span>
-          <span class="line line-2">Wonder <em>more</em>.</span>
-          <span class="line line-3">Fear less.</span>
-        </h1>
+        <!-- Page-level H1 for screen readers + SEO (no on-screen
+             headline by design — the brand identity sits in the
+             header injected by js/layout.js). -->
+        <h1 class="visually-hidden">Aryabhat Foundation</h1>
 
         <p class="hero-lede">
-          <b>Aryabhat Foundation</b> turns the night sky into a classroom. Since 1995, we've helped students,
+          <em>Aryabhat Foundation</em> turns the night sky into a classroom. Since 1995, we've helped students,
           teachers, and the simply-curious fall in love with astronomy and basic science — <b>without the jargon,
             without the superstition.</b>
         </p>

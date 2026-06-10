@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Offered Activities — Aryabhat Foundation</title>
+  <meta name="description"
+    content="The educative programs Aryabhat Foundation offers — Slide Show, Film Show, Science Lecture, Telescope-aided Sky View Camp, and Solar Astronomy Workshop.">
+  <meta name="author" content="Aryabhat Foundation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="images/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================
+       activities.html
+       Screen: cosmic gold theme per design.md
+       Print:  letterhead-style document for clean Save-as-PDF
+       ========================================================== */
+
+    /* ---------- 1. TOKENS (design.md §1.1, §1.2, §1.3) ---------- */
+    :root {
+      --gold:        #ffcc33;
+      --gold-soft:   #ffe58a;
+      --gold-deep:   #ffa41b;
+      --ink:         #e6eef7;
+      --ink-dim:     #9fb3c8;
+      --accent-cyan: #1EAEDB;
+      --panel:       #16223388;
+      --panel-solid: #1a2636;
+      --border:      #2a3d55;
+
+      --font-brand:   'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body:    'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+      --brand-shape:       14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+
+      /* Print-only ink */
+      --print-ink:      #111;
+      --print-dim:      #555;
+      --print-gold:     #a87100;   /* dark amber that reads on paper */
+      --print-border:   #cfcfcf;
+      --print-bg-soft:  #f6f3ea;   /* warm cream for facts panel */
+    }
+
+    .container > .header { display: none !important; }
+    html, body { overflow-x: hidden; }
+
+    html, body {
+      font-family: var(--font-body);
+      color: var(--ink);
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    /* ---------- 2. NAVBAR (design.md §2.6) ----------
+       Glass-morph, gold underline, pill links. The layout.js script
+       injects the list — we restyle it here. */
+    .navbar {
+      position: relative;
+      min-height: 4.4rem;
+      background: linear-gradient(180deg, rgba(10,19,28,0.96), rgba(10,19,28,0.86));
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255,204,51,0.18);
+      box-shadow: 0 4px 22px rgba(0,0,0,0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+    .navbar::-webkit-scrollbar { display: none; }
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent,
+        rgba(255,204,51,0.18) 15%,
+        rgba(255,204,51,0.7) 50%,
+        rgba(255,204,51,0.18) 85%, transparent);
+      pointer-events: none;
+    }
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+    .navbar-list {
+      display: flex;
+      gap: 6px;
+      margin: 0; padding: 0; list-style: none;
+      white-space: nowrap;
+    }
+    .navbar-item { float: none !important; flex: 0 0 auto; border-bottom: none; margin: 0; padding: 0; }
+    .navbar-item.current { background: transparent; border-radius: 0; }
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      color: var(--ink);
+      padding: 11px 20px;
+      border-radius: 999px;
+      transition: color .2s, background .2s, box-shadow .25s;
+    }
+    .navbar-link:hover, .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255,204,51,0.10);
+      outline: 0;
+    }
+    .navbar-link.active {
+      color: var(--gold);
+      font-weight: 600;
+      background: rgba(255,204,51,0.12);
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,204,51,0.4),
+        0 0 16px rgba(255,204,51,0.12);
+    }
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; }
+    }
+
+    /* ---------- 3. BUTTONS (design.md §2.2) ----------
+       Gold on dark, always. Hierarchy through mass + halo. */
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255,204,51,0.5);
+      background: transparent;
+      color: var(--gold);
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s, color .25s, border-color .25s, box-shadow .3s, transform .15s;
+    }
+    .button:hover, .button:focus {
+      background: rgba(255,204,51,0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255,204,51,0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+    .button:active {
+      transform: translateY(0);
+      background: rgba(255,204,51,0.14);
+      box-shadow: 0 0 12px rgba(255,204,51,0.25);
+    }
+    .button-primary {
+      font-weight: 600;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255,204,51,0.18),
+        inset 0 1px 0 rgba(255,204,51,0.12);
+    }
+    .button-primary:hover, .button-primary:focus {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255,204,51,0.32),
+        inset 0 1px 0 rgba(255,204,51,0.20);
+      transform: translateY(-2px);
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---------- 4. HERO (design.md §2.4 — single-line variant) ---------- */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 3rem 1rem 2.2rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 25%, rgba(255,204,51,0.10), transparent 50%),
+        radial-gradient(ellipse at 20% 70%, rgba(30,174,219,0.08), transparent 55%),
+        radial-gradient(ellipse at 80% 60%, rgba(170,110,255,0.06), transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .hero-logo {
+      height: clamp(110px, 18vw, 170px);
+      width: auto;
+      margin: 0 auto 1.2rem;
+      display: block;
+      /* design.md §1.6 — layered WHITE drop-shadows, hero values */
+      filter:
+        drop-shadow(0 0 6px rgba(255,255,255,0.75))
+        drop-shadow(0 0 16px rgba(255,255,255,0.28))
+        drop-shadow(2px 4px 7px rgba(0,0,0,0.55));
+      animation: logo-float 6s ease-in-out infinite;
+    }
+
+    .hero .kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0 auto 1rem;
+      font-family: var(--font-brand);
+      font-weight: 300;
+      line-height: 1.1;   /* renfrew needs +0.05 over Space Grotesk (§1.2) */
+      letter-spacing: 0;  /* renfrew dislikes negative tracking */
+      color: var(--ink);
+      font-size: clamp(2.4rem, 7vw, 4.4rem);
+      text-shadow:
+        0 2px 18px rgba(0,0,0,0.6),
+        0 0 40px rgba(255,204,51,0.20);
+    }
+    .hero h1 em { font-style: normal; color: var(--gold); }
+
+    .hero-lede {
+      max-width: 720px;
+      margin: 1.2rem auto 1.6rem;
+      font-size: clamp(1rem, 1.6vw, 1.15rem);
+      line-height: 1.75;
+      color: var(--ink);
+    }
+
+    /* ---------- 5. MARQUEE (design.md §2.5) ---------- */
+    .marquee {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, #0f1a26, #16243a 50%, #0f1a26);
+      margin: 1rem 0 2.4rem;
+      padding: 12px 0;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 48px;
+      width: max-content;
+      animation: marquee 50s linear infinite;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+    .marquee-track span { display: inline-flex; align-items: center; }
+    .marquee-track span::before {
+      content: "✦";
+      color: var(--gold);
+      margin-right: 48px;
+      font-size: 0.8em;
+    }
+
+    /* ---------- 6. SECTION LABEL (design.md §2.1) ---------- */
+    .section-label {
+      text-align: center;
+      margin: 0 0 1.4rem;
+    }
+    .section-label .kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+    .section-label h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0;
+      letter-spacing: 0;
+    }
+    .section-label h2 em { font-style: normal; color: var(--gold); }
+
+    /* ---------- 7. PROGRAMS GRID — do-tiles (design.md §2.3) ---------- */
+    .programs {
+      max-width: 1080px;
+      margin: 0 auto 2.8rem;
+      padding: 0 12px;
+    }
+    .programs-lede {
+      max-width: 780px;
+      margin: 0 auto 1.6rem;
+      text-align: center;
+      color: var(--ink);
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+    .do-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 640px)  { .do-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .do-grid { grid-template-columns: repeat(5, 1fr); } }
+
+    .do-tile {
+      position: relative;
+      background: linear-gradient(160deg, rgba(30,45,66,0.9), rgba(15,26,38,0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;        /* §1.4 — small content card */
+      padding: 22px 18px 18px;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      overflow: hidden;
+    }
+    .do-tile:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,204,51,0.15);
+    }
+    .do-tile .num {
+      position: absolute;
+      top: 6px;
+      right: 14px;
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: rgba(255,204,51,0.12);  /* low-alpha gold decoration */
+      line-height: 1;
+    }
+    .do-tile .icon {
+      display: block;
+      width: 38px;
+      height: 38px;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+    .do-tile h3 {
+      margin: 0;
+      color: var(--gold);
+      font-size: 1.05rem;
+      line-height: 1.3;
+      font-family: var(--font-display);
+    }
+
+    /* ---------- 8. PROGRAM DETAIL — prose + at-a-glance panel ---------- */
+    .program-detail {
+      max-width: 1080px;
+      margin: 0 auto 2.8rem;
+      padding: 0 12px;
+    }
+    .program-detail .section-label {
+      text-align: left;
+      margin-bottom: 1.2rem;
+    }
+    .pd-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+    @media (min-width: 820px) {
+      .pd-grid { grid-template-columns: 1.6fr 1fr; }
+      .pd-grid.reverse > .pd-prose { order: 2; }
+      .pd-grid.reverse > .pd-facts { order: 1; }
+    }
+
+    .pd-prose {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;          /* §1.4 — section panel */
+      padding: 24px 22px;
+    }
+    .pd-prose p {
+      color: var(--ink);
+      line-height: 1.8;
+      margin: 0;
+      font-size: 1rem;
+    }
+    @media (min-width: 700px) { .pd-prose p { text-align: justify; } }
+
+    .pd-image {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+      background: var(--panel-solid);
+      margin-bottom: 22px;
+    }
+    .pd-image img { display: block; width: 100%; height: auto; margin: 0; }
+
+    .pd-facts {
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(255,204,51,0.10), transparent 55%),
+        linear-gradient(160deg, rgba(30,45,66,0.9), rgba(15,26,38,0.95));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pd-facts::after {
+      content: "✦";
+      position: absolute;
+      top: 14px; right: 16px;
+      color: rgba(255,204,51,0.35);
+      font-size: 1rem;
+    }
+    .pd-facts .facts-title {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 12px;
+    }
+    .pd-facts dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .pd-facts dt {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin: 0 0 2px;
+    }
+    .pd-facts dd {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.98rem;
+      line-height: 1.4;
+    }
+    .pd-facts dd b { color: var(--gold-soft); font-weight: 600; }
+
+    /* ---------- 9. SCHOOLS / TEACHERS — story panel ---------- */
+    .schools {
+      max-width: 980px;
+      margin: 0 auto 2.8rem;
+      padding: 0 12px;
+    }
+    .schools-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;          /* §1.4 — section panel */
+      padding: 28px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .schools-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--gold), transparent);
+    }
+    .schools-card .section-label {
+      text-align: left;
+      margin-bottom: 0.9rem;
+    }
+    .schools-card p {
+      color: var(--ink);
+      line-height: 1.8;
+      margin: 0;
+      font-size: 1rem;
+    }
+    @media (min-width: 700px) { .schools-card p { text-align: justify; } }
+
+    .schools-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 1.2rem;
+    }
+    .schools-pills span {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      background: rgba(255,204,51,0.08);
+      border: 1px solid rgba(255,204,51,0.3);
+      border-radius: 999px;          /* §1.4 — micro-tag */
+      padding: 6px 12px;
+    }
+
+    /* ---------- 10. JOIN BANNER (design.md §2.8) ---------- */
+    .join-banner {
+      position: relative;
+      margin: 3rem auto 2rem;
+      padding: 3rem 1.5rem 2.4rem;
+      max-width: 1000px;
+      border-radius: 22px;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(255,204,51,0.15), transparent 55%),
+        radial-gradient(ellipse at 80% 70%, rgba(30,174,219,0.12), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid var(--border);
+      text-align: center;
+      overflow: hidden;
+    }
+    .join-banner::before {
+      content: "✦";
+      position: absolute; top: 18px; left: 24px;
+      color: rgba(255,204,51,0.4);
+      font-size: 1.2rem;
+    }
+    .join-banner::after {
+      content: "✦";
+      position: absolute; bottom: 18px; right: 24px;
+      color: rgba(30,174,219,0.5);
+      font-size: 1.2rem;
+    }
+    .join-banner h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.15;
+      color: #fff;
+      margin: 0 0 .8rem;
+    }
+    .join-banner h2 em { font-style: normal; color: var(--gold); }
+    .join-banner p {
+      color: var(--ink);
+      max-width: 720px;
+      margin: 0 auto 1.4rem;
+      line-height: 1.75;
+    }
+
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ---------- 11. PRINT-ONLY LETTERHEAD ----------
+       Hidden on screen; replaces the hero in print so the PDF
+       mirrors the original document's letterhead format. */
+    .print-letterhead { display: none; }
+
+    /* ---------- 12. MOTION (design.md §3) ---------- */
+    @keyframes logo-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero .kicker, .hero h1, .hero-lede, .hero .cta-row {
+      animation: fadeUp .8s ease-out both;
+    }
+    .hero .kicker  { animation-delay: .05s; }
+    .hero h1       { animation-delay: .15s; }
+    .hero-lede     { animation-delay: .30s; }
+    .hero .cta-row { animation-delay: .45s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-logo, .marquee-track,
+      .hero .kicker, .hero h1, .hero-lede, .hero .cta-row {
+        animation: none !important;
+      }
+    }
+
+    /* ---------- 13. MOBILE ---------- */
+    @media (max-width: 600px) {
+      .hero { padding: 1.8rem .5rem 1.6rem; }
+      .hero-logo { height: clamp(96px, 28vw, 130px); margin-bottom: 1rem; }
+      .hero h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+      .hero-lede { font-size: .98rem; line-height: 1.65; margin: .8rem auto 1.2rem; }
+
+      .marquee { padding: 9px 0; margin: .6rem 0 1.8rem; }
+      .marquee-track { gap: 28px; font-size: .95rem; letter-spacing: .1em; }
+      .marquee-track span::before { margin-right: 28px; }
+
+      .section-label .kicker { font-size: .68rem; letter-spacing: .3em; }
+      .section-label h2 { font-size: clamp(1.5rem, 5.5vw, 2rem); }
+
+      .programs, .program-detail, .schools {
+        padding: 0 .5rem;
+        margin-bottom: 2rem;
+      }
+      .do-tile { padding: 18px 16px 14px; }
+      .do-tile .num { font-size: 2.4rem; }
+      .do-tile h3   { font-size: 1rem; }
+      .do-tile .icon { width: 32px; height: 32px; margin-bottom: 8px; }
+
+      .pd-prose { padding: 18px 16px; border-radius: 14px; }
+      .pd-prose p { text-align: left; font-size: .95rem; line-height: 1.7; }
+      .pd-facts { padding: 18px 16px; border-radius: 14px; }
+      .pd-facts dd { font-size: .95rem; }
+      .pd-image { border-radius: 14px; margin-bottom: 16px; }
+
+      .schools-card { padding: 20px 18px; border-radius: 16px; }
+      .schools-card p { text-align: left; font-size: .95rem; line-height: 1.7; }
+
+      .join-banner { padding: 2rem .9rem 1.6rem; margin: 2rem .5rem 1.4rem; border-radius: 16px; }
+      .join-banner h2 { font-size: clamp(1.55rem, 6vw, 2rem); }
+      .join-banner p  { font-size: .95rem; }
+
+      .button { font-size: .85rem; height: 40px; padding: 0 18px; }
+      .button-primary { font-size: .9rem; }
+
+      .footer-line { font-size: .75rem; letter-spacing: .12em; margin: 1.8rem 0 2.2rem; }
+    }
+
+    /* ============================================================
+       14. PRINT — Save-as-PDF target.
+       Convert the cosmic theme to a clean letterhead document:
+       light background, dark ink, no animations, no nav, no glow,
+       page-break controls so cards don't split.
+       ============================================================ */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 14mm 16mm;
+      }
+
+      html, body {
+        background: #fff !important;
+        color: var(--print-ink) !important;
+        font-family: var(--font-body);
+        font-size: 10.5pt;
+        line-height: 1.5;
+      }
+
+      /* Hide all screen-only chrome */
+      .container > .header,
+      .navbar,
+      .marquee,
+      .hero,
+      .hero-logo,
+      .join-banner .cta-row,
+      .schools-pills,
+      .footer-line,
+      .pd-facts::after,
+      .join-banner::before,
+      .join-banner::after,
+      canvas {
+        display: none !important;
+      }
+
+      .main {
+        background: #fff !important;
+        padding: 0 !important;
+      }
+
+      /* No animations, transitions, transforms, or shadows */
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+      }
+
+      a { color: var(--print-ink); text-decoration: none; }
+
+      /* --- Print letterhead (Aryabhat document header) --- */
+      .print-letterhead {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14mm;
+        padding-bottom: 6mm;
+        margin-bottom: 6mm;
+        border-bottom: 1.5pt solid var(--print-gold);
+      }
+      .print-letterhead .pl-brand {
+        display: flex;
+        align-items: center;
+        gap: 6mm;
+      }
+      .print-letterhead .pl-brand img {
+        height: 18mm;
+        width: auto;
+      }
+      .print-letterhead .pl-name {
+        font-family: var(--font-brand);
+        font-size: 22pt;
+        line-height: 1;
+        color: var(--print-gold);
+      }
+      .print-letterhead .pl-sub {
+        font-family: var(--font-display);
+        font-size: 9pt;
+        color: var(--print-dim);
+        margin-top: 1mm;
+        letter-spacing: 0.04em;
+      }
+      .print-letterhead .pl-contact {
+        font-family: var(--font-display);
+        font-size: 8.5pt;
+        color: var(--print-ink);
+        text-align: right;
+        line-height: 1.55;
+      }
+      .print-letterhead .pl-contact .pl-regn {
+        color: var(--print-dim);
+        margin-bottom: 1mm;
+      }
+      .print-letterhead .pl-contact a { color: var(--print-ink); }
+
+      /* --- Document title (replaces hero) --- */
+      .print-title {
+        display: block !important;
+        text-align: center;
+        margin: 0 0 6mm;
+      }
+      .print-title .kicker {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 8pt;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: var(--print-gold);
+        margin-bottom: 2mm;
+      }
+      .print-title h1 {
+        font-family: var(--font-brand);
+        font-weight: 400;
+        font-size: 24pt;
+        line-height: 1.1;
+        color: var(--print-ink);
+        margin: 0;
+        text-decoration: underline;
+        text-decoration-color: var(--print-gold);
+        text-underline-offset: 4pt;
+      }
+      .print-title h1 em { font-style: normal; color: var(--print-gold); }
+
+      /* --- Section labels --- */
+      .section-label .kicker {
+        color: var(--print-gold) !important;
+        font-size: 8pt;
+        letter-spacing: 0.3em;
+      }
+      .section-label h2 {
+        color: var(--print-ink) !important;
+        font-size: 16pt;
+        line-height: 1.2;
+        margin: 0;
+        text-shadow: none;
+      }
+      .section-label h2 em { color: var(--print-gold) !important; }
+      .section-label { text-align: left; margin-bottom: 3mm; }
+
+      /* --- Programs intro --- */
+      .programs {
+        max-width: none;
+        margin: 0 0 6mm;
+        padding: 0;
+      }
+      .programs-lede {
+        color: var(--print-ink) !important;
+        font-size: 10.5pt;
+        line-height: 1.55;
+        text-align: left;
+        max-width: none;
+        margin: 0 0 4mm;
+      }
+      .programs-lede + .section-label,
+      .programs .section-label { margin-bottom: 3mm; }
+
+      /* --- Programs grid (5 across if room, 3 otherwise) --- */
+      .do-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 3mm !important;
+      }
+      .do-tile {
+        background: var(--print-bg-soft) !important;
+        border: 0.5pt solid var(--print-border) !important;
+        border-radius: 3pt !important;
+        padding: 3.5mm 3mm 3mm !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .do-tile .num {
+        color: var(--print-gold) !important;
+        font-size: 16pt;
+        opacity: 0.3;
+      }
+      .do-tile .icon {
+        color: var(--print-gold) !important;
+        width: 7mm;
+        height: 7mm;
+        margin-bottom: 2mm;
+      }
+      .do-tile h3 {
+        color: var(--print-ink) !important;
+        font-size: 9pt;
+        font-weight: 600;
+      }
+
+      /* --- Program detail block --- */
+      .program-detail {
+        max-width: none;
+        margin: 0 0 6mm;
+        padding: 0;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .pd-grid {
+        grid-template-columns: 1.7fr 1fr !important;
+        gap: 4mm !important;
+      }
+      .pd-grid.reverse > .pd-prose { order: 0; }
+      .pd-grid.reverse > .pd-facts { order: 0; }
+
+      .pd-prose {
+        background: #fff !important;
+        border: 0.5pt solid var(--print-border) !important;
+        border-radius: 3pt !important;
+        padding: 4mm 4mm !important;
+      }
+      .pd-prose p {
+        color: var(--print-ink) !important;
+        font-size: 10pt;
+        line-height: 1.55;
+        text-align: justify;
+      }
+
+      .pd-facts {
+        background: var(--print-bg-soft) !important;
+        border: 0.5pt solid var(--print-border) !important;
+        border-radius: 3pt !important;
+        padding: 4mm !important;
+      }
+      .pd-facts .facts-title {
+        color: var(--print-gold) !important;
+        font-size: 7.5pt;
+        margin-bottom: 2.5mm;
+      }
+      .pd-facts dl { gap: 2.5mm; }
+      .pd-facts dt {
+        color: var(--print-dim) !important;
+        font-size: 7pt;
+        letter-spacing: 0.15em;
+      }
+      .pd-facts dd {
+        color: var(--print-ink) !important;
+        font-size: 9.5pt;
+        line-height: 1.35;
+      }
+      .pd-facts dd b { color: var(--print-gold) !important; }
+
+      .pd-image {
+        border: 0.5pt solid var(--print-border) !important;
+        border-radius: 3pt !important;
+        background: #fff !important;
+        margin-bottom: 4mm;
+        page-break-inside: avoid;
+      }
+      .pd-image img { max-height: 70mm; object-fit: cover; }
+
+      /* --- Schools section --- */
+      .schools {
+        max-width: none;
+        margin: 0 0 6mm;
+        padding: 0;
+        page-break-inside: avoid;
+      }
+      .schools-card {
+        background: #fff !important;
+        border: 0.5pt solid var(--print-border) !important;
+        border-left: 2pt solid var(--print-gold) !important;
+        border-radius: 0 3pt 3pt 0 !important;
+        padding: 4mm 5mm !important;
+      }
+      .schools-card::before { display: none; }
+      .schools-card p {
+        color: var(--print-ink) !important;
+        font-size: 10pt;
+        line-height: 1.55;
+        text-align: justify;
+      }
+
+      /* --- Free-of-charge closing (no banner, just typography) --- */
+      .join-banner {
+        background: #fff !important;
+        border: none !important;
+        border-top: 1pt solid var(--print-gold) !important;
+        border-radius: 0 !important;
+        margin: 6mm 0 0 !important;
+        padding: 4mm 0 0 !important;
+        text-align: left;
+        page-break-inside: avoid;
+      }
+      .join-banner h2 {
+        color: var(--print-ink) !important;
+        font-size: 14pt;
+        margin: 0 0 2mm;
+        text-align: left;
+      }
+      .join-banner h2 em { color: var(--print-gold) !important; }
+      .join-banner p {
+        color: var(--print-ink) !important;
+        font-size: 10pt;
+        line-height: 1.55;
+        max-width: none;
+        margin: 0;
+        text-align: justify;
+      }
+
+      /* --- Page-break controls --- */
+      .program-detail, .schools, .join-banner,
+      .do-tile, .pd-prose, .pd-facts {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      h1, h2, h3 {
+        page-break-after: avoid;
+        break-after: avoid-page;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <div class="container">
+    <section class="header"><!-- layout.js injects here; hidden on screen, hidden in print too --></section>
+    <nav class="navbar"><!-- layout.js injects here --></nav>
+
+    <div class="main">
+
+      <!-- ============================================================
+           PRINT-ONLY LETTERHEAD
+           Mirrors the original Offered_Activities.pdf header.
+           ============================================================ -->
+      <header class="print-letterhead" aria-hidden="true">
+        <div class="pl-brand">
+          <img src="images/aryabhat.svg" alt="">
+          <div>
+            <div class="pl-name">Aryabhat</div>
+            <div class="pl-sub">Foundation for promoting Basic Science</div>
+          </div>
+        </div>
+        <div class="pl-contact">
+          <div class="pl-regn">Regn No 16212</div>
+          <div>+91-94256-74075</div>
+          <div>info@aryabhat.org</div>
+          <div>www.aryabhat.org</div>
+        </div>
+      </header>
+
+      <!-- Print-only document title (appears only when printing) -->
+      <div class="print-title" style="display:none;" aria-hidden="true">
+        <span class="kicker">Aryabhat Foundation</span>
+        <h1>Offered <em>Activities</em></h1>
+      </div>
+
+      <!-- ============================================================
+           HERO (screen)
+           ============================================================ -->
+      <section class="hero">
+        <img class="hero-logo" src="images/aryabhat.svg" alt="Aryabhat Foundation logo">
+        <span class="kicker">Offered Activities</span>
+        <h1>Programs that bring the <em>sky</em> to you.</h1>
+        <p class="hero-lede">
+          Aryabhat Foundation is a registered social service organisation striving to inculcate a
+          science-based temperament in the young generation. We promote and popularise Astronomy and
+          Basic Sciences in the region.
+        </p>
+        <div class="cta-row">
+          <a class="button button-primary" href="https://aryabhat.org/requestevent">Request an Event</a>
+          <a class="button" href="contact.html">Contact Us</a>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MARQUEE (screen only)
+           ============================================================ -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>Slide Show</span>
+          <span>Film Show</span>
+          <span>Science Lecture</span>
+          <span>Sky View Camp</span>
+          <span>Solar Astronomy</span>
+          <span>Slide Show</span>
+          <span>Film Show</span>
+          <span>Science Lecture</span>
+          <span>Sky View Camp</span>
+          <span>Solar Astronomy</span>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           PROGRAMS AT A GLANCE
+           ============================================================ -->
+      <section class="programs">
+        <div class="section-label">
+          <span class="kicker">What we offer</span>
+          <h2>Five ways we <em>share</em> the sky</h2>
+        </div>
+
+        <p class="programs-lede">
+          To make the children aware of the scientific facts, we conduct several educative
+          programs like Slide Show, Film Show, Science Lecture, Telescope aided Sky View Camp and
+          Solar Astronomy Workshop. We have adequate equipment and expertise to conduct these
+          programs. Institutions interested in availing these facilities may send us a request for
+          specific program and shall arrange for infrastructure and local hospitality. We have also
+          been conducting Aryabhat Astronomy Quiz for school students for more than two decades now,
+          with thousands of beneficiaries across the state.
+        </p>
+
+        <div class="do-grid">
+          <div class="do-tile">
+            <span class="num">01</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="12" rx="1.5"/>
+              <path d="M3 17h18M9 21h6M12 17v4"/>
+              <circle cx="12" cy="11" r="2"/>
+            </svg>
+            <h3>Slide Show</h3>
+          </div>
+          <div class="do-tile">
+            <span class="num">02</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="6" width="14" height="12" rx="1.5"/>
+              <path d="M17 9l4-2v10l-4-2z"/>
+              <circle cx="8" cy="12" r="1.5"/>
+            </svg>
+            <h3>Film Show</h3>
+          </div>
+          <div class="do-tile">
+            <span class="num">03</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="11" rx="3"/>
+              <path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6"/>
+            </svg>
+            <h3>Science Lecture</h3>
+          </div>
+          <div class="do-tile">
+            <span class="num">04</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M14 4l5 2-2 5-5-2z"/>
+              <path d="M12 9l-4 9M7 22l3-2 2 2-2 2zM11 13l2 1"/>
+            </svg>
+            <h3>Telescope Sky&nbsp;View Camp</h3>
+          </div>
+          <div class="do-tile">
+            <span class="num">05</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>
+            </svg>
+            <h3>Solar Astronomy Workshop</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DETAIL — SPACE-SCIENCE MOVIES
+           ============================================================ -->
+      <section class="program-detail">
+        <div class="section-label">
+          <span class="kicker">Space-science movies</span>
+          <h2>Stories the <em>sky</em> has told us</h2>
+        </div>
+        <div class="pd-grid">
+          <div class="pd-prose">
+            <p>
+              We have a collection of Space-science movies and presentations, which are interesting
+              and informative for the school students and elders alike. The infrastructure required
+              for this program is an audio-visual hall with LCD projector and sound system. We
+              encourage the participants to raise their doubts and questions after the show, to get
+              their inquisitiveness satisfied. We prefer a homogenous group of same level of
+              understanding, which facilitates effective communication, thus being more fruitful for
+              the beneficiaries. We normally depute one official and one volunteer to conduct such
+              shows.
+            </p>
+          </div>
+          <aside class="pd-facts">
+            <span class="facts-title">At a glance</span>
+            <dl>
+              <div><dt>Audience</dt><dd>School students <b>&amp;</b> elders</dd></div>
+              <div><dt>Venue</dt><dd>Audio-visual hall</dd></div>
+              <div><dt>Equipment</dt><dd>LCD projector <b>+</b> sound system</dd></div>
+              <div><dt>Format</dt><dd>Show <b>+</b> open Q&amp;A</dd></div>
+              <div><dt>From Aryabhat</dt><dd><b>1</b> official <b>+</b> <b>1</b> volunteer</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DETAIL — TELESCOPE SKY-VIEW
+           ============================================================ -->
+      <section class="program-detail">
+        <div class="section-label">
+          <span class="kicker">Sky view camp</span>
+          <h2>When the <em>moon</em> steps aside</h2>
+        </div>
+
+        <div class="pd-image">
+          <img class="value-img" src="images/alltelescopes.webp"
+               alt="Aryabhat's collection of astronomical telescopes">
+        </div>
+
+        <div class="pd-grid reverse">
+          <div class="pd-prose">
+            <p>
+              The Telescope aided Sky-view program can be conducted in the evening hours. Our
+              Astronomical telescopes reveal the craters of Moon, Star Clusters, Nebulae and Planets
+              present in the sky overhead. The visibility will depend upon the clarity and
+              transparency of the sky. We prefer to conduct this activity when the moon is less than
+              half in size. We would require an open space, free from nearby lights to set our
+              telescopes. We normally deploy three telescopes for a gathering of around hundred
+              people – each telescope manned by a trained volunteer. We also depute an expert
+              official for the program.
+            </p>
+          </div>
+          <aside class="pd-facts">
+            <span class="facts-title">At a glance</span>
+            <dl>
+              <div><dt>Time</dt><dd>Evening hours</dd></div>
+              <div><dt>Moon phase</dt><dd>Less than <b>half</b></dd></div>
+              <div><dt>Gathering</dt><dd>Around <b>100</b> people</dd></div>
+              <div><dt>Telescopes</dt><dd><b>3</b>, each with a trained volunteer</dd></div>
+              <div><dt>Venue</dt><dd>Open space, free from nearby lights</dd></div>
+              <div><dt>You'll see</dt><dd>Moon craters, star clusters, nebulae, planets</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DETAIL — SOLAR ASTRONOMY WORKSHOP
+           ============================================================ -->
+      <section class="program-detail">
+        <div class="section-label">
+          <span class="kicker">Solar astronomy</span>
+          <h2>The <em>Sun</em>, observed safely</h2>
+        </div>
+        <div class="pd-grid">
+          <div class="pd-prose">
+            <p>
+              The Solar Astronomy Workshop is designed to educate the people about the scientific
+              aspects of the Sun and hazards of observing it without proper care or protection. We
+              also explain the safe viewing techniques for solar studies. The workshop includes a
+              theory session of about an hour, followed by a practical demonstration under the open
+              sky. This program shall be conducted in the daytime, for a homogenous group of around
+              fifty persons. The infrastructure required for this program is a suitable hall with
+              LCD projector for the presentation and an open space for the observation session. We
+              normally depute one expert official and one volunteer for the workshop.
+            </p>
+          </div>
+          <aside class="pd-facts">
+            <span class="facts-title">At a glance</span>
+            <dl>
+              <div><dt>Time</dt><dd>Daytime</dd></div>
+              <div><dt>Group</dt><dd>Around <b>50</b> persons</dd></div>
+              <div><dt>Theory</dt><dd>~<b>1 hour</b> session</dd></div>
+              <div><dt>Practical</dt><dd>Open-sky demonstration</dd></div>
+              <div><dt>Venue</dt><dd>Hall with LCD projector <b>+</b> open space</dd></div>
+              <div><dt>From Aryabhat</dt><dd><b>1</b> expert <b>+</b> <b>1</b> volunteer</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SCHOOLS / TEACHERS / VOLUNTEERS
+           ============================================================ -->
+      <section class="schools">
+        <div class="schools-card">
+          <div class="section-label">
+            <span class="kicker">Special programs</span>
+            <h2>For <em>teachers</em>, judges &amp; volunteers</h2>
+          </div>
+          <p>
+            We conduct special program for School Teachers to equip them with proper information to
+            tackle the questions on Astronomy and Space asked by the students occasionally. We also
+            undertake requests from schools conducting science fares &amp; model competitions, for
+            providing services of our scientific experts as judges. We also accommodate school
+            students joining as volunteers for hands-on experience on Telescopes &amp; Practical
+            Astronomy.
+          </p>
+          <div class="schools-pills">
+            <span>Teacher training</span>
+            <span>Science-fair judges</span>
+            <span>Model-competition judges</span>
+            <span>Student volunteer slots</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CLOSING — Free of charge
+           ============================================================ -->
+      <section class="join-banner">
+        <h2>We don't <em>charge</em> for any of this.</h2>
+        <p>
+          We do not charge anything for conducting these activities. However, the host shall arrange
+          for transport and due hospitality with proper lodging/boarding arrangements for the group.
+          The interested organisation and institutions may contact us through email or on telephone
+          for any further clarification.
+        </p>
+        <div class="cta-row">
+          <a class="button button-primary" href="https://aryabhat.org/requestevent">Request an Event</a>
+          <a class="button" href="contact.html">Contact Us</a>
+          <a class="button" href="mailto:info@aryabhat.org">info@aryabhat.org</a>
+        </div>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+    </div>
+  </div>
+
+  <!-- Reveal the print-only document title only when actually printing -->
+  <style>
+    @media print { .print-title { display: block !important; } }
+  </style>
+
+  <script src="js/cosmos-bg.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+
+</html>

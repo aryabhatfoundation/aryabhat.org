@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
-  <title>404 - Page Not Found</title>
-  <meta name="description" content="404 Page - Page Not Found" />
+  <title>404 — Lost in Orbit · Aryabhat</title>
+  <meta name="description" content="404 Page — Page Not Found" />
   <meta name="author" content="Alok Mandavgane, Aryabhat Foundation" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -12,45 +12,551 @@
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <style>
-    /* Add some basic styling for the animation */
-    #animation-container {
+    /* ==========================================================
+       404.html — design-system port (scoped: this page only)
+       Vector "Lost in Orbit" SVG; follows design.md.
+       ========================================================== */
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — lifted from index.html
+       ============================================================ */
+    .navbar {
       position: relative;
-      width: 200px;
-      /* Adjust as needed */
-      height: 200px;
-      /* Adjust as needed */
-      margin: 20px auto;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
-    .star {
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .navbar::after {
+      content: "";
       position: absolute;
-      width: 5px;
-      height: 5px;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 2s infinite;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
     }
 
-    @keyframes twinkle {
-      0% {
-        opacity: 0.2;
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current { background: transparent; border-radius: 0; }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+    }
+
+    html, body {
+      font-family: var(--font-body);
+    }
+
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — lifted from index.html
+       ============================================================ */
+    .main .button,
+    .main button,
+    .cta-row .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease, border-color .25s ease, box-shadow .3s ease, transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus,
+    .cta-row .button:hover {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active,
+    .cta-row .button:active {
+      transform: translateY(0);
+      background: rgba(255, 204, 51, 0.14);
+      box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* Primary: gold-on-dark with halo. See design.md §2.2. */
+    .main .button.button-primary,
+    .cta-row .button.button-primary {
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: .03em;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+      text-shadow: none;
+    }
+
+    .main .button.button-primary:hover,
+    .cta-row .button.button-primary:hover {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active,
+    .cta-row .button.button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 16px rgba(255, 204, 51, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       HERO — slimmer than home, centered around the lost-stage SVG
+       ============================================================ */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 2.5rem 1rem 2rem;
+      overflow: hidden;
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 28%, rgba(255, 204, 51, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(30, 174, 219, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       LOST-STAGE — vector "Lost in Orbit" scene
+       ============================================================ */
+    .lost-stage {
+      position: relative;
+      max-width: 520px;
+      margin: 0 auto 1.4rem;
+      padding: 0 10px;
+    }
+
+    .lost-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* Background stars — white pinpricks twinkling on their own phases */
+    .lost-svg .bg-star {
+      fill: rgba(255, 255, 255, 0.75);
+      animation: lost-twinkle 3s ease-in-out infinite;
+    }
+
+    .lost-svg .bg-star:nth-of-type(2n)  { animation-duration: 4s;   animation-delay: .4s; }
+    .lost-svg .bg-star:nth-of-type(3n)  { animation-duration: 2.6s; animation-delay: 1.1s; }
+    .lost-svg .bg-star:nth-of-type(5n)  { animation-duration: 3.6s; animation-delay: 1.8s; }
+
+    /* Gold accent stars — bigger, warmer, more presence */
+    .lost-svg .gold-star {
+      fill: var(--gold);
+      filter: drop-shadow(0 0 2px rgba(255, 204, 51, 0.7));
+      animation: lost-twinkle 3.4s ease-in-out infinite;
+    }
+
+    .lost-svg .gold-star:nth-of-type(2n) { animation-delay: .8s; animation-duration: 4.2s; }
+
+    /* Orbit ring — dashed gold, gently breathing dash offset */
+    .lost-svg .orbit-ring {
+      fill: none;
+      stroke: rgba(255, 204, 51, 0.4);
+      stroke-width: 1;
+      stroke-dasharray: 3 4;
+      animation: lost-orbit-shift 12s linear infinite;
+    }
+
+    /* Saturn-style ring around the planet */
+    .lost-svg .planet-ring {
+      fill: none;
+      stroke: rgba(255, 220, 150, 0.7);
+      stroke-width: 1.5;
+    }
+
+    /* Satellite — animateMotion does the orbital path; this just
+       styles the little vehicle. */
+    .lost-svg .satellite {
+      filter: drop-shadow(0 0 3px rgba(255, 204, 51, 0.5));
+    }
+
+    @keyframes lost-twinkle {
+      0%, 100% { opacity: 0.25; }
+      50%      { opacity: 1; }
+    }
+
+    @keyframes lost-orbit-shift {
+      to { stroke-dashoffset: -28; }
+    }
+
+    /* The mega "404" overlays the SVG, top-center */
+    .error-code {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -10%);
+      font-family: var(--font-brand);
+      font-weight: 300;
+      font-size: clamp(5rem, 18vw, 9rem);
+      line-height: 1;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+      text-shadow:
+        0 4px 30px rgba(255, 204, 51, 0.3),
+        0 0 60px rgba(255, 204, 51, 0.15);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ============================================================
+       Headline / lede / CTAs — mirror the section-label pattern
+       ============================================================ */
+    .section-label {
+      text-align: center;
+      margin: 0 0 1rem;
+    }
+
+    .section-label .kicker {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+
+    .section-label h1 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .section-label h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .hero-lede {
+      max-width: 560px;
+      margin: 1rem auto 1.6rem;
+      font-size: clamp(.98rem, 1.5vw, 1.1rem);
+      line-height: 1.65;
+      color: var(--ink);
+      padding: 0 .5rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       ENTRANCE FADE
+       ============================================================ */
+    @keyframes lost-fadeup {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .lost-stage,
+    .section-label,
+    .hero-lede,
+    .cta-row {
+      animation: lost-fadeup .8s ease-out both;
+    }
+
+    .lost-stage   { animation-delay: 0s; }
+    .section-label { animation-delay: .15s; }
+    .hero-lede    { animation-delay: .3s; }
+    .cta-row      { animation-delay: .45s; }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .hero {
+        padding: 1.4rem .5rem 1.4rem;
       }
 
-      50% {
-        opacity: 1;
+      .lost-stage {
+        max-width: 95%;
+        margin-bottom: 1rem;
       }
 
-      100% {
-        opacity: 0.2;
+      .error-code {
+        font-size: clamp(4rem, 22vw, 6.5rem);
+      }
+
+      .section-label .kicker {
+        font-size: .68rem;
+        letter-spacing: .3em;
+      }
+
+      .section-label h1 {
+        font-size: clamp(1.6rem, 7vw, 2.2rem);
+      }
+
+      .hero-lede {
+        font-size: .96rem;
+        line-height: 1.6;
+        margin-top: .8rem;
+      }
+
+      .main .button,
+      .cta-row .button {
+        font-size: .85rem;
+        height: 40px;
+        padding: 0 18px;
+      }
+
+      .main .button.button-primary,
+      .cta-row .button.button-primary {
+        font-size: .9rem;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
+      }
+    }
+
+    /* ============================================================
+       REDUCED MOTION — disable orbit/twinkle for users who opt out
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .lost-svg .bg-star,
+      .lost-svg .gold-star,
+      .lost-svg .orbit-ring,
+      .lost-stage,
+      .section-label,
+      .hero-lede,
+      .cta-row {
+        animation: none !important;
+      }
+
+      .lost-svg .satellite animateMotion {
+        /* SMIL can't be disabled by CSS — but on a 404 page, a
+           lone satellite holding still is fine. Browsers that
+           honour reduced-motion via prefers will also pause SMIL
+           in many modern implementations. */
       }
     }
   </style>
-
-
 </head>
 
 <body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
   <div class="container">
     <section class="header">
       <!-- Injected by js/layout.js -->
@@ -60,34 +566,129 @@
       <!-- Injected by js/layout.js -->
     </nav>
 
-    <div class="main row">
-      <div class="twelve columns" style="text-align: center;">
-        <h2>404 - Page Not Found</h2>
-        <h1>Oops! It seems like this page doesn't exist.</h1>
-        <p>
-          The requested URL was not found on this server.
-          Please check the address or return to the
-          <a href="index.html">homepage</a>.
-        </p>
+    <div class="main">
 
-        <!-- Add Astronomy Related Animation -->
-        <div id="animation-container">
-          <div class="star" style="top: 20%; left: 10%;"></div>
-          <div class="star" style="top: 50%; left: 30%;"></div>
-          <div class="star" style="top: 80%; left: 50%;"></div>
-          <div class="star" style="top: 30%; left: 70%;"></div>
-          <div class="star" style="top: 60%; left: 90%;"></div>
-          <!-- You can add more stars as needed -->
+      <section class="hero">
+
+        <!-- ============================================================
+             Lost-in-Orbit scene — vector + CSS + SMIL
+             ============================================================ -->
+        <div class="lost-stage">
+          <svg viewBox="0 0 400 280" class="lost-svg" aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Planet body gradient (matches the Saturn from the old hero) -->
+              <radialGradient id="lost-planet" cx="0.35" cy="0.32" r="0.7">
+                <stop offset="0%"  stop-color="#ffe79b" />
+                <stop offset="30%" stop-color="#f4b942" />
+                <stop offset="72%" stop-color="#c47a1e" />
+                <stop offset="100%" stop-color="#5e350c" />
+              </radialGradient>
+
+              <!-- Soft golden halo around the planet -->
+              <radialGradient id="lost-halo" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%"  stop-color="rgba(255,204,51,0.35)" />
+                <stop offset="60%" stop-color="rgba(255,204,51,0.08)" />
+                <stop offset="100%" stop-color="rgba(255,204,51,0)" />
+              </radialGradient>
+
+              <!-- Invisible orbit path the satellite traces -->
+              <path id="lost-orbit-path"
+                d="M 60 200 A 140 38 0 1 1 340 200 A 140 38 0 1 1 60 200"
+                fill="none" />
+            </defs>
+
+            <!-- BACKGROUND STAR FIELD ============================ -->
+            <g class="star-field">
+              <circle class="bg-star" cx="40"  cy="34"  r="1.2" />
+              <circle class="bg-star" cx="92"  cy="78"  r="0.8" />
+              <circle class="bg-star" cx="350" cy="46"  r="1.5" />
+              <circle class="bg-star" cx="318" cy="98"  r="1.0" />
+              <circle class="bg-star" cx="60"  cy="130" r="0.9" />
+              <circle class="bg-star" cx="370" cy="160" r="1.0" />
+              <circle class="bg-star" cx="18"  cy="220" r="1.1" />
+              <circle class="bg-star" cx="384" cy="244" r="0.8" />
+              <circle class="bg-star" cx="120" cy="58"  r="0.7" />
+              <circle class="bg-star" cx="278" cy="68"  r="0.9" />
+              <circle class="bg-star" cx="240" cy="40"  r="1.0" />
+              <circle class="bg-star" cx="178" cy="80"  r="0.6" />
+              <circle class="bg-star" cx="30"  cy="160" r="0.8" />
+
+              <!-- Gold accents -->
+              <circle class="gold-star" cx="150" cy="52"  r="1.6" />
+              <circle class="gold-star" cx="258" cy="108" r="1.3" />
+              <circle class="gold-star" cx="356" cy="200" r="1.5" />
+            </g>
+
+            <!-- ORBIT + PLANET ===================================== -->
+            <!-- Soft halo behind the planet -->
+            <circle cx="200" cy="200" r="60" fill="url(#lost-halo)" />
+
+            <!-- The dashed orbit ring (visible) -->
+            <ellipse class="orbit-ring" cx="200" cy="200" rx="140" ry="38" />
+
+            <!-- Saturn-like ring sitting behind the planet body -->
+            <ellipse class="planet-ring" cx="200" cy="200" rx="56" ry="10"
+              transform="rotate(-12 200 200)" />
+
+            <!-- Planet body — painted ON TOP of orbit + ring so they
+                 visually pass behind it -->
+            <circle class="planet-body" cx="200" cy="200" r="34" fill="url(#lost-planet)" />
+
+            <!-- Inner shadow on the planet for sphericity -->
+            <circle cx="200" cy="200" r="34" fill="none"
+              stroke="rgba(0,0,0,0.35)" stroke-width="3" opacity=".5" />
+
+            <!-- SATELLITE — traces the invisible orbit path ====== -->
+            <g class="satellite">
+              <!-- Solar panels -->
+              <rect x="-12" y="-1.5" width="7" height="3" fill="#1EAEDB" opacity="0.9" />
+              <rect x="5"   y="-1.5" width="7" height="3" fill="#1EAEDB" opacity="0.9" />
+              <!-- Panel grid lines -->
+              <line x1="-9" y1="-1.5" x2="-9" y2="1.5" stroke="rgba(0,0,0,0.4)" stroke-width=".3" />
+              <line x1="9"  y1="-1.5" x2="9"  y2="1.5" stroke="rgba(0,0,0,0.4)" stroke-width=".3" />
+              <!-- Body -->
+              <rect x="-3.5" y="-2.5" width="7" height="5" fill="#ffcc33" rx="0.5" />
+              <!-- Dish -->
+              <circle cx="0" cy="-4.5" r="1.6" fill="#ffe58a" />
+              <line x1="0" y1="-3" x2="0" y2="-2.5" stroke="#ffcc33" stroke-width=".6" />
+
+              <!-- The actual motion -->
+              <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" calcMode="linear">
+                <mpath href="#lost-orbit-path" />
+              </animateMotion>
+            </g>
+          </svg>
+
+          <!-- Mega 404 overlay -->
+          <div class="error-code" aria-hidden="true">404</div>
         </div>
 
-      </div>
-    </div>
+        <!-- HEADLINE PAIR -->
+        <div class="section-label">
+          <span class="kicker">Lost in orbit</span>
+          <h1>This page <em>drifted</em> out of view.</h1>
+        </div>
 
-    <div class="row">
-      <p>&copy; Aryabhat Foundation</p>
+        <!-- LEDE -->
+        <p class="hero-lede">
+          The address you followed isn't anywhere in our universe — the link may have moved, or the page may have
+          never existed. Let's get you back to a known sky.
+        </p>
+
+        <!-- CTAs -->
+        <div class="cta-row">
+          <a class="button button-primary" href="index.html">← Take me home</a>
+          <a class="button" href="sky.html">Open Sky Map</a>
+        </div>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
     </div>
   </div>
-  <script src="js/background-stars.js"></script>
+
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
 </body>
 
