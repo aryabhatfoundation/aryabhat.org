@@ -433,6 +433,213 @@
     }
 
     /* ============================================================
+       HERO-SLOT — rotating "promo" area at the bottom of the hero.
+       Cycles between the telescopes-promo (→ telescopes.html) and
+       the dhoom-teaser (→ dhoomketu.html) every 12 seconds.
+
+       Cadence intentionally chosen 3:1 against the inner vehicle
+       cycle (which is 12s ÷ 3 vehicles = 4s per vehicle). So the
+       teaser stays visible long enough to show all 3 vehicle angles
+       before the slot swaps back to the telescopes promo.
+
+       Uses grid-stacking so the slot auto-sizes to the tallest of
+       the two children (no clipping when the teaser stacks on mobile).
+       ============================================================ */
+    .hero-slot {
+      max-width: 880px;
+      width: 100%;
+      margin: 2rem auto 0;
+      display: grid;
+      grid-template-areas: "stack";
+      min-height: 220px;
+    }
+
+    .hero-slot > * {
+      grid-area: stack;
+      opacity: 0;
+      animation: slot-cycle 24s ease-in-out infinite;
+    }
+
+    .hero-slot > .telescopes-promo { animation-delay: 0s; }
+    .hero-slot > .dhoom-teaser     { animation-delay: 12s; margin: 0; max-width: none; }
+
+    @keyframes slot-cycle {
+      0%        { opacity: 0; }
+      5%, 50%   { opacity: 1; }
+      55%, 100% { opacity: 0; }
+    }
+
+    /* ============================================================
+       TELESCOPES PROMO — clickable image (no panel/frame).
+       Floats in the slot area; hover effect lives on the image,
+       not on a surrounding box. Keeps the slot from looking like
+       a half-empty panel when the wide image is in a tall cell.
+       ============================================================ */
+    .telescopes-promo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: inherit;
+      outline: 0;
+    }
+
+    .telescopes-promo img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
+      transition: transform .25s ease, filter .25s ease;
+    }
+
+    .telescopes-promo:hover img,
+    .telescopes-promo:focus img {
+      transform: translateY(-3px) scale(1.015);
+      filter:
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))
+        drop-shadow(0 0 28px rgba(255, 204, 51, 0.3));
+    }
+
+    /* ============================================================
+       DHOOMKETU TEASER — clickable banner linking to dhoomketu.html.
+       Logo + cycling vehicle photos + "see more" arrow.
+       ============================================================ */
+    .dhoom-teaser {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(18px, 4vw, 40px);
+      max-width: 880px;
+      margin: 2rem auto 0;
+      padding: 1.4rem 1.6rem;
+      border-radius: 22px;
+      background:
+        radial-gradient(ellipse at 18% 25%, rgba(255, 204, 51, 0.13), transparent 55%),
+        radial-gradient(ellipse at 82% 75%, rgba(30, 174, 219, 0.10), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .dhoom-teaser:hover,
+    .dhoom-teaser:focus {
+      border-color: rgba(255, 204, 51, 0.55);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55), 0 0 32px rgba(255, 204, 51, 0.15);
+      outline: 0;
+    }
+
+    /* Decorative ✦ corners — same motif as the join-banner */
+    .dhoom-teaser::before {
+      content: "✦";
+      position: absolute;
+      top: 12px; left: 16px;
+      color: rgba(255, 204, 51, 0.4);
+      font-size: 1rem;
+    }
+
+    .dhoom-teaser-text {
+      flex: 0 1 280px;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .dhoom-teaser-kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .dhoom-teaser-title {
+      display: block;
+      max-width: 220px;
+      width: 90%;
+      height: auto;
+      margin: 0 auto .5rem;
+      filter:
+        drop-shadow(0 0 4px rgba(255, 255, 255, 0.25))
+        drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .dhoom-teaser-tag {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-soft);
+      margin: 0 0 .7rem;
+    }
+
+    .dhoom-teaser-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+      transition: gap .2s ease;
+    }
+
+    .dhoom-teaser:hover .dhoom-teaser-cta {
+      gap: 12px;
+      color: var(--gold-soft);
+    }
+
+    .dhoom-teaser-cta .arrow {
+      transition: transform .2s ease;
+    }
+
+    /* Vehicle photo viewer — 3 images stacked, cross-fade carousel */
+    .dhoom-teaser-viewer {
+      position: relative;
+      flex: 0 1 380px;
+      min-width: 240px;
+      aspect-ratio: 16 / 11;
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 204, 51, 0.08), transparent 60%);
+    }
+
+    .teaser-vehicle {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+      opacity: 0;
+      filter:
+        drop-shadow(0 0 4px rgba(255, 255, 255, 0.18))
+        drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6));
+      animation: teaser-cycle 12s ease-in-out infinite;
+    }
+
+    .teaser-side  { animation-delay: 0s; }
+    .teaser-front { animation-delay: 4s; }
+    .teaser-back  { animation-delay: 8s; }
+
+    @keyframes teaser-cycle {
+      0%        { opacity: 0; }
+      8%, 30%   { opacity: 1; }
+      38%, 100% { opacity: 0; }
+    }
+
+    /* ============================================================
        SCROLLING MARQUEE OF VALUES
        ============================================================ */
     .marquee {
@@ -862,6 +1069,65 @@
         width: 100%;
       }
 
+      /* Keep the teaser horizontal on mobile too — compact layout
+         with smaller logo + viewer so the slot stays short and the
+         telescopes image (when its turn comes) doesn't drown in a
+         half-empty cell. */
+      .dhoom-teaser {
+        padding: .85rem .9rem;
+        margin-top: 1.5rem;
+        border-radius: 14px;
+        gap: 10px;
+      }
+
+      .dhoom-teaser::before {
+        top: 8px; left: 10px;
+        font-size: .85rem;
+      }
+
+      .dhoom-teaser-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: center;
+      }
+
+      /* "MEET" kicker is redundant on a phone — the logo IS the
+         brand mark. Drop it to recover vertical space. */
+      .dhoom-teaser-kicker {
+        display: none;
+      }
+
+      .dhoom-teaser-title {
+        max-width: 130px;
+        width: 100%;
+        margin: 0 auto .3rem;
+      }
+
+      .dhoom-teaser-tag {
+        font-size: .58rem;
+        letter-spacing: .08em;
+        margin: 0 0 .3rem;
+      }
+
+      .dhoom-teaser-cta {
+        justify-content: center;
+        width: 100%;
+        font-size: .72rem;
+      }
+
+      .dhoom-teaser-viewer {
+        flex: 0 0 auto;
+        width: 42%;
+        max-width: 170px;
+        min-width: 120px;
+        aspect-ratio: 16 / 11;
+      }
+
+      /* Slot can shrink to fit the compact teaser */
+      .hero-slot {
+        min-height: 0;
+      }
+
       .main .button,
       .main button,
       .cta-row .button,
@@ -1017,9 +1283,14 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .marquee-track, .hero-lede, .cta-row {
+      .marquee-track, .hero-lede, .cta-row,
+      .hero-slot > *, .teaser-vehicle {
         animation: none !important;
       }
+      /* Show the telescopes promo as the static fallback */
+      .hero-slot > .telescopes-promo { opacity: 1; }
+      .hero-slot > .dhoom-teaser     { opacity: 0; pointer-events: none; }
+      .teaser-side { opacity: 1; }
     }
   </style>
 </head>
@@ -1067,7 +1338,32 @@
           <a class="button button-primary" href="quiz.html#institutional">Join Astro Quiz 2026-27</a>
           <a class="button" href="https://aryabhat.org/requestevent">Request an Event</a>
         </div>
-        <img class="value-img" src="images/alltelescopes.webp">
+
+        <!-- Hero-slot — cycles between the telescopes promo and the
+             Dhoomketu teaser every ~6 seconds. Each is clickable. -->
+        <div class="hero-slot" aria-label="Featured promos — telescopes and the Dhoomketu vehicle">
+
+          <!-- Telescopes promo → telescopes.html -->
+          <a class="telescopes-promo" href="telescopes.html" aria-label="Our telescope kit">
+            <img src="images/alltelescopes.webp" alt="All telescopes at Aryabhat Foundation" />
+          </a>
+
+          <!-- Dhoomketu teaser → dhoomketu.html -->
+          <a class="dhoom-teaser" href="dhoomketu.html" aria-label="Meet Dhoomketu — our mobile observatory">
+            <div class="dhoom-teaser-text">
+              <span class="dhoom-teaser-kicker">Meet</span>
+              <img class="dhoom-teaser-title" src="vehiclelogo/dhoomketu.png" alt="Dhoomketu" />
+              <p class="dhoom-teaser-tag">Spreading Knowledge Everywhere</p>
+              <span class="dhoom-teaser-cta">See the vehicle <span class="arrow">→</span></span>
+            </div>
+
+            <div class="dhoom-teaser-viewer" aria-hidden="true">
+              <img class="teaser-vehicle teaser-side"  src="vehiclelogo/dhoomketu-side.png"  alt="" />
+              <img class="teaser-vehicle teaser-front" src="vehiclelogo/dhoomketu-front.png" alt="" />
+              <img class="teaser-vehicle teaser-back"  src="vehiclelogo/dhoomketu-back.png"  alt="" />
+            </div>
+          </a>
+        </div>
       </section>
 
       <!-- ============================================================

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Dhoomketu — Aryabhat's mobile observatory</title>
+  <meta name="description"
+    content="Dhoomketu is the Aryabhat Foundation's mobile observatory — a converted Mahindra Bolero Camper bringing telescopes to schools across Madhya Pradesh.">
+  <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Yatra+One&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       dhoomketu-demo.html — vehicle carousel proof-of-concept.
+       Standalone preview file. Follows newindex.html/design.md.
+       ========================================================== */
+
+    html, body { overflow-x: hidden; }
+
+    /* ============================================================
+       NAVBAR (lifted)
+       ============================================================ */
+    .navbar {
+      position: relative; height: auto; min-height: 4.4rem;
+      background: linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .navbar::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 204, 51, 0.18) 15%,
+        rgba(255, 204, 51, 0.7) 50%, rgba(255, 204, 51, 0.18) 85%, transparent 100%);
+      pointer-events: none;
+    }
+    .navbar > .container {
+      width: max-content; min-width: 100%; min-height: 4.4rem;
+      padding: 0 14px; display: flex; align-items: center;
+    }
+    .navbar-list {
+      display: flex; flex-wrap: nowrap; white-space: nowrap;
+      align-items: center; gap: 6px; margin: 0; padding: 0; list-style: none;
+    }
+    .navbar-item { float: none !important; flex: 0 0 auto; border-bottom: none; padding: 0; margin-bottom: 0; }
+    .navbar-item.current { background: transparent; border-radius: 0; }
+    .navbar-link {
+      display: inline-flex; align-items: center;
+      font-family: var(--font-display); font-size: 1rem; font-weight: 500;
+      letter-spacing: .05em; text-transform: none; line-height: 1.3;
+      color: var(--ink); margin: 0; padding: 11px 20px;
+      border-radius: 999px; position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+    .navbar-link:hover, .navbar-link:focus {
+      color: var(--gold-soft); background: rgba(255, 204, 51, 0.10); outline: 0;
+    }
+    .navbar-link.active {
+      color: var(--gold); background: rgba(255, 204, 51, 0.12);
+      font-weight: 600; border-radius: var(--brand-shape-tight);
+      box-shadow: inset 0 0 0 1px rgba(255, 204, 51, 0.4), 0 0 16px rgba(255, 204, 51, 0.12);
+    }
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+    }
+    html, body { font-family: var(--font-body); }
+    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+      font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em;
+    }
+    .main {
+      background-color: #0a131ccc; padding: 1.5rem 0 0; border-radius: 0;
+    }
+
+    /* ============================================================
+       DHOOMKETU HERO — title + carousel + lede
+       ============================================================ */
+    .dhoom-hero {
+      max-width: 1000px;
+      margin: 0 auto 2.4rem;
+      padding: 0 16px;
+      text-align: center;
+    }
+
+    .dhoom-kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: .75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 .6rem;
+      font-weight: 600;
+    }
+
+    .dhoom-title {
+      display: block;
+      max-width: 560px;
+      width: 70%;
+      margin: 0 auto .4rem;
+      filter:
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.4))
+        drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Vehicle motto — large renfrew brand display, single line.
+       font-size clamps so it shrinks to fit on every viewport;
+       white-space: nowrap keeps it from breaking. */
+    .dhoom-tagline {
+      font-family: var(--font-brand);
+      font-size: clamp(1.4rem, 4.2vw, 2.4rem);
+      font-weight: 300;
+      letter-spacing: 0;
+      color: var(--gold-soft);
+      line-height: 1.2;
+      margin: .6rem auto 1.8rem;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+      white-space: nowrap;
+    }
+
+    .dhoom-tagline::before,
+    .dhoom-tagline::after {
+      content: "✦";
+      color: rgba(255, 204, 51, 0.6);
+      margin: 0 .35em;
+      font-size: .55em;
+      vertical-align: 0.35em;
+    }
+
+    /* ============================================================
+       CAROUSEL STAGE
+       ============================================================ */
+    .dhoom-stage {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      aspect-ratio: 16 / 10;
+      margin: 0 auto 1.2rem;
+      border-radius: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 204, 51, 0.10), transparent 55%),
+        radial-gradient(ellipse at 70% 80%, rgba(30, 174, 219, 0.10), transparent 55%),
+        linear-gradient(180deg, #142132 0%, #0a131c 100%);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Background comet streak — sweeps across at the same cadence
+       as the angle changes, reinforcing the Dhoomketu = comet theme */
+    .comet-streak {
+      position: absolute;
+      top: 18%;
+      left: -30%;
+      width: 50%;
+      height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 204, 51, 0.0) 10%,
+        rgba(255, 229, 138, 0.55) 65%,
+        #fff 100%);
+      transform: rotate(-12deg);
+      transform-origin: right center;
+      filter: blur(0.5px);
+      opacity: 0;
+      animation: comet-sweep 15s ease-in infinite;
+    }
+
+    .comet-streak::after {
+      content: "";
+      position: absolute;
+      right: -3px; top: 50%;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translateY(-50%);
+      box-shadow: 0 0 8px #fff, 0 0 14px rgba(255, 204, 51, 0.9);
+    }
+
+    @keyframes comet-sweep {
+      /* Idle, then quick streak across when faces change */
+      0%, 28%   { opacity: 0; transform: translateX(0) rotate(-12deg); }
+      30%      { opacity: 0.9; transform: translateX(0) rotate(-12deg); }
+      40%      { opacity: 1; transform: translateX(240%) rotate(-12deg); }
+      45%, 100% { opacity: 0; transform: translateX(240%) rotate(-12deg); }
+    }
+
+    /* Twinkling micro-stars in the stage background */
+    .stage-star {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      animation: stage-twinkle 3s ease-in-out infinite;
+    }
+    .stage-star:nth-child(2) { top: 12%; left: 8%;  animation-delay: .3s; }
+    .stage-star:nth-child(3) { top: 22%; left: 88%; animation-delay: 1.1s; width: 3px; height: 3px; background: var(--gold); }
+    .stage-star:nth-child(4) { top: 78%; left: 14%; animation-delay: 1.8s; }
+    .stage-star:nth-child(5) { top: 88%; left: 72%; animation-delay: .8s; }
+    .stage-star:nth-child(6) { top: 38%; left: 96%; animation-delay: 2.2s; }
+    .stage-star:nth-child(7) { top: 65%; left: 3%;  animation-delay: 1.4s; width: 3px; height: 3px; background: var(--gold); }
+    @keyframes stage-twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.6); }
+      50%      { opacity: 1;    transform: scale(1.3); }
+    }
+
+    /* ============================================================
+       VEHICLE FACES — stacked, cross-fade carousel.
+       3 photos (background-removed) × 5s each = 15s cycle.
+
+       Expected files (transparent PNG, ~1200px on long edge):
+         vehiclelogo/dhoomketu-side.png
+         vehiclelogo/dhoomketu-front.png
+         vehiclelogo/dhoomketu-back.png
+       ============================================================ */
+    .vehicle-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4%;
+      opacity: 0;
+      animation: face-cycle 15s ease-in-out infinite;
+    }
+
+    .vehicle-photo {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      /* Soft white halo lifts the cutout off the dark stage,
+         dark drop-shadow grounds it. */
+      filter:
+        drop-shadow(0 0 4px rgba(255, 255, 255, 0.18))
+        drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6));
+      animation: vehicle-bob 5s ease-in-out infinite;
+    }
+
+    .face-side  { animation-delay: 0s; }
+    .face-front { animation-delay: 5s; }
+    .face-back  { animation-delay: 10s; }
+
+    @keyframes face-cycle {
+      /* fade in (0 → 6%), hold visible (6% → 28%), fade out (28% → 35%), invisible rest */
+      0%        { opacity: 0; }
+      6%, 28%   { opacity: 1; }
+      35%, 100% { opacity: 0; }
+    }
+
+    @keyframes vehicle-bob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+
+    /* Label indicating which angle is showing */
+    .angle-label {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .angle-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 204, 51, 0.25);
+      transition: background .3s ease;
+      animation: dot-cycle 15s ease-in-out infinite;
+    }
+    .angle-dot.d-side  { animation-delay: 0s; }
+    .angle-dot.d-front { animation-delay: 5s; }
+    .angle-dot.d-back  { animation-delay: 10s; }
+
+    @keyframes dot-cycle {
+      0%, 33%    { background: var(--gold); box-shadow: 0 0 8px rgba(255, 204, 51, 0.6); }
+      34%, 100%  { background: rgba(255, 204, 51, 0.25); box-shadow: none; }
+    }
+
+    /* ============================================================
+       LEDE BELOW STAGE
+       ============================================================ */
+    .dhoom-lede {
+      max-width: 580px;
+      margin: 1.2rem auto 1.6rem;
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .dhoom-lede b {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .dhoom-lede em {
+      font-family: var(--font-brand);
+      font-style: normal;
+      font-weight: 300;
+      font-size: 1.2em;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+    }
+
+    /* Sponsor credit chip */
+    .sponsor-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: .5rem;
+      padding: 6px 14px;
+      border: 1px solid rgba(255, 204, 51, 0.3);
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .sponsor-chip b { color: var(--gold-soft); font-weight: 600; letter-spacing: .08em; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .main { padding-top: 1rem; }
+      .dhoom-hero { padding: 0 .75rem; margin-bottom: 1.6rem; }
+      .dhoom-title { width: 85%; margin-bottom: 1rem; }
+      .dhoom-tagline {
+        /* Shrink further on phones so the single line still fits. */
+        font-size: clamp(.95rem, 4.6vw, 1.4rem);
+        margin: .4rem auto 1.2rem;
+      }
+      .dhoom-tagline::before,
+      .dhoom-tagline::after {
+        margin: 0 .25em;
+        font-size: .6em;
+      }
+      .dhoom-stage {
+        max-width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 16px;
+      }
+      .dhoom-lede {
+        font-size: .98rem;
+        line-height: 1.6;
+        margin: 1rem auto 1.2rem;
+        padding: 0 .25rem;
+      }
+      .footer-line { font-size: .75rem; letter-spacing: .12em; margin: 1.8rem 0 2.2rem; padding-bottom: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vehicle-face, .vehicle-face .vehicle-svg,
+      .comet-streak, .stage-star, .angle-dot {
+        animation: none !important;
+      }
+      /* Show only the side view when motion is reduced */
+      .face-side { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <div class="container">
+    <section class="header">
+      <!-- Injected by js/layout.js -->
+    </section>
+
+    <nav class="navbar">
+      <!-- Injected by js/layout.js -->
+    </nav>
+
+    <div class="main">
+
+      <section class="dhoom-hero">
+        <span class="dhoom-kicker">Meet</span>
+
+        <!-- Existing Dhoomketu logo PNG as the title -->
+        <img class="dhoom-title" src="vehiclelogo/dhoomketu.png" alt="Dhoomketu" />
+
+        <!-- Vehicle motto -->
+        <p class="dhoom-tagline">Spreading Knowledge Everywhere</p>
+
+        <!-- ============================================================
+             CAROUSEL STAGE — 3 vehicle photos cross-fade every 5s
+             ============================================================ -->
+        <div class="dhoom-stage" aria-label="Dhoomketu — Aryabhat's mobile observatory, shown from side, front, and back">
+
+          <!-- Backdrop sparkles + comet streak -->
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="stage-star" aria-hidden="true"></div>
+          <div class="comet-streak" aria-hidden="true"></div>
+
+          <!-- =================================================
+               SIDE VIEW — drop a background-removed PNG at
+               vehiclelogo/dhoomketu-side.png and it shows here
+               ================================================= -->
+          <div class="vehicle-face face-side" aria-label="Side view">
+            <img class="vehicle-photo" src="vehiclelogo/dhoomketu-side.png"
+              alt="Dhoomketu, side view" />
+          </div>
+
+          <!-- =================================================
+               FRONT VIEW — vehiclelogo/dhoomketu-front.png
+               ================================================= -->
+          <div class="vehicle-face face-front" aria-label="Front view">
+            <img class="vehicle-photo" src="vehiclelogo/dhoomketu-front.png"
+              alt="Dhoomketu, front view" />
+          </div>
+
+          <!-- =================================================
+               BACK VIEW — vehiclelogo/dhoomketu-back.png
+               ================================================= -->
+          <div class="vehicle-face face-back" aria-label="Back view">
+            <img class="vehicle-photo" src="vehiclelogo/dhoomketu-back.png"
+              alt="Dhoomketu, back view" />
+          </div>
+
+          <!-- Angle indicator dots -->
+          <div class="angle-label" aria-hidden="true">
+            <span class="angle-dot d-side"></span>
+            <span class="angle-dot d-front"></span>
+            <span class="angle-dot d-back"></span>
+          </div>
+        </div>
+
+        <!-- Lede below the carousel -->
+        <p class="dhoom-lede">
+          <em>Dhoomketu</em> is our mobile observatory — a <b>Mahindra Bolero Camper</b> converted to carry telescopes
+          and a few wide-eyed students out to dark skies. When she visits your school, the sky comes with her.
+        </p>
+
+        <span class="sponsor-chip">
+          Donated by &nbsp;<b>HEG Limited, Bhopal</b>
+        </span>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+    </div>
+  </div>
+
+  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <script src="js/cosmos-bg.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+
+</html>
