@@ -275,6 +275,76 @@
     }
 
     /* ============================================================
+       QUIZ PORTAL BANNER — top-level announcement card linking
+       to the live quiz portal (quiz.aryabhat.org).
+       ============================================================ */
+    .quiz-portal {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto 1.6rem;
+      padding: 1.3rem 1.7rem;
+      border-radius: 18px;
+      background:
+        radial-gradient(ellipse at 18% 25%, rgba(255, 204, 51, 0.16), transparent 55%),
+        radial-gradient(ellipse at 82% 75%, rgba(30, 174, 219, 0.10), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid rgba(255, 204, 51, 0.35);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.10);
+      overflow: hidden;
+    }
+
+    .quiz-portal::before {
+      content: "✦";
+      position: absolute;
+      top: 12px;
+      left: 18px;
+      color: rgba(255, 204, 51, 0.4);
+      font-size: 1rem;
+    }
+
+    .quiz-portal::after {
+      content: "✦";
+      position: absolute;
+      bottom: 12px;
+      right: 18px;
+      color: rgba(30, 174, 219, 0.5);
+      font-size: 1rem;
+    }
+
+    /* Title + button share one baseline-aligned row, so the button's
+       label sits on the title's baseline (not the kicker's). */
+    .quiz-portal-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 32px);
+      text-align: center;
+    }
+
+    .quiz-portal-kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .quiz-portal-title {
+      display: block;
+      font-family: var(--font-brand);
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      line-height: 1.15;
+      color: #fff;
+    }
+
+    /* ============================================================
        PAGE LAYOUT — sidebar (details cards) + main (prose)
        ============================================================ */
     .quiz-layout {
@@ -596,6 +666,15 @@
     @media (max-width: 600px) {
       .main { padding-top: 1rem; }
 
+      .quiz-portal {
+        margin: 0 .5rem 1.2rem;
+        padding: 1.1rem 1rem;
+        gap: 12px;
+        border-radius: 14px;
+      }
+      .quiz-portal::before { top: 8px; left: 10px; font-size: .85rem; }
+      .quiz-portal::after  { bottom: 8px; right: 10px; font-size: .85rem; }
+
       .quiz-layout {
         padding: 0 .5rem;
         gap: 16px;
@@ -703,6 +782,22 @@
 
     <div class="main">
 
+      <!-- ============================================================
+           QUIZ PORTAL BANNER — top-level card linking to the live
+           quiz portal (Astro Quiz 2026-27 registration is open).
+           ============================================================ -->
+      <section class="quiz-portal">
+        <span class="quiz-portal-kicker">Astro Quiz 2026&ndash;27</span>
+        <div class="quiz-portal-line">
+          <div class="quiz-portal-title-box">
+            <span class="quiz-portal-title">Registration is now open</span>
+          </div>
+          <div class="quiz-portal-action">
+            <a class="button button-primary" href="https://quiz.aryabhat.org" target="_blank">Take me there &rarr;</a>
+          </div>
+        </div>
+      </section>
+
       <div class="quiz-layout">
 
         <aside class="quiz-sidebar">
@@ -765,7 +860,8 @@
               <h5>👤 Individual Registration</h5>
             </summary>
             <div class="card-content">
-              <p class="renfrew" style="margin: 0;">Registration opens on 20 June 2026</p>
+              <p class="renfrew" style="margin: 0; flex-basis: 100%;">Registration is now open</p>
+              <a class="button button-primary" target="_blank" href="https://quiz.aryabhat.org">Take me there &rarr;</a>
             </div>
           </details>
 
