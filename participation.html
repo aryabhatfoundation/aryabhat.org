@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Participation Over the Years — Aryabhat Astronomy Quiz</title>
+  <meta name="description"
+    content="Two decades of the Aryabhat Astronomy Quiz — over 1,00,000 student participations across 21 academic years, charted year by year.">
+  <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       participation.html — participation history (scoped page)
+       Design-system port: tokens / navbar / buttons lifted from
+       index.html per design.md §6 porting checklist. Page-specific
+       components (stat tiles, bar chart, data table) added below.
+       ========================================================== */
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — portable as-is from index.html
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current {
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-weight: 600;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar,
+      .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ---------- Tokens ---------- */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 14px 4px 14px 4px;
+      --brand-shape-tight: 10px 3px 10px 3px;
+
+      /* Data-series colours for the chart (boys = cyan, girls = gold).
+         Used only inside the chart so the brand-gold "action" rule
+         on buttons/kickers is not diluted elsewhere on the page. */
+      --boys: #1EAEDB;
+      --girls: #ffcc33;
+    }
+
+    html,
+    body { font-family: var(--font-body); }
+
+    .main h1,
+    .main h2,
+    .main h3,
+    .main h4 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — portable as-is from index.html
+       ============================================================ */
+    .main .button,
+    .cta-row .button,
+    .join-banner .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease,
+        border-color .25s ease, box-shadow .3s ease, transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus,
+    .cta-row .button:hover,
+    .join-banner .button:hover {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active { transform: translateY(0); margin-bottom: 1rem; }
+
+    .main .button.button-primary,
+    .cta-row .button.button-primary,
+    .join-banner .button.button-primary {
+      color: var(--gold);
+      font-weight: 600;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+    }
+
+    .main .button.button-primary:hover,
+    .main .button.button-primary:focus,
+    .cta-row .button.button-primary:hover,
+    .join-banner .button.button-primary:hover {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active { transform: translateY(0); margin-bottom: 1rem; }
+
+    /* ============================================================
+       PAGE WRAP + HERO (single-line hero per design.md §2.4)
+       ============================================================ */
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .ph-hero {
+      position: relative;
+      text-align: center;
+      padding: 3rem 1rem 1.5rem;
+      overflow: hidden;
+    }
+
+    .ph-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(255, 204, 51, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(30, 174, 219, 0.09) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ph-hero > * { position: relative; z-index: 1; }
+
+    .ph-hero .kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .ph-hero h1 {
+      font-family: var(--font-brand);
+      font-size: clamp(2rem, 5.5vw, 3.6rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 0 0 1rem;
+      letter-spacing: 0;
+    }
+
+    .ph-hero h1 em { font-style: normal; color: var(--gold); }
+
+    .ph-lede {
+      max-width: 680px;
+      margin: 0 auto;
+      font-size: clamp(1.02rem, 2vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .ph-lede b { color: var(--gold-soft); font-weight: 600; }
+
+    /* ============================================================
+       STAT TILES — headline totals
+       ============================================================ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 2rem auto 2.6rem;
+    }
+
+    @media (min-width: 760px) {
+      .stats { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .stat {
+      position: relative;
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 16px 16px;
+      text-align: center;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 204, 51, 0.15);
+    }
+
+    .stat-num {
+      display: block;
+      font-family: var(--font-brand);
+      font-size: clamp(1.9rem, 4.5vw, 2.7rem);
+      line-height: 1;
+      color: var(--gold);
+      text-shadow: 0 2px 18px rgba(255, 204, 51, 0.22);
+    }
+
+    .stat-num sup { font-size: 0.45em; vertical-align: super; color: var(--ink-dim); }
+
+    .stat-label {
+      display: block;
+      margin-top: 0.55rem;
+      font-family: var(--font-display);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      line-height: 1.4;
+    }
+
+    /* ============================================================
+       SECTION HEADING
+       ============================================================ */
+    .section-label { text-align: center; margin: 0 0 1.4rem; }
+
+    .section-label .kicker {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+
+    .section-label h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .section-label h2 em { font-style: normal; color: var(--gold); }
+
+    /* ============================================================
+       BAR CHART — stacked boys/girls, year by year.
+       Bars sit on a fixed-height track; only the inner .bar-fill
+       scales on load (transform: scaleY) so there is no per-frame
+       layout reflow — see design.md §3 (perf budget).
+       ============================================================ */
+    .chart-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 20px 16px;
+      margin: 0 auto 1.4rem;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 18px;
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      color: var(--ink-dim);
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+    .sw {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .sw-b { background: linear-gradient(180deg, #2bc3ef, #1488ad); }
+    .sw-g { background: linear-gradient(180deg, #ffd866, #f0a81b); }
+
+    /* The plot: a fixed-width y-axis gutter + a horizontally
+       scrollable column strip. --plot-h is the bar-track height. */
+    .chart {
+      --plot-h: 300px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .chart-y {
+      position: relative;
+      flex: 0 0 auto;
+      width: 30px;
+      height: var(--plot-h);
+      margin-top: 22px;       /* match .chart-scroll top padding (value-label room) */
+      margin-right: 6px;
+    }
+
+    .chart-y span {
+      position: absolute;
+      right: 0;
+      transform: translateY(50%);
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+
+    .chart-scroll {
+      flex: 1 1 auto;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-top: 22px;      /* room for value labels above the tallest bar */
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 204, 51, 0.4) transparent;
+      /* Start the scroll at the right edge so the latest year is what
+         shows first; scrolling reveals earlier years. The columns
+         themselves stay chronological (left→right) via .plot's ltr,
+         so the desktop view still reads as growth over time. */
+      direction: rtl;
+    }
+
+    .chart-scroll::-webkit-scrollbar { height: 7px; }
+    .chart-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 204, 51, 0.4);
+      border-radius: 4px;
+    }
+
+    .plot {
+      position: relative;
+      min-width: 100%;
+      width: max-content;
+      direction: ltr;         /* keep columns chronological inside the rtl scroll */
+    }
+
+    /* Horizontal gridlines, overlaid behind the columns */
+    .gridlines {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: var(--plot-h);
+      pointer-events: none;
+    }
+
+    .gridlines i {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .gridlines i:first-child { background: rgba(255, 255, 255, 0.16); } /* baseline */
+
+    .cols {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      gap: clamp(4px, 0.7vw, 8px);
+    }
+
+    /* Columns flex-fill the plot so all 21 years are always visible
+       on desktop (no hidden recent years). The year label is the only
+       in-flow child with an intrinsic width (~34px) — the absolutely
+       positioned value label does not inflate it — so the plot's
+       max-content stays under the container width and min-width:100%
+       wins, letting the columns grow to fill. On narrow screens the
+       min-width forces the plot wider than the viewport and the
+       .chart-scroll strip scrolls. */
+    .col {
+      flex: 1 1 0;
+      min-width: 30px;
+      max-width: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      outline: 0;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: var(--plot-h);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .bar {
+      position: relative;
+      width: 78%;
+      height: var(--t);
+      min-height: 5px;
+    }
+
+    .col-val {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translateX(-50%);
+      margin-bottom: 4px;
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--ink-dim);
+      white-space: nowrap;
+      transition: color .2s ease;
+    }
+
+    .bar-fill {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column-reverse;     /* boys at the bottom, girls on top */
+      border-radius: 5px 5px 0 0;
+      overflow: hidden;
+      transform-origin: bottom;
+      transform: scaleY(0);
+      animation: grow .8s cubic-bezier(.2, .7, .2, 1) forwards;
+      animation-delay: calc(var(--i) * 38ms);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .seg { width: 100%; }
+    .seg-boys  { background: linear-gradient(180deg, #2bc3ef, #1488ad); }
+    .seg-girls { background: linear-gradient(180deg, #ffd866, #f0a81b); }
+
+    .col-year {
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      letter-spacing: 0.02em;
+      color: var(--ink-dim);
+      white-space: nowrap;
+      transition: color .2s ease;
+    }
+
+    /* Hover / keyboard-focus affordance */
+    .col:hover .bar-fill,
+    .col:focus .bar-fill {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 18px rgba(255, 204, 51, 0.35);
+    }
+
+    .col:hover .col-year,
+    .col:focus .col-year,
+    .col:hover .col-val,
+    .col:focus .col-val { color: var(--gold-soft); }
+
+    /* The record year gets a permanent soft halo + gold label */
+    .col.peak .col-val { color: var(--gold); font-weight: 600; }
+    .col.peak .bar-fill { box-shadow: inset 0 0 0 1px rgba(255, 204, 51, 0.4), 0 0 16px rgba(255, 204, 51, 0.22); }
+
+    @keyframes grow {
+      from { transform: scaleY(0); }
+      to   { transform: scaleY(1); }
+    }
+
+    .scroll-hint {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-dim);
+      margin: 12px 0 0;
+    }
+
+    @media (min-width: 920px) {
+      /* Whole chart fits — no need to nudge the user to scroll */
+      .scroll-hint { display: none; }
+    }
+
+    /* Visually-hidden (screen-reader-only) utility */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ============================================================
+       DATA TABLE — columns hug their content (the wrap is sized to
+       max-content and centred) so there is no slack stretching the
+       cells apart; on a phone the wrap caps at 100% and scrolls.
+       Column order: Year, Total, Boys, Girls, Schools — the two most
+       important figures (year + total) lead, so they are what shows
+       first before any horizontal scroll. Boys/Girls reuse the chart
+       colours.
+       ============================================================ */
+    .table-section { margin: 2.6rem auto 1rem; }
+
+    .table-wrap {
+      width: max-content;
+      max-width: 100%;
+      margin: 0 auto;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--panel);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table.ptable {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: 0.94rem;
+    }
+
+    table.ptable thead th {
+      background: #16233a;
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: right;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.ptable thead th:first-child { text-align: left; }
+
+    /* Legend swatch inside the Boys/Girls headers */
+    table.ptable thead th .sw {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 6px;
+      vertical-align: baseline;
+    }
+
+    table.ptable tbody th,
+    table.ptable tfoot th {
+      text-align: left;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--ink);
+      padding: 9px 14px;
+      white-space: nowrap;
+    }
+
+    table.ptable tbody td,
+    table.ptable tfoot td {
+      text-align: right;
+      padding: 9px 14px;
+      white-space: nowrap;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.ptable tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.022); }
+    table.ptable tbody tr:hover { background: rgba(255, 204, 51, 0.07); }
+
+    /* Series colours — match the chart */
+    .ptable .t-total { color: #fff; font-weight: 700; }
+    .ptable .t-boys  { color: #45c8ef; font-weight: 600; }
+    .ptable .t-girls { color: var(--gold); font-weight: 600; }
+    .ptable .t-sch   { color: var(--ink-dim); }
+
+    table.ptable tfoot th,
+    table.ptable tfoot td {
+      border-top: 2px solid var(--border);
+      padding: 12px 14px;
+      background: rgba(255, 204, 51, 0.05);
+    }
+
+    table.ptable tfoot .t-total { color: #fff; }
+
+    .table-note {
+      max-width: 540px;
+      margin: 0.9rem auto 0;
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       CLOSING CTA — join banner (portable from index.html)
+       ============================================================ */
+    .join-banner {
+      position: relative;
+      margin: 3rem auto 2rem;
+      padding: 2.6rem 1.5rem 2.2rem;
+      border-radius: 22px;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(255, 204, 51, 0.15), transparent 55%),
+        radial-gradient(ellipse at 80% 70%, rgba(30, 174, 219, 0.12), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid var(--border);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .join-banner::before { content: "✦"; position: absolute; top: 18px; left: 24px; color: rgba(255, 204, 51, 0.4); font-size: 1.2rem; }
+    .join-banner::after  { content: "✦"; position: absolute; bottom: 18px; right: 24px; color: rgba(30, 174, 219, 0.5); font-size: 1.2rem; }
+
+    .join-banner h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+      line-height: 1.15;
+      color: #fff;
+      margin: 0 0 .7rem;
+    }
+
+    .join-banner h2 em { font-style: normal; color: var(--gold); }
+
+    .join-banner p { color: var(--ink); max-width: 600px; margin: 0 auto 1.3rem; line-height: 1.6; }
+
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.4rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ph-hero .kicker, .ph-hero h1, .ph-lede { animation: fadeUp .7s ease-out both; }
+    .ph-hero h1 { animation-delay: .08s; }
+    .ph-lede    { animation-delay: .16s; }
+
+    /* ============================================================
+       MOBILE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .ph-hero { padding: 1.8rem .5rem 1.2rem; }
+      .chart { --plot-h: 230px; }
+      .chart-card { padding: 18px 12px 12px; border-radius: 16px; }
+      .stats { margin: 1.5rem auto 2rem; }
+      .stat-label { font-size: .68rem; letter-spacing: .08em; }
+      .join-banner { padding: 2rem .9rem 1.6rem; border-radius: 16px; }
+      .main .button, .cta-row .button, .join-banner .button { font-size: .85rem; height: 40px; padding: 0 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bar-fill { transform: scaleY(1); animation: none; }
+      .ph-hero .kicker, .ph-hero h1, .ph-lede { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <div class="container">
+    <section class="header">
+      <!-- Injected by js/layout.js -->
+    </section>
+    <nav class="navbar">
+      <!-- Injected by js/layout.js -->
+    </nav>
+
+    <div class="main">
+
+      <!-- ============================================================
+           HERO
+           ============================================================ -->
+      <section class="ph-hero">
+        <span class="kicker">Astro Quiz &middot; Since 1995</span>
+        <h1>Two decades of <em>looking up</em></h1>
+        <p class="ph-lede">
+          Every academic year, thousands of students sit down for the Aryabhat Astronomy Quiz.
+          It has run since 1995; the year-by-year records we have begin in 2005&ndash;06 — and
+          they already add up to <b>over 1,00,000 participations</b>, one year at a time.
+        </p>
+      </section>
+
+      <div class="wrap">
+
+        <!-- ============================================================
+             STAT TILES
+             ============================================================ -->
+        <section class="stats" aria-label="Participation totals">
+          <div class="stat">
+            <span class="stat-num">1,00,625</span>
+            <span class="stat-label">Student<br>participations</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">1,307</span>
+            <span class="stat-label">School<br>participations</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">21</span>
+            <span class="stat-label">Years on record<br>(2005&ndash;26)</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">10,842</span>
+            <span class="stat-label">Best year<br>(2025&ndash;26)</span>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             CHART
+             ============================================================ -->
+        <section class="chart-section">
+          <div class="section-label">
+            <span class="kicker">Year by year</span>
+            <h2>Students who <em>showed up</em></h2>
+          </div>
+
+          <div class="chart-card">
+            <div class="legend" aria-hidden="true">
+              <span><i class="sw sw-b"></i>Boys</span>
+              <span><i class="sw sw-g"></i>Girls</span>
+            </div>
+
+            <div class="chart">
+              <div class="chart-y" aria-hidden="true">
+                <span style="bottom: 0%">0</span>
+                <span style="bottom: 25%">3k</span>
+                <span style="bottom: 50%">6k</span>
+                <span style="bottom: 75%">9k</span>
+                <span style="bottom: 100%">12k</span>
+              </div>
+
+              <div class="chart-scroll">
+                <div class="plot">
+                  <div class="gridlines" aria-hidden="true">
+                    <i style="bottom: 0%"></i>
+                    <i style="bottom: 25%"></i>
+                    <i style="bottom: 50%"></i>
+                    <i style="bottom: 75%"></i>
+                    <i style="bottom: 100%"></i>
+                  </div>
+
+                  <div class="cols">
+                    <!-- COLS:START (generated from Participation_summary - Updated(1).xlsx) -->
+          <div class="col" tabindex="0" role="img"
+               aria-label="2005-06: 6,760 students (4,306 boys, 2,454 girls) from 46 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:56.33%;--i:0">
+                <span class="col-val">6,760</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:4306"></div>
+                  <div class="seg seg-girls" style="flex-grow:2454"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;05&ndash;06</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2006-07: 2,442 students (1,434 boys, 1,008 girls) from 34 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:20.35%;--i:1">
+                <span class="col-val">2,442</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1434"></div>
+                  <div class="seg seg-girls" style="flex-grow:1008"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;06&ndash;07</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2007-08: 1,809 students (1,150 boys, 659 girls) from 32 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:15.07%;--i:2">
+                <span class="col-val">1,809</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1150"></div>
+                  <div class="seg seg-girls" style="flex-grow:659"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;07&ndash;08</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2008-09: 2,121 students (1,431 boys, 690 girls) from 32 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:17.68%;--i:3">
+                <span class="col-val">2,121</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1431"></div>
+                  <div class="seg seg-girls" style="flex-grow:690"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;08&ndash;09</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2009-10: 2,722 students (1,590 boys, 1,132 girls) from 35 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:22.68%;--i:4">
+                <span class="col-val">2,722</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1590"></div>
+                  <div class="seg seg-girls" style="flex-grow:1132"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;09&ndash;10</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2010-11: 3,204 students (1,680 boys, 1,524 girls) from 24 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:26.7%;--i:5">
+                <span class="col-val">3,204</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1680"></div>
+                  <div class="seg seg-girls" style="flex-grow:1524"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;10&ndash;11</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2011-12: 3,570 students (2,058 boys, 1,512 girls) from 33 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:29.75%;--i:6">
+                <span class="col-val">3,570</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:2058"></div>
+                  <div class="seg seg-girls" style="flex-grow:1512"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;11&ndash;12</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2012-13: 3,330 students (1,979 boys, 1,351 girls) from 35 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:27.75%;--i:7">
+                <span class="col-val">3,330</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1979"></div>
+                  <div class="seg seg-girls" style="flex-grow:1351"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;12&ndash;13</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2013-14: 5,113 students (2,928 boys, 2,185 girls) from 51 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:42.61%;--i:8">
+                <span class="col-val">5,113</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:2928"></div>
+                  <div class="seg seg-girls" style="flex-grow:2185"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;13&ndash;14</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2014-15: 5,164 students (3,202 boys, 1,962 girls) from 42 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:43.03%;--i:9">
+                <span class="col-val">5,164</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:3202"></div>
+                  <div class="seg seg-girls" style="flex-grow:1962"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;14&ndash;15</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2015-16: 5,583 students (3,828 boys, 1,755 girls) from 41 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:46.52%;--i:10">
+                <span class="col-val">5,583</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:3828"></div>
+                  <div class="seg seg-girls" style="flex-grow:1755"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;15&ndash;16</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2016-17: 6,847 students (4,233 boys, 2,614 girls) from 135 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:57.06%;--i:11">
+                <span class="col-val">6,847</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:4233"></div>
+                  <div class="seg seg-girls" style="flex-grow:2614"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;16&ndash;17</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2017-18: 3,067 students (2,036 boys, 1,031 girls) from 52 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:25.56%;--i:12">
+                <span class="col-val">3,067</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:2036"></div>
+                  <div class="seg seg-girls" style="flex-grow:1031"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;17&ndash;18</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2018-19: 5,127 students (3,186 boys, 1,941 girls) from 50 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:42.73%;--i:13">
+                <span class="col-val">5,127</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:3186"></div>
+                  <div class="seg seg-girls" style="flex-grow:1941"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;18&ndash;19</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2019-20: 5,297 students (3,377 boys, 1,920 girls) from 61 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:44.14%;--i:14">
+                <span class="col-val">5,297</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:3377"></div>
+                  <div class="seg seg-girls" style="flex-grow:1920"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;19&ndash;20</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2020-21: 3,927 students (2,604 boys, 1,323 girls) from 246 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:32.73%;--i:15">
+                <span class="col-val">3,927</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:2604"></div>
+                  <div class="seg seg-girls" style="flex-grow:1323"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;20&ndash;21</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2021-22: 2,155 students (1,530 boys, 625 girls) from 68 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:17.96%;--i:16">
+                <span class="col-val">2,155</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:1530"></div>
+                  <div class="seg seg-girls" style="flex-grow:625"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;21&ndash;22</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2022-23: 5,350 students (3,398 boys, 1,952 girls) from 31 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:44.58%;--i:17">
+                <span class="col-val">5,350</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:3398"></div>
+                  <div class="seg seg-girls" style="flex-grow:1952"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;22&ndash;23</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2023-24: 8,323 students (4,985 boys, 3,338 girls) from 117 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:69.36%;--i:18">
+                <span class="col-val">8,323</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:4985"></div>
+                  <div class="seg seg-girls" style="flex-grow:3338"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;23&ndash;24</span>
+          </div>
+          <div class="col" tabindex="0" role="img"
+               aria-label="2024-25: 7,872 students (4,707 boys, 3,165 girls) from 71 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:65.6%;--i:19">
+                <span class="col-val">7,872</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:4707"></div>
+                  <div class="seg seg-girls" style="flex-grow:3165"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;24&ndash;25</span>
+          </div>
+          <div class="col peak" tabindex="0" role="img"
+               aria-label="2025-26: 10,842 students (6,297 boys, 4,545 girls) from 71 schools">
+            <div class="bar-track">
+              <div class="bar" style="--t:90.35%;--i:20">
+                <span class="col-val">10,842</span>
+                <div class="bar-fill">
+                  <div class="seg seg-boys"  style="flex-grow:6297"></div>
+                  <div class="seg seg-girls" style="flex-grow:4545"></div>
+                </div>
+              </div>
+            </div>
+            <span class="col-year">&rsquo;25&ndash;26</span>
+          </div>
+                    <!-- COLS:END -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="scroll-hint">Latest year shown first &mdash; swipe to see earlier years</p>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             DATA TABLE
+             ============================================================ -->
+        <section class="table-section">
+          <div class="section-label">
+            <span class="kicker">The full record</span>
+            <h2>Every <em>year</em>, in numbers</h2>
+          </div>
+
+          <div class="table-wrap">
+            <table class="ptable">
+              <caption class="visually-hidden">Aryabhat Astronomy Quiz participation by academic year</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Year</th>
+                  <th scope="col">Total</th>
+                  <th scope="col"><i class="sw sw-b"></i>Boys</th>
+                  <th scope="col"><i class="sw sw-g"></i>Girls</th>
+                  <th scope="col">Schools</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">2005-06</th>
+                  <td class="t-total">6,760</td>
+                  <td class="t-boys">4,306</td>
+                  <td class="t-girls">2,454</td>
+                  <td class="t-sch">46</td>
+                </tr>
+                <tr>
+                  <th scope="row">2006-07</th>
+                  <td class="t-total">2,442</td>
+                  <td class="t-boys">1,434</td>
+                  <td class="t-girls">1,008</td>
+                  <td class="t-sch">34</td>
+                </tr>
+                <tr>
+                  <th scope="row">2007-08</th>
+                  <td class="t-total">1,809</td>
+                  <td class="t-boys">1,150</td>
+                  <td class="t-girls">659</td>
+                  <td class="t-sch">32</td>
+                </tr>
+                <tr>
+                  <th scope="row">2008-09</th>
+                  <td class="t-total">2,121</td>
+                  <td class="t-boys">1,431</td>
+                  <td class="t-girls">690</td>
+                  <td class="t-sch">32</td>
+                </tr>
+                <tr>
+                  <th scope="row">2009-10</th>
+                  <td class="t-total">2,722</td>
+                  <td class="t-boys">1,590</td>
+                  <td class="t-girls">1,132</td>
+                  <td class="t-sch">35</td>
+                </tr>
+                <tr>
+                  <th scope="row">2010-11</th>
+                  <td class="t-total">3,204</td>
+                  <td class="t-boys">1,680</td>
+                  <td class="t-girls">1,524</td>
+                  <td class="t-sch">24</td>
+                </tr>
+                <tr>
+                  <th scope="row">2011-12</th>
+                  <td class="t-total">3,570</td>
+                  <td class="t-boys">2,058</td>
+                  <td class="t-girls">1,512</td>
+                  <td class="t-sch">33</td>
+                </tr>
+                <tr>
+                  <th scope="row">2012-13</th>
+                  <td class="t-total">3,330</td>
+                  <td class="t-boys">1,979</td>
+                  <td class="t-girls">1,351</td>
+                  <td class="t-sch">35</td>
+                </tr>
+                <tr>
+                  <th scope="row">2013-14</th>
+                  <td class="t-total">5,113</td>
+                  <td class="t-boys">2,928</td>
+                  <td class="t-girls">2,185</td>
+                  <td class="t-sch">51</td>
+                </tr>
+                <tr>
+                  <th scope="row">2014-15</th>
+                  <td class="t-total">5,164</td>
+                  <td class="t-boys">3,202</td>
+                  <td class="t-girls">1,962</td>
+                  <td class="t-sch">42</td>
+                </tr>
+                <tr>
+                  <th scope="row">2015-16</th>
+                  <td class="t-total">5,583</td>
+                  <td class="t-boys">3,828</td>
+                  <td class="t-girls">1,755</td>
+                  <td class="t-sch">41</td>
+                </tr>
+                <tr>
+                  <th scope="row">2016-17</th>
+                  <td class="t-total">6,847</td>
+                  <td class="t-boys">4,233</td>
+                  <td class="t-girls">2,614</td>
+                  <td class="t-sch">135</td>
+                </tr>
+                <tr>
+                  <th scope="row">2017-18</th>
+                  <td class="t-total">3,067</td>
+                  <td class="t-boys">2,036</td>
+                  <td class="t-girls">1,031</td>
+                  <td class="t-sch">52</td>
+                </tr>
+                <tr>
+                  <th scope="row">2018-19</th>
+                  <td class="t-total">5,127</td>
+                  <td class="t-boys">3,186</td>
+                  <td class="t-girls">1,941</td>
+                  <td class="t-sch">50</td>
+                </tr>
+                <tr>
+                  <th scope="row">2019-20</th>
+                  <td class="t-total">5,297</td>
+                  <td class="t-boys">3,377</td>
+                  <td class="t-girls">1,920</td>
+                  <td class="t-sch">61</td>
+                </tr>
+                <tr>
+                  <th scope="row">2020-21</th>
+                  <td class="t-total">3,927</td>
+                  <td class="t-boys">2,604</td>
+                  <td class="t-girls">1,323</td>
+                  <td class="t-sch">246</td>
+                </tr>
+                <tr>
+                  <th scope="row">2021-22</th>
+                  <td class="t-total">2,155</td>
+                  <td class="t-boys">1,530</td>
+                  <td class="t-girls">625</td>
+                  <td class="t-sch">68</td>
+                </tr>
+                <tr>
+                  <th scope="row">2022-23</th>
+                  <td class="t-total">5,350</td>
+                  <td class="t-boys">3,398</td>
+                  <td class="t-girls">1,952</td>
+                  <td class="t-sch">31</td>
+                </tr>
+                <tr>
+                  <th scope="row">2023-24</th>
+                  <td class="t-total">8,323</td>
+                  <td class="t-boys">4,985</td>
+                  <td class="t-girls">3,338</td>
+                  <td class="t-sch">117</td>
+                </tr>
+                <tr>
+                  <th scope="row">2024-25</th>
+                  <td class="t-total">7,872</td>
+                  <td class="t-boys">4,707</td>
+                  <td class="t-girls">3,165</td>
+                  <td class="t-sch">71</td>
+                </tr>
+                <tr>
+                  <th scope="row">2025-26</th>
+                  <td class="t-total">10,842</td>
+                  <td class="t-boys">6,297</td>
+                  <td class="t-girls">4,545</td>
+                  <td class="t-sch">71</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">All years</th>
+                  <td class="t-total">1,00,625</td>
+                  <td class="t-boys">61,939</td>
+                  <td class="t-girls">38,686</td>
+                  <td class="t-sch">1,307</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <p class="table-note">
+            Total student participations in the Aryabhat Astronomy Quiz by academic year.
+            The quiz has run since 1995; consolidated year-by-year records are available from
+            2005&ndash;06. Source: Aryabhat Foundation participation records.
+          </p>
+        </section>
+
+        <!-- ============================================================
+             CLOSING CTA
+             ============================================================ -->
+        <section class="join-banner">
+          <h2>Add your school to the <em>next</em> column.</h2>
+          <p>
+            Registration for Astro Quiz 2026&ndash;27 is open. Bring your students into the
+            count and keep the wonder going.
+          </p>
+          <div class="cta-row">
+            <a class="button button-primary" href="quiz.html#institutional">Join Astro Quiz 2026-27</a>
+            <a class="button" href="index.html">Back to Home</a>
+          </div>
+        </section>
+
+        <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Animation -->
+  <script src="js/cosmos-bg.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+
+</html>
