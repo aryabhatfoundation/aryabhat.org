@@ -46,16 +46,16 @@ Renfrew has more vertical air than Space Grotesk — when you switch a heading t
 ### 1.3 The brand shape
 
 ```css
---brand-shape:       14px 4px 14px 4px;
---brand-shape-tight: 10px 3px 10px 3px;
+--brand-shape:       10px;
+--brand-shape-tight: 8px;
 ```
 
-Asymmetric corners on the TL→BR diagonal — softly evokes a comet trajectory.
+A calm, uniform radius. (Earlier this was an asymmetric `14px 4px 14px 4px` "comet" corner — two opposite corners rounded, two sharp — but that read as a dated leaf/eye shape and fought itself at button height. Replaced with an even radius.)
 
 **Use on:** buttons, the navbar's *active* pill.
-**Do not use on:** cards, panels, containers, inactive navbar links, images. Containers stay on a regular `border-radius: 14–22px`. The brand shape is reserved for click affordances so its appearance carries meaning — "this is an action".
+**Do not use on:** cards, panels, containers, inactive navbar links, images. Containers stay on a larger `border-radius: 14–22px` — the brand shape's job now is to sit *tighter* than container radii so click affordances still read distinct ("this is an action") through curvature scale rather than asymmetry.
 
-Use `--brand-shape-tight` for elements smaller than ~36px tall (otherwise the 14px curve dominates).
+Use `--brand-shape-tight` for elements smaller than ~36px tall (otherwise the corner curve dominates).
 
 ### 1.4 Radii (containers)
 

@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <title>Telescopes at Aryabhat</title>
-  <meta name="description" content="Website of NGO Aryabhat, Foundation for promoting basic science">
+  <meta name="description"
+    content="The Aryabhat Foundation telescope collection — every instrument named for a constellation, from the 300 mm Hydra to the 40 mm Microscopium.">
   <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="images/favicon.ico" />
@@ -20,18 +21,18 @@
     rel="stylesheet">
   <style>
     /* ==========================================================
-       telescopes.html — design-system port (scoped: this page only)
-       Content unchanged from the original; only presentation
-       follows newindex.html / design.md.
+       telescopes.html — telescope gallery (scoped: this page only)
+       Cutout images produced by macOS Vision subject-lifting; data
+       merged from the equipment docx + the published Google Sheet
+       (constellation code names, apertures, optics).
+       Presentation follows index.html / design.md.
        ========================================================== */
 
     html,
-    body {
-      overflow-x: hidden;
-    }
+    body { overflow-x: hidden; }
 
     /* ============================================================
-       NAVBAR — lifted from newindex.html
+       NAVBAR — portable from index.html
        ============================================================ */
     .navbar {
       position: relative;
@@ -125,19 +126,11 @@
     .navbar-link.active {
       color: var(--gold);
       background: rgba(255, 204, 51, 0.12);
-      font-family: var(--font-display);
       font-weight: 600;
-      text-transform: none;
       border-radius: var(--brand-shape-tight);
       box-shadow:
         inset 0 0 0 1px rgba(255, 204, 51, 0.4),
         0 0 16px rgba(255, 204, 51, 0.12);
-    }
-
-    .navbar-link.active:hover,
-    .navbar-link.active:focus {
-      color: var(--gold-soft);
-      background: rgba(255, 204, 51, 0.18);
     }
 
     @media (max-width: 700px) {
@@ -170,15 +163,13 @@
       --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
       --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
       --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --brand-shape: 14px 4px 14px 4px;
-      --brand-shape-tight: 10px 3px 10px 3px;
+      --brand-shape: 10px;
+      --brand-shape-tight: 8px;
     }
 
-    html, body {
-      font-family: var(--font-body);
-    }
+    html, body { font-family: var(--font-body); }
 
-    .main h1, .main h2, .main h3, .main h4, .main h5, .main h6 {
+    .main h1, .main h2, .main h3, .main h4 {
       font-family: var(--font-display);
       font-weight: 500;
       letter-spacing: -0.01em;
@@ -186,51 +177,433 @@
 
     .main {
       background-color: #0a131ccc;
-      padding: 1.5rem 0 0;
+      padding: 0;
       border-radius: 0;
     }
 
     /* ============================================================
-       TELESCOPES — image + Google Sheet iframe
+       HERO
        ============================================================ */
-    .telescopes-wrap {
-      max-width: 1100px;
-      margin: 0 auto 2.4rem;
-      padding: 0 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .telescopes-image-frame {
-      border-radius: 18px;
+    .gal-hero {
+      position: relative;
+      text-align: center;
+      padding: 2.8rem 1rem 1.4rem;
       overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-      background: var(--panel-solid);
     }
 
-    .telescopes-image-frame img {
+    .gal-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(255, 204, 51, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(30, 174, 219, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .gal-hero > * { position: relative; z-index: 1; }
+
+    .gal-hero .kicker {
       display: block;
-      width: 100%;
-      height: auto;
+      font-family: var(--font-display);
+      font-size: 0.74rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.7rem;
+    }
+
+    .gal-hero h1 {
+      font-family: var(--font-brand);
+      font-size: clamp(2rem, 5.2vw, 3.4rem);
+      line-height: 1.12;
+      color: var(--ink);
+      margin: 0 0 0.9rem;
+    }
+
+    .gal-hero h1 em { font-style: normal; color: var(--gold); }
+
+    .gal-lede {
+      max-width: 660px;
+      margin: 0 auto;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .gal-lede em {
+      font-family: var(--font-brand);
+      font-style: normal;
+      font-size: 1.12em;
+      color: var(--gold-soft);
+      letter-spacing: 0.01em;
+    }
+
+    /* ============================================================
+       FILTERS
+       ============================================================ */
+    .filters {
+      max-width: 1120px;
+      margin: 1.6rem auto 1.4rem;
+      padding: 0 14px;
+      text-align: center;
+    }
+
+    .chip {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 4px;
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 15px;
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .chip:hover { color: var(--gold-soft); border-color: rgba(255, 204, 51, 0.5); }
+
+    .chip .n { color: var(--ink-dim); font-size: 0.78em; margin-left: 4px; }
+
+    .chip.active {
+      color: #0a131c;
+      background: var(--gold);
+      border-color: var(--gold);
+      font-weight: 600;
+    }
+
+    .chip.active .n { color: rgba(10, 19, 28, 0.6); }
+
+    /* ============================================================
+       GALLERY GRID
+       ============================================================ */
+    /* Plain inline-block tiles — no flex, no grid. Tiles are appended
+       by JS (no whitespace text nodes between them), so there are no
+       inline-block gaps to fight; spacing comes from each tile's margin. */
+    .gallery {
+      max-width: 1120px;
+      margin: 0 auto 3rem;
+      padding: 0 8px;
+      text-align: center;
+    }
+
+    .scope {
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+      display: inline-block;
+      vertical-align: top;
+      width: 168px;
+      margin: 9px;
+      position: relative;
+      padding: 14px 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.55), rgba(15, 26, 38, 0.55));
+      cursor: pointer;
+      color: inherit;
+      text-align: center;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .scope:hover,
+    .scope:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 204, 51, 0.15);
+      outline: 0;
+    }
+
+    /* Aperture badge */
+    .scope-ap {
+      position: absolute;
+      top: 9px;
+      right: 10px;
+      font-family: var(--font-display);
+      font-size: 0.64rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.10);
+      border: 1px solid rgba(255, 204, 51, 0.28);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+
+    /* Classic fixed-height image box. The image is a normal inline
+       element (NOT a flex/grid item), so max-height just works — it
+       can never overflow. Vertical centering is the old strut trick:
+       a full-height inline-block before the image, both aligned middle. */
+    .scope-img {
+      display: block;
+      height: 188px;
+      margin-bottom: 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .scope-img:before {
+      content: "";
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    .scope-img img {
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 100%;
+      max-height: 100%;
+      filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.55));
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .scope:hover .scope-img img,
+    .scope:focus-visible .scope-img img {
+      transform: scale(1.06);
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 16px rgba(255, 204, 51, 0.28));
+    }
+
+    .scope-code {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: var(--gold);
+      line-height: 1.15;
+      margin-bottom: 2px;
+    }
+
+    .scope-sub {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--ink-dim);
+      letter-spacing: 0.01em;
+    }
+
+    /* ============================================================
+       DETAIL — sheet on mobile, right sidebar on desktop
+       ============================================================ */
+    .detail-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 15, 0.66);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .28s ease;
+      z-index: 60;
+    }
+
+    .detail-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .detail {
+      position: fixed;
+      z-index: 61;
+      background: linear-gradient(180deg, #16243a, #0c1622);
+      border: 1px solid rgba(255, 204, 51, 0.25);
+      box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.6);
+      /* Mobile: bottom sheet */
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: 90vh;
+      border-radius: 22px 22px 0 0;
+      transform: translateY(101%);
+      transition: transform .32s cubic-bezier(.2, .8, .2, 1);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .detail.open { transform: translateY(0); }
+
+    .detail-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      text-align: center;
+      line-height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(10, 19, 28, 0.7);
+      color: var(--ink);
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+      transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .detail-close:hover { color: var(--gold); border-color: var(--gold); background: rgba(255, 204, 51, 0.08); }
+
+    /* Drag handle (mobile sheet affordance) */
+    .detail::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .detail-stage {
+      position: relative;
+      height: 240px;
+      text-align: center;
+      white-space: nowrap;
+      background:
+        radial-gradient(ellipse at 50% 45%, rgba(255, 204, 51, 0.12), transparent 62%);
+    }
+
+    .detail-stage:before {
+      content: "";
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+    .detail-stage img {
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 82%;
+      max-height: 82%;
+      filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.6));
+    }
+
+    .detail-body { padding: 6px 24px 26px; }
+
+    .detail-kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+
+    .detail-code {
+      font-family: var(--font-brand);
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      color: var(--ink);
+      margin: 0 0 0.2rem;
+      line-height: 1.05;
+    }
+
+    .detail-name {
+      color: var(--ink-dim);
+      font-size: 0.96rem;
+      margin: 0 0 1.2rem;
+    }
+
+    .spec {
       margin: 0;
-    }
-
-    .sheet-frame {
-      border-radius: 18px;
-      overflow: hidden;
       border: 1px solid var(--border);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-      background: #fff;
-      /* Google sheets render on white; let the sheet's bg show */
+      border-radius: 14px;
+      overflow: hidden;
     }
 
-    .sheet-frame iframe {
-      display: block;
-      width: 100%;
-      height: 1000px;
-      border: 0;
+    .spec > div {
+      background: rgba(10, 19, 28, 0.55);
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .spec > div:first-child { border-top: 0; }
+
+    .spec dt {
+      font-family: var(--font-display);
+      font-size: 0.64rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 3px;
+    }
+
+    .spec dd {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.98rem;
+      font-weight: 500;
+    }
+
+    .swatch {
+      display: inline-block;
+      vertical-align: middle;
+      width: 14px;
+      height: 14px;
+      margin-right: 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Desktop: dock as a right-hand sidebar */
+    @media (min-width: 760px) {
+      .detail {
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: auto;
+        width: min(420px, 92vw);
+        max-height: none;
+        border-radius: 0;
+        border-width: 0 0 0 1px;
+        transform: translateX(101%);
+        box-shadow: -16px 0 44px rgba(0, 0, 0, 0.55);
+      }
+
+      .detail.open { transform: translateX(0); }
+
+      .detail::before { display: none; }
+
+      .detail-stage { height: 300px; }
+    }
+
+    /* ============================================================
+       PLACEHOLDERS — entries without a photograph yet
+       ============================================================ */
+    .scope-img .ph-glyph {
+      display: inline-block;
+      vertical-align: middle;
+      width: 86px;
+      height: 86px;
+      color: rgba(255, 204, 51, 0.5);
+    }
+
+    .scope.is-ph { background: linear-gradient(160deg, rgba(30, 45, 66, 0.4), rgba(15, 26, 38, 0.4)); }
+    .scope.is-ph .scope-ap { color: var(--ink-dim); background: rgba(255, 255, 255, 0.05); border-color: var(--border); }
+    .scope.is-ph .scope-code { color: var(--ink); }
+
+    .detail-stage .ph-glyph {
+      display: inline-block;
+      vertical-align: middle;
+      width: 108px;
+      height: 108px;
+      color: rgba(255, 204, 51, 0.45);
+    }
+
+    .ph-note {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
     }
 
     /* ============================================================
@@ -242,37 +615,31 @@
       font-size: 0.85rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      margin: 2.5rem 0 3rem;
+      margin: 2rem 0 3rem;
       padding-bottom: 1.5rem;
     }
 
-    /* ============================================================
-       MOBILE
-       ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .gal-hero .kicker, .gal-hero h1, .gal-lede { animation: fadeUp .7s ease-out both; }
+    .gal-hero h1 { animation-delay: .06s; }
+    .gal-lede   { animation-delay: .14s; }
+
     @media (max-width: 600px) {
-      .main { padding-top: 1rem; }
+      .gal-hero { padding: 1.8rem .5rem 1rem; }
+      .gallery { padding: 0 6px; }
+      .scope { width: 44%; max-width: 168px; margin: 6px 2%; }
+      .scope-img { height: 150px; }
+      .detail-body { padding: 6px 18px 24px; }
+    }
 
-      .telescopes-wrap {
-        padding: 0 .5rem;
-        gap: 16px;
-        margin-bottom: 1.6rem;
-      }
-
-      .telescopes-image-frame,
-      .sheet-frame {
-        border-radius: 14px;
-      }
-
-      .sheet-frame iframe {
-        height: 700px;
-      }
-
-      .footer-line {
-        font-size: .75rem;
-        letter-spacing: .12em;
-        margin: 1.8rem 0 2.2rem;
-        padding-bottom: 1rem;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      .gal-hero .kicker, .gal-hero h1, .gal-lede { animation: none; }
+      .detail { transition: none; }
+      .scope, .scope-img img { transition: none; }
     }
   </style>
 </head>
@@ -288,8 +655,8 @@
 
     ga('create', 'UA-68513114-1', 'auto');
     ga('send', 'pageview');
-
   </script>
+
   <div class="container">
     <section class="header">
       <!-- Injected by js/layout.js -->
@@ -301,21 +668,187 @@
 
     <div class="main">
 
-      <section class="telescopes-wrap">
-        <div class="telescopes-image-frame">
-          <img class="value-img" src="images/alltelescopes.webp">
-        </div>
-        <div class="sheet-frame">
-          <iframe
-            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQsicqPFoGJwAllbRDgyUi6k7F7yGDMXBF7qYGKw9puts4RrZ1AtDX1_pUwqqdldc400_GUL6zLiguP/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-        </div>
+      <section class="gal-hero">
+        <span class="kicker">The collection</span>
+        <h1>Telescopes, <em>named for the sky</em></h1>
+        <p class="gal-lede">
+          Twenty-eight instruments, most carrying a constellation's name — from the
+          300&nbsp;mm <em>Hydra</em> down to the 40&nbsp;mm <em>Microscopium</em>.
+          Tap any telescope to see what it's made of.
+        </p>
       </section>
+
+      <div class="filters" id="filters" role="group" aria-label="Filter telescopes by optical design"></div>
+
+      <div class="gallery" id="gallery"></div>
 
       <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
     </div>
   </div>
 
-  <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+  <!-- Detail panel (sidebar on desktop, bottom sheet on mobile) -->
+  <div class="detail-backdrop" id="backdrop"></div>
+  <aside class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="detail-code" aria-hidden="true">
+    <button class="detail-close" id="detailClose" aria-label="Close details">&times;</button>
+    <div class="detail-stage" id="detail-stage"></div>
+    <div class="detail-body">
+      <span class="detail-kicker">Telescope</span>
+      <h2 class="detail-code" id="detail-code"></h2>
+      <p class="detail-name" id="detail-name"></p>
+      <dl class="spec" id="detail-spec"></dl>
+    </div>
+  </aside>
+
+  <script>
+    /* ---- Master database (merged: equipment docx + published sheet) ---- */
+    const TELESCOPES = [
+    {slug:"hydra", code:"Hydra", name:"300 mm Dobsonian", ap:300, inch:"12 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"Black", brand:"SkyWatcher"},
+    {slug:"centaurus", code:"Centaurus", name:"250 mm Dobsonian", ap:250, inch:"10 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"White", brand:""},
+    {slug:"cetus", code:"Cetus", name:"200 mm Dobsonian (LF)", ap:200, inch:"8 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"Light Gray", brand:""},
+    {slug:"draco", code:"Draco", name:"200 mm Dobsonian (SF)", ap:200, inch:"8 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"Dark Blue", brand:""},
+    {slug:"carina", code:"Carina", name:"200mm Classical Cassegrain", ap:200, inch:"8 in", fl:2400, fr:"12.0", type:"Cassegrain", mount:"Equatorial", color:"White", brand:"GSO"},
+    {slug:null, code:"", name:"150 mm Dobsonian", ap:150, inch:"", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"Black", brand:"Dwij"},
+    {slug:"andromeda", code:"Andromeda", name:"150 mm Dobsonian (GSO)", ap:150, inch:"6 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"Light Gray", brand:"GSO"},
+    {slug:"pegasus", code:"Pegasus", name:"150 mm (SF)", ap:150, inch:"6 in", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"White", brand:"Startracker"},
+    {slug:"perseus", code:"Perseus", name:"135 mm Dobsonian", ap:135, inch:"5 in", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"White", brand:""},
+    {slug:"hercules", code:"Hercules", name:"130 mm Dobsonian Sturdy", ap:130, inch:"5 in", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"Brown", brand:""},
+    {slug:null, code:"Sagitta", name:"125 mm Reflector", ap:125, inch:"5 in", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"Carrot", brand:""},
+    {slug:"lyra", code:"Lyra", name:"114 mm Reflector", ap:114, inch:"4 in", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"White", brand:"Startracker"},
+    {slug:null, code:"", name:"100 mm Reflector", ap:100, inch:"", fl:null, fr:"", type:"Reflector", mount:"Plank", color:"Peach", brand:""},
+    {slug:null, code:"", name:"100 mm Reflector", ap:100, inch:"", fl:null, fr:"", type:"Reflector", mount:"Dobsonian", color:"", brand:"Mayank"},
+    {slug:"cygnus", code:"Cygnus", name:"100 mm Refractor", ap:100, inch:"4 in", fl:1000, fr:"10.0", type:"Refractor", mount:"Equatorial", color:"White", brand:"Bresser"},
+    {slug:null, code:"", name:"90 mm Cassegrain", ap:90, inch:"", fl:null, fr:"", type:"Cassegrain", mount:"Equatorial", color:"Blue", brand:"Meade"},
+    {slug:"delphinus", code:"Delphinus", name:"80 mm Reflector", ap:80, inch:"3 in", fl:null, fr:"", type:"Reflector", mount:"Tripod", color:"Royal Blue", brand:""},
+    {slug:"lynx", code:"Lynx", name:"75 mm Refractor", ap:75, inch:"3 in", fl:null, fr:"", type:"Refractor", mount:"Tripod", color:"Golden", brand:""},
+    {slug:null, code:"Ursa Minor", name:"60 mm Polarscope", ap:60, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"", color:"", brand:""},
+    {slug:"dorado", code:"Dorado", name:"60 mm Air-spaced Refractor", ap:60, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Plank", color:"Yellow", brand:""},
+    {slug:"grus", code:"Grus", name:"60 mm Refractor Golden", ap:60, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Plank", color:"Golden", brand:""},
+    {slug:"fornax", code:"Fornax", name:"60 mm Refractor Meade", ap:60, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Tripod", color:"Black", brand:"Meade"},
+    {slug:null, code:"Octans", name:"50 mm GuideScope", ap:50, inch:"2 in", fl:161, fr:"3.2", type:"Refractor", mount:"Plank", color:"Black", brand:""},
+    {slug:"camelopardalis", code:"Camelopardalis", name:"45 mm Refractor (LF)", ap:45, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Tripod", color:"Gray", brand:""},
+    {slug:"canis-minor", code:"Canis Minor", name:"45 mm Refractor (SF)", ap:45, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Plank", color:"Yellow", brand:""},
+    {slug:"microscopium", code:"Microscopium", name:"40 mm Refractor", ap:40, inch:"2 in", fl:null, fr:"", type:"Refractor", mount:"Plank", color:"Yellow", brand:""},
+    {slug:"sb1", code:"Solar Box 1", name:"Solar projection box", ap:null, inch:"", fl:null, fr:"", type:"Solar", mount:"", color:"Yellow", brand:""},
+    {slug:"sb3-small", code:"Solar Box (Small)", name:"Solar projection box", ap:null, inch:"", fl:null, fr:"", type:"Solar", mount:"", color:"Yellow", brand:""}
+    ];
+
+    const COLORS = {
+      'Black':'#1c1c1e','White':'#eef1f4','Light Gray':'#c3c7cd','Gray':'#9aa0a8','Dark Blue':'#1e3160',
+      'Royal Blue':'#2b4cd6','Blue':'#2b6cdb','Brown':'#6b4423','Carrot':'#ed7117','Peach':'#ffcaa8',
+      'Golden':'#d4a017','Pale Golden':'#e3c884','Yellow':'#ffd21f','Bright Yellow':'#ffd400','Pale Yellow':'#f3e6a0'
+    };
+    const MOUNTS = { 'Altaz':'Alt-azimuth', 'Plank':'Plank (alt-az)', 'Dobsonian':'Dobsonian', 'Equatorial':'Equatorial', 'Tripod':'Tripod' };
+
+    /* Line-art telescope used for entries that have no photograph yet */
+    const GLYPH = '<svg class="ph-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<line x1="19" y1="32" x2="45" y2="18" stroke-width="8"/>' +
+      '<line x1="14" y1="35" x2="21" y2="31" stroke-width="4"/>' +
+      '<line x1="32" y1="25" x2="32" y2="33" stroke-width="3"/>' +
+      '<path d="M32 33 L24 52 M32 33 L40 52 M27 45 L37 45" stroke-width="2.6"/></svg>';
+
+    const cleanName = s => (s || '').replace(/\b0+(\d)/g, '$1');
+    const title = t => t.code || t.name;
+    const apLabel = t => t.ap ? t.ap + ' mm' : 'Solar';
+    const sub = t => t.ap ? `${t.ap} mm &middot; ${t.type}` : 'Solar projector';
+    const imgMarkup = t => t.slug
+      ? `<img src="images/telescopes/${t.slug}.webp" alt="${title(t)} telescope" loading="lazy">`
+      : GLYPH;
+
+    /* ---- Build gallery ---- */
+    const gallery = document.getElementById('gallery');
+    TELESCOPES.forEach((t, i) => {
+      const b = document.createElement('div');
+      b.className = 'scope';
+      b.setAttribute('role', 'button');
+      b.tabIndex = 0;
+      b.dataset.type = t.type;
+      b.dataset.i = i;
+      b.classList.toggle('is-ph', !t.slug);
+      b.setAttribute('aria-label', `${title(t)}${t.code ? ' — ' + t.name : ''}`);
+      b.innerHTML =
+        `<span class="scope-ap">${apLabel(t)}</span>` +
+        `<span class="scope-img${t.slug ? '' : ' ph'}">${imgMarkup(t)}</span>` +
+        `<span class="scope-code">${title(t)}</span>` +
+        `<span class="scope-sub">${sub(t)}</span>`;
+      b.addEventListener('click', () => openDetail(i));
+      b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(i); } });
+      gallery.appendChild(b);
+    });
+
+    /* ---- Filters ---- */
+    const types = ['all', ...[...new Set(TELESCOPES.map(t => t.type))]];
+    const counts = t => t === 'all' ? TELESCOPES.length : TELESCOPES.filter(x => x.type === t).length;
+    const label = t => t === 'all' ? 'All' : (t === 'Cassegrain' ? 'Cassegrain' : t === 'Solar' ? 'Solar boxes' : t + 's');
+    const filters = document.getElementById('filters');
+    types.forEach((t, k) => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (k === 0 ? ' active' : '');
+      c.dataset.filter = t;
+      c.innerHTML = `${label(t)} <span class="n">${counts(t)}</span>`;
+      c.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+        c.classList.add('active');
+        document.querySelectorAll('.scope').forEach(s => {
+          s.style.display = (t === 'all' || s.dataset.type === t) ? '' : 'none';
+        });
+      });
+      filters.appendChild(c);
+    });
+
+    /* ---- Detail panel ---- */
+    const detail = document.getElementById('detail');
+    const backdrop = document.getElementById('backdrop');
+    const spec = document.getElementById('detail-spec');
+    let lastFocus = null;
+
+    function row(dt, dd, full) {
+      return `<div${full ? ' class="full"' : ''}><dt>${dt}</dt><dd>${dd}</dd></div>`;
+    }
+
+    function openDetail(i) {
+      const t = TELESCOPES[i];
+      lastFocus = document.activeElement;
+      document.getElementById('detail-stage').innerHTML =
+        imgMarkup(t) + (t.slug ? '' : '<span class="ph-note">Photograph coming soon</span>');
+      document.getElementById('detail-code').textContent = title(t);
+      const nameEl = document.getElementById('detail-name');
+      nameEl.textContent = t.code ? t.name : '';
+      nameEl.style.display = t.code ? '' : 'none';
+
+      const design = t.type === 'Solar' ? 'Solar projection box' : t.type;
+      let rows = '';
+      if (t.ap) rows += row('Aperture', `${t.ap} mm${t.inch ? ` <span style="color:var(--ink-dim)">(${t.inch})</span>` : ''}`);
+      rows += row('Optical design', design);
+      if (t.mount) rows += row('Mount', MOUNTS[t.mount] || t.mount);
+      if (t.fl) rows += row('Focal length', `${t.fl} mm`);
+      if (t.fr) rows += row('Focal ratio', `f/${t.fr}`);
+      if (t.brand) rows += row('Brand', t.brand);
+      if (t.color) {
+        const hex = COLORS[t.color] || '#888';
+        rows += row('Tube colour', `<span class="swatch" style="background:${hex}"></span>${t.color}`);
+      }
+      spec.innerHTML = rows;
+
+      backdrop.classList.add('open');
+      detail.classList.add('open');
+      detail.setAttribute('aria-hidden', 'false');
+      document.getElementById('detailClose').focus();
+    }
+
+    function closeDetail() {
+      backdrop.classList.remove('open');
+      detail.classList.remove('open');
+      detail.setAttribute('aria-hidden', 'true');
+      if (lastFocus) lastFocus.focus();
+    }
+
+    document.getElementById('detailClose').addEventListener('click', closeDetail);
+    backdrop.addEventListener('click', closeDetail);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && detail.classList.contains('open')) closeDetail(); });
+  </script>
+
+  <!-- Background Animation -->
   <script src="js/cosmos-bg.js"></script>
   <script src="js/layout.js"></script>
 </body>

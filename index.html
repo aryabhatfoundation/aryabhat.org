@@ -212,8 +212,8 @@
          to a hard leaf-shape. Used consistently on buttons + the
          navbar active pill so the same silhouette repeats wherever
          the user can click. */
-      --brand-shape: 14px 4px 14px 4px;
-      --brand-shape-tight: 10px 3px 10px 3px;
+      --brand-shape: 10px;
+      --brand-shape-tight: 8px;
     }
 
     /* Page-scoped typography: Space Grotesk for display/UI,
@@ -511,6 +511,13 @@
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
+    }
+
+    /* Quick links sitting between the hero and the marquee */
+    .hero-links {
+      max-width: 880px;
+      margin: 1.4rem auto 0;
+      padding: 0 12px;
     }
 
     /* ============================================================
@@ -1463,6 +1470,14 @@
           </a>
         </div>
       </section>
+
+      <!-- ============================================================
+           QUICK LINKS — Dhoomketu + Telescopes (above the marquee)
+           ============================================================ -->
+      <div class="cta-row hero-links">
+        <a class="button" href="dhoomketu.html">Meet Dhoomketu &rarr;</a>
+        <a class="button" href="telescopes.html">Our Telescopes &rarr;</a>
+      </div>
 
       <!-- ============================================================
            SCROLLING MARQUEE
