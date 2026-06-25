@@ -319,9 +319,11 @@
       outline: 0;
     }
 
-    /* Aperture badge */
+    /* Aperture badge — z-index keeps it above the image, which forms
+       its own stacking context via filter: drop-shadow. */
     .scope-ap {
       position: absolute;
+      z-index: 2;
       top: 9px;
       right: 10px;
       font-family: var(--font-display);
@@ -329,8 +331,8 @@
       font-weight: 600;
       letter-spacing: 0.02em;
       color: var(--gold);
-      background: rgba(255, 204, 51, 0.10);
-      border: 1px solid rgba(255, 204, 51, 0.28);
+      background: rgba(11, 19, 30, 0.92);
+      border: 1px solid rgba(255, 204, 51, 0.5);
       border-radius: 999px;
       padding: 2px 8px;
     }
@@ -582,7 +584,7 @@
     }
 
     .scope.is-ph { background: linear-gradient(160deg, rgba(30, 45, 66, 0.4), rgba(15, 26, 38, 0.4)); }
-    .scope.is-ph .scope-ap { color: var(--ink-dim); background: rgba(255, 255, 255, 0.05); border-color: var(--border); }
+    .scope.is-ph .scope-ap { color: var(--ink-dim); background: rgba(11, 19, 30, 0.92); border-color: var(--border); }
     .scope.is-ph .scope-code { color: var(--ink); }
 
     .detail-stage .ph-glyph {
