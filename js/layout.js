@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { href: "index.html", text: "Home" },
         { href: "quiz.html", text: "Astronomy Quiz" },
         { href: "sky.html", text: "Sky Map" },
+        { href: "whatsup.html", text: "What's Up" },
         { href: "download.html", text: "Download" },
         { href: "photos.html", text: "Photos" },
         { href: "contact.html", text: "Contact Us" }

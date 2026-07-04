@@ -818,9 +818,11 @@
                     <div class="cardinal east">E</div>
                     <div class="cardinal west">W</div>
                 </div>
-                <div style="text-align: center; margin-top: 10px;">
+                <div style="text-align: center; margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
                     <a class="button button-primary" onclick="saveMap()">💾 Save Map</a>
+                    <a class="button" id="stories-link" href="whatsup.html?city=Bhopal">🔭 What's Up →</a>
                 </div>
+                <p class="center" style="font-size:0.8em; color:var(--ink-dim); margin-top:6px;">Story-style preview of what visitors will see on the selected evening</p>
             </div>
         </div>
     </div>
@@ -1000,6 +1002,15 @@
         function updateDateDisplay() {
             var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('selected-date-display').innerText = selectedDate.toLocaleDateString("en-US", options);
+
+            // Point the "Evening Show" link at the currently selected date.
+            var link = document.getElementById('stories-link');
+            if (link) {
+                var y = selectedDate.getFullYear();
+                var mo = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                var dy = selectedDate.getDate().toString().padStart(2, '0');
+                link.href = 'whatsup.html?city=Bhopal&date=' + y + '-' + mo + '-' + dy;
+            }
         }
 
         // Initialize Calendar

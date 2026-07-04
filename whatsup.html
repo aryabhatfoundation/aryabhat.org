@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>What's Up: Aryabhat</title>
+    <meta name="description" content="What's Up — a story-style preview of what you'll see in the evening sky (planets, constellations, deep-sky objects) for a given city and date. By Aryabhat Foundation.">
+    <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- SunCalc — sunset / twilight times -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+    <!-- Astronomy Engine — planet & object altitude / azimuth -->
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <!-- Content catalogues + city list (data only) -->
+    <script src="js/whatsup-data.js"></script>
+    <!-- satellite.js (vendored, MIT) — SGP4 pass prediction, no runtime API -->
+    <script src="js/satellite.min.js"></script>
+    <script src="js/satellites-tle.js"></script>
+
+    <style>
+        :root {
+            --gold: #ffcc33;
+            --gold-deep: #ffa41b;
+            --gold-soft: #ffe58a;
+            --ink: #e6eef7;
+            --ink-dim: #9fb3c8;
+            --panel: #16223388;
+            --panel-solid: #1a2636;
+            --border: #2a3d55;
+            --accent-cyan: #1EAEDB;
+            --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+            --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+            --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --brand-shape: 10px;
+            --brand-shape-tight: 8px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: #04060a;
+            font-family: var(--font-body);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================================
+           STORIES SHELL — phone-column on desktop, full-bleed on phone
+           ============================================================ */
+        #stories {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .story-frame {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 120%, #14243a 0%, #0a1018 55%, #04060a 100%);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
+        }
+
+        @media (min-width: 620px) {
+            #stories { padding: 18px; }
+            .story-frame {
+                height: min(92vh, 860px);
+                border-radius: 22px;
+                box-shadow: 0 20px 70px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 204, 51, .10);
+            }
+        }
+
+        /* ---- Progress segments ---- */
+        .progress-row {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            z-index: 6;
+            display: flex;
+            gap: 4px;
+            padding: 10px 12px 6px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            pointer-events: none;   /* never intercept taps on the controls */
+        }
+        .pseg {
+            flex: 1 1 0;
+            height: 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .16);
+            overflow: hidden;
+        }
+        /* fill width is driven per-frame in JS via scaleX(0..1) */
+        .pseg-fill {
+            display: block;
+            height: 100%;
+            width: 100%;
+            transform: scaleX(0);
+            transform-origin: left center;
+            background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+            box-shadow: 0 0 5px rgba(255, 204, 51, .55);
+            border-radius: 4px;
+        }
+        .pseg.done .pseg-fill { transform: scaleX(1); }
+
+        /* ---- Top bar (brand + date + close) ---- */
+        .story-top {
+            position: absolute;
+            left: 0; right: 0;
+            top: calc(14px + env(safe-area-inset-top));
+            z-index: 6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px 0;
+        }
+        .story-brand {
+            font-family: var(--font-brand);
+            font-size: 1.05rem;
+            letter-spacing: .02em;
+            color: var(--ink);
+            text-shadow: 0 0 8px rgba(255, 255, 255, .35), 0 2px 3px rgba(0, 0, 0, .6);
+            white-space: nowrap;
+            flex: 0 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .top-controls {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 0 0 auto;
+        }
+        /* pill = city / date selector */
+        .story-pill {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            height: 30px;
+            max-width: 38vw;
+            padding: 0 10px;
+            font-family: var(--font-display);
+            font-size: .74rem;
+            font-weight: 600;
+            letter-spacing: .02em;
+            color: var(--gold);
+            background: rgba(10, 19, 28, .55);
+            border: 1px solid rgba(255, 204, 51, .35);
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .story-pill > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* native control overlaid invisibly so it opens on tap */
+        .story-pill input[type="date"],
+        .story-pill select {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            cursor: pointer;
+            color: transparent;
+            background: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .story-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .22);
+            background: rgba(10, 19, 28, .5);
+            color: var(--ink);
+            font-size: 1.1rem;
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .story-icon svg { width: 16px; height: 16px; display: block; }
+        .story-icon:hover { background: rgba(255, 255, 255, .12); }
+        #shareBtn { color: var(--gold); border-color: rgba(255, 204, 51, .4); }
+
+        /* toast for "link copied" */
+        .story-toast {
+            position: absolute;
+            left: 50%;
+            bottom: calc(58px + env(safe-area-inset-bottom));
+            transform: translateX(-50%) translateY(10px);
+            z-index: 8;
+            padding: 9px 16px;
+            border-radius: 999px;
+            background: rgba(10, 19, 28, .92);
+            border: 1px solid rgba(255, 204, 51, .4);
+            color: var(--gold-soft);
+            font-family: var(--font-display);
+            font-size: .8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+        }
+        .story-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 384px) {
+            .story-brand { display: none; }
+            .story-pill { max-width: 42vw; }
+        }
+
+        /* ---- Slides ---- */
+        .slides { position: absolute; inset: 0; z-index: 1; }
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .38s ease;
+            display: flex;
+        }
+        .slide.active { opacity: 1; visibility: visible; }
+
+        .slide-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 78px 26px calc(66px + env(safe-area-inset-bottom));
+            scrollbar-width: none;
+        }
+        .slide-inner::-webkit-scrollbar { display: none; }
+        .slide-inner.center { justify-content: center; }
+        /* Never let any slide child exceed the frame's content width. */
+        .slide-inner > * { max-width: 100%; }
+
+        .kicker {
+            font-family: var(--font-display);
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .32em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin: 0 0 10px;
+        }
+        .slide h2 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(1.7rem, 7vw, 2.3rem);
+            line-height: 1.08;
+            letter-spacing: -0.01em;
+            margin: 0 0 2px;
+        }
+        .slide h2 em { color: var(--gold); font-style: normal; }
+        .slide .devnag {
+            font-size: 1.15rem;
+            color: var(--gold-soft);
+            margin: 2px 0 0;
+            letter-spacing: .01em;
+        }
+        .slide .translit {
+            font-size: .8rem;
+            color: var(--ink-dim);
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin: 4px 0 0;
+        }
+        .slide p.body {
+            font-size: clamp(.98rem, 3.7vw, 1.08rem);
+            line-height: 1.5;
+            color: var(--ink);
+            margin: 16px 0 0;
+            max-width: min(30rem, 100%);
+        }
+        .slide p.body.dim { color: var(--ink-dim); }
+
+        /* visibility chip */
+        .vischip {
+            margin: 18px 0 0;
+            display: inline-flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+            padding: 11px 18px;
+            border-radius: 14px;
+            background: rgba(102, 187, 106, .10);
+            border: 1px solid rgba(102, 187, 106, .35);
+            max-width: min(30rem, 100%);
+        }
+        .vischip.faint {
+            background: rgba(255, 255, 255, .05);
+            border-color: rgba(255, 255, 255, .16);
+        }
+        .vischip .when {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: .98rem;
+            color: #b7f5c0;
+        }
+        .vischip.faint .when { color: var(--ink-dim); }
+        .vischip .where { font-size: .84rem; color: var(--ink-dim); }
+
+        /* fact pills */
+        .facts {
+            list-style: none;
+            margin: 18px 0 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            justify-content: center;
+            max-width: min(30rem, 100%);
+        }
+        .facts li {
+            font-size: .78rem;
+            line-height: 1.3;
+            color: var(--ink-dim);
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+        .facts li b { color: var(--ink); font-weight: 600; }
+
+        .scope-note {
+            margin: 16px 0 0;
+            font-size: .82rem;
+            color: var(--gold-soft);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        /* ============================================================
+           VISUALS — CSS orbs, moon, sun, asterism SVG
+           ============================================================ */
+        .visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: min(46vw, 190px);
+            height: min(46vw, 190px);
+            margin: 4px 0 6px;
+            flex: 0 0 auto;
+        }
+
+        /* ---- Cover (first) slide ---- */
+        .visual-stars {
+            width: min(74vw, 270px);
+            height: 108px;
+            margin: 2px 0 6px;
+            flex: 0 0 auto;
+        }
+        .visual-stars .starfield { display: block; width: 100%; height: 100%; }
+        .cover-brand {
+            margin-top: auto;           /* push the branding into the bottom half */
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+        }
+        .cover-title {
+            font-family: var(--font-brand);
+            font-size: clamp(2rem, 9vw, 2.7rem);
+            line-height: 1.12;
+            color: var(--ink);
+            text-shadow: 0 0 10px rgba(255, 255, 255, .28), 0 2px 4px rgba(0, 0, 0, .55);
+        }
+        .cover-logo {
+            height: clamp(88px, 27vw, 116px);
+            width: auto;
+            max-width: 82%;
+            /* hero logo — full three-layer white treatment (design.md §1.6) */
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, .6))
+                    drop-shadow(0 0 16px rgba(255, 255, 255, .22))
+                    drop-shadow(2px 4px 5px rgba(0, 0, 0, .5));
+        }
+        /* the big cover logo replaces the small corner watermark here */
+        .story-frame.cover .story-mark { display: none; }
+
+        .orb {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset -14px -12px 34px rgba(0, 0, 0, .55);
+        }
+        .orb.small { width: 74%; height: 74%; }
+
+        .orb-sun {
+            background: radial-gradient(circle at 42% 38%, #fff2c4 0%, #ffd24d 42%, #ff9e1b 100%);
+            box-shadow: 0 0 40px rgba(255, 180, 40, .55), 0 0 90px rgba(255, 150, 20, .35), inset -8px -8px 22px rgba(180, 90, 0, .35);
+        }
+        .moon-svg {
+            width: 96%;
+            height: 96%;
+            display: block;
+            filter: drop-shadow(0 0 14px rgba(220, 228, 245, .3)) drop-shadow(0 0 34px rgba(200, 214, 245, .14));
+        }
+        .meteor-svg, .sat-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            filter: drop-shadow(0 0 12px rgba(255, 204, 51, .18));
+        }
+        .orb-venus {
+            background: radial-gradient(circle at 40% 36%, #ffffff 0%, #fff0c9 38%, #f4d089 72%, #d8ab5c 100%);
+            box-shadow: 0 0 34px rgba(255, 236, 190, .55), inset -12px -10px 30px rgba(120, 85, 20, .35);
+        }
+        .orb-jupiter {
+            background:
+                repeating-linear-gradient(180deg,
+                    #e9d5b8 0 7%, #c99f76 7% 12%, #dcc09a 12% 19%, #b98a5f 19% 24%,
+                    #e6cba6 24% 33%, #a9744c 33% 37%, #e3c49c 37% 46%, #c79b70 46% 52%,
+                    #ecdcc0 52% 62%, #b3865c 62% 66%, #e0c39a 66% 76%, #caa074 76% 82%, #e9d5b8 82% 100%);
+            box-shadow: inset -16px -12px 40px rgba(60, 35, 10, .5);
+        }
+        .orb-jupiter .spot {
+            position: absolute;
+            width: 22%;
+            height: 12%;
+            border-radius: 50%;
+            left: 26%;
+            top: 60%;
+            background: radial-gradient(circle, #c65a3f 0%, #9c4030 70%, rgba(140, 60, 40, 0) 100%);
+        }
+        .orb-mars {
+            background: radial-gradient(circle at 40% 36%, #ffb27a 0%, #e5713b 40%, #b8431f 78%, #7f2c15 100%);
+            box-shadow: 0 0 26px rgba(220, 90, 40, .4), inset -12px -10px 30px rgba(70, 20, 5, .5);
+        }
+        .orb-mars .cap {
+            position: absolute;
+            width: 34%; height: 20%;
+            border-radius: 50%;
+            left: 33%; top: 2%;
+            background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 70%);
+        }
+        .orb-mercury {
+            background: radial-gradient(circle at 40% 36%, #d7d3cc 0%, #9c968c 45%, #6d675f 80%, #45403a 100%);
+            box-shadow: inset -12px -10px 28px rgba(0, 0, 0, .55);
+        }
+        /* Saturn: orb + ring */
+        .saturn-wrap { transform: rotate(-16deg); }
+        .orb-saturn {
+            background: radial-gradient(circle at 42% 36%, #f4e3c0 0%, #e2c288 44%, #c69b56 78%, #9a743c 100%);
+            box-shadow: inset -14px -10px 32px rgba(70, 45, 10, .5);
+            width: 66%; height: 66%;
+        }
+        .ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 150%; height: 46%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 7px solid rgba(230, 208, 160, .85);
+            box-shadow: 0 0 0 3px rgba(180, 150, 95, .35);
+        }
+        .ring.back { border-bottom-color: transparent; }
+        .ring.front { border-top-color: transparent; clip-path: inset(50% 0 0 0); }
+
+        .glyph {
+            font-size: min(30vw, 118px);
+            line-height: 1;
+            filter: drop-shadow(0 0 20px rgba(255, 204, 51, .3));
+        }
+
+        /* asterism svg */
+        .aster {
+            width: min(72vw, 300px);
+            height: auto;
+            margin: 2px 0 4px;
+            flex: 0 0 auto;
+        }
+        .aster line { stroke: rgba(160, 195, 235, .5); stroke-width: 1.1; }
+        .aster circle { fill: #eaf2ff; }
+        .aster circle.bright { fill: var(--gold); }
+        .aster .star-halo { fill: rgba(255, 255, 255, .12); }
+
+        /* ============================================================
+           OVERVIEW GRIDS — zodiac / nakshatra
+           ============================================================ */
+        .ov-grid {
+            display: grid;
+            gap: 6px;
+            width: 100%;
+            max-width: min(30rem, 100%);
+            margin: 16px 0 0;
+        }
+        .ov-grid.zod { grid-template-columns: repeat(2, 1fr); }
+        .ov-grid.nak { grid-template-columns: repeat(2, 1fr); }
+        .ov-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            padding: 6px 9px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .04);
+            border-left: 3px solid transparent;
+            font-size: .8rem;
+            text-align: left;
+            opacity: .4;
+        }
+        .ov-item.up {
+            opacity: 1;
+            background: rgba(102, 187, 106, .09);
+            border-left-color: #66bb6a;
+        }
+        .ov-item.moon-here {
+            background: rgba(255, 204, 51, .12);
+            border-left-color: var(--gold);
+            opacity: 1;
+        }
+        .ov-item .dv { color: var(--gold-soft); font-size: .92rem; }
+        .ov-item.up .en { color: var(--ink); font-weight: 600; }
+        .ov-item .en { color: var(--ink-dim); }
+        .ov-item .tag { margin-left: auto; font-size: .66rem; color: var(--ink-dim); white-space: nowrap; }
+        .ov-legend { margin: 12px 0 0; font-size: .74rem; color: var(--ink-dim); }
+        .ov-legend b { color: var(--gold); }
+
+        @media (max-width: 360px) {
+            .ov-grid.nak { grid-template-columns: 1fr; }
+            .ov-item { font-size: .74rem; }
+        }
+
+        /* time table on intro */
+        .timecard {
+            margin: 22px 0 4px;
+            width: 100%;
+            max-width: min(22rem, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .timerow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 13px;
+            background: linear-gradient(160deg, rgba(30, 45, 66, .8), rgba(15, 26, 38, .8));
+            border: 1px solid var(--border);
+        }
+        .timerow .lbl { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+        .timerow .lbl .t { font-family: var(--font-display); font-weight: 600; font-size: .96rem; color: var(--ink); }
+        .timerow .lbl .s { font-size: .74rem; color: var(--ink-dim); }
+        .timerow .val { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--gold); }
+        .timerow .ico { font-size: 1.3rem; margin-right: 12px; }
+        .timerow .lft { display: flex; align-items: center; }
+
+        .countline {
+            margin: 20px 0 0;
+            font-size: .92rem;
+            color: var(--ink-dim);
+            line-height: 1.6;
+        }
+        .countline b { color: var(--gold-soft); font-weight: 600; }
+
+        .tap-hint {
+            position: absolute;
+            bottom: calc(14px + env(safe-area-inset-bottom));
+            left: 0; right: 0;
+            z-index: 4;
+            text-align: center;
+            font-size: .74rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: rgba(230, 238, 247, .5);
+            pointer-events: none;
+        }
+
+        /* small Aryabhat logo watermark, bottom-left corner.
+           White drop-shadow per design.md §1.6 (never gold). */
+        .story-mark {
+            position: absolute;
+            left: 13px;
+            bottom: calc(10px + env(safe-area-inset-bottom));
+            height: 34px;
+            width: auto;
+            z-index: 5;
+            opacity: .85;
+            pointer-events: none;
+            /* crisp, tight white edge + small dark depth (design.md §1.6) */
+            filter: drop-shadow(0 0 1.2px rgba(255, 255, 255, .95)) drop-shadow(0 1px 2px rgba(0, 0, 0, .55));
+        }
+
+        .outro-tips {
+            list-style: none;
+            margin: 20px 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: min(26rem, 100%);
+            width: 100%;
+        }
+        .outro-tips li {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            text-align: left;
+            font-size: .9rem;
+            line-height: 1.4;
+            color: var(--ink);
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 11px 13px;
+        }
+        .outro-tips li .ti { font-size: 1.25rem; flex: 0 0 auto; }
+
+        /* satellite pass list */
+        .pass-list {
+            list-style: none;
+            margin: 16px 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: min(28rem, 100%);
+        }
+        .pass-list li {
+            text-align: left;
+            background: rgba(102, 187, 106, .08);
+            border: 1px solid rgba(102, 187, 106, .3);
+            border-radius: 12px;
+            padding: 10px 13px;
+        }
+        .pass-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .pass-name { font-family: var(--font-display); font-weight: 600; font-size: .98rem; color: var(--ink); }
+        .pass-time { font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: #b7f5c0; }
+        .pass-desc { display: block; margin-top: 2px; font-size: .82rem; color: var(--ink-dim); line-height: 1.35; }
+        .pass-desc b { color: var(--gold-soft); font-weight: 600; }
+        .pass-src { margin: 14px 0 0; font-size: .74rem; color: var(--ink-dim); letter-spacing: .02em; }
+
+        .story-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 22px 0 0;
+            height: 44px;
+            padding: 0 22px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: .92rem;
+            color: var(--gold);
+            text-decoration: none;
+            background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+            border: 1.5px solid var(--gold);
+            border-radius: var(--brand-shape);
+            box-shadow: 0 0 22px rgba(255, 204, 51, .18);
+            cursor: pointer;
+        }
+
+        /* fade-in of slide content */
+        .slide.active .slide-inner > * { animation: fadeUp .55s ease-out both; }
+        .slide.active .slide-inner > *:nth-child(2) { animation-delay: .05s; }
+        .slide.active .slide-inner > *:nth-child(3) { animation-delay: .10s; }
+        .slide.active .slide-inner > *:nth-child(4) { animation-delay: .15s; }
+        .slide.active .slide-inner > *:nth-child(n+5) { animation-delay: .20s; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide { transition: none; }
+            .slide.active .slide-inner > * { animation: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="stories">
+        <div class="story-frame" id="frame">
+            <div class="progress-row" id="progress"></div>
+            <div class="story-top">
+                <span class="story-brand">What's Up</span>
+                <div class="top-controls">
+                    <label class="story-pill" id="cityBtn">
+                        📍<span id="cityLabel">Bhopal</span> ▾
+                        <select id="citySelect" aria-label="Choose city"></select>
+                    </label>
+                    <label class="story-pill" id="dateBtn">
+                        <span id="dateBtnLabel">Tonight</span> ▾
+                        <input type="date" id="dateInput" aria-label="Choose evening">
+                    </label>
+                    <button class="story-icon" id="shareBtn" type="button" aria-label="Share this evening">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+                    </button>
+                    <a class="story-icon" id="closeBtn" href="sky.html" aria-label="Close">✕</a>
+                </div>
+            </div>
+            <div class="slides" id="slides"></div>
+            <img class="story-mark" src="images/aryabhat.svg" alt="Aryabhat" aria-hidden="true">
+            <div class="story-toast" id="toast">Link copied</div>
+            <div class="tap-hint" id="tapHint">tap to continue · hold to pause</div>
+        </div>
+    </div>
+
+    <script src="js/cosmos-bg.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        // Cities + astronomy catalogues live in js/whatsup-data.js
+        var CITIES = WHATSUP_DATA.CITIES;
+        function findCity(name) {
+            if (!name) return null;
+            name = String(name).trim().toLowerCase();
+            for (var i = 0; i < CITIES.length; i++) {
+                if (CITIES[i].name.toLowerCase() === name) return CITIES[i];
+            }
+            return null;
+        }
+
+        // ── Resolve location from URL: ?city=, or ?lat=&?lng=(&place=),
+        //    else default Bhopal. `loc` drives share links too. ──
+        var params = new URLSearchParams(window.location.search);
+        var loc;
+        var qLat = parseFloat(params.get('lat')), qLng = parseFloat(params.get('lng'));
+        if (!isNaN(qLat) && !isNaN(qLng)) {
+            loc = { name: params.get('place') || 'Custom location', lat: qLat, lng: qLng, custom: true };
+        } else {
+            var c0 = findCity(params.get('city')) || findCity('Bhopal');
+            loc = { name: c0.name, lat: c0.lat, lng: c0.lng };
+        }
+        // Mutable — recreated when the city changes.
+        var LAT = loc.lat, LNG = loc.lng, PLACE = loc.name;
+        var observer = new Astronomy.Observer(LAT, LNG, 500);
+
+        var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ── Selected evening ──
+        function parseDateParam(s) {
+            if (!s) return null;
+            var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+            if (!m) return null;
+            return new Date(+m[1], +m[2] - 1, +m[3], 12, 0, 0, 0);
+        }
+        var selectedDate = parseDateParam(params.get('date'));
+        if (!selectedDate) { selectedDate = new Date(); selectedDate.setHours(12, 0, 0, 0); }
+
+        // ── Content catalogue ──────────────────────────────────────
+        // Planets. `body` is the astronomy-engine identifier.
+        var PLANETS = WHATSUP_DATA.PLANETS, CONSTELLATIONS = WHATSUP_DATA.CONSTELLATIONS,
+            DSOS = WHATSUP_DATA.DSOS, ZODIAC = WHATSUP_DATA.ZODIAC, NAKSHATRA = WHATSUP_DATA.NAKSHATRA;
+
+        // DSO altitude comes straight from RA/Dec via Horizon() (see
+        // computeVis below), so no Astronomy.DefineStar registration is
+        // needed — that call is limited to the fixed Star1–Star8 slots.
+
+        var METEOR_SHOWERS = WHATSUP_DATA.METEOR_SHOWERS;
+
+        // ── Astronomy helpers ──────────────────────────────────────
+        function fmtTime(d) {
+            return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+        function bodyAltAz(bd, date) {
+            var equ = Astronomy.Equator(bd, date, observer, true, true);
+            var hor = Astronomy.Horizon(date, observer, equ.ra, equ.dec, 'normal');
+            return { alt: hor.altitude, az: hor.azimuth };
+        }
+        function fixedAltAz(ra, dec, date) {
+            var hor = Astronomy.Horizon(date, observer, ra, dec, 'normal');
+            return { alt: hor.altitude, az: hor.azimuth };
+        }
+        var COMPASS = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
+        var COMPASS_SHORT = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        function cardinal(az, short) {
+            var i = Math.round(az / 45) % 8;
+            return (short ? COMPASS_SHORT : COMPASS)[i];
+        }
+        function altDesc(a) {
+            if (a < 12) return 'low on the horizon';
+            if (a < 30) return 'a third of the way up';
+            if (a < 55) return 'high in the sky';
+            if (a < 75) return 'high overhead';
+            return 'nearly straight up';
+        }
+
+        // Scan the evening window and summarise visibility.
+        // altAzFn(date) -> {alt, az}. Returns a display object.
+        function computeVis(altAzFn, win, minAlt) {
+            var step = 10 * 60 * 1000;
+            var anyUp = false, firstUpT = null, setT = null, wasUp = false;
+            var peakAlt = -91, peakTime = null, peakAz = 0;
+            for (var t = win.scanStart.getTime(); t <= win.scanEnd.getTime(); t += step) {
+                var d = new Date(t);
+                var aa = altAzFn(d);
+                if (aa.alt > peakAlt) { peakAlt = aa.alt; peakTime = d; peakAz = aa.az; }
+                if (aa.alt > minAlt) {
+                    if (!anyUp) { firstUpT = d; anyUp = true; }
+                    wasUp = true;
+                } else if (wasUp && !setT) {
+                    setT = d;
+                }
+            }
+            var altDusk = altAzFn(win.dark).alt;
+            var altSunset = altAzFn(win.sunset).alt;
+            var upAtDusk = altDusk > minAlt || altSunset > minAlt;
+
+            var out = {
+                visible: peakAlt > minAlt,
+                peakAlt: peakAlt,
+                peakTime: peakTime,
+                cardinal: cardinal(peakAz),
+                cardinalShort: cardinal(peakAz, true),
+                when: '',
+                where: ''
+            };
+            if (!out.visible) {
+                out.when = 'Not up this evening';
+                out.where = 'Below the horizon after dark tonight.';
+                return out;
+            }
+            if (upAtDusk) {
+                if (setT && setT.getTime() < win.scanEnd.getTime()) {
+                    out.when = 'Up at dusk · sets ~' + fmtTime(setT);
+                } else {
+                    out.when = 'Up all evening';
+                }
+            } else if (firstUpT) {
+                out.when = 'Rises ~' + fmtTime(firstUpT);
+            } else {
+                out.when = 'Skims the horizon';
+            }
+            out.where = 'Look ' + out.cardinal + ' — ' + altDesc(peakAlt)
+                + '. Highest around ' + fmtTime(peakTime) + '.';
+            return out;
+        }
+
+        // ── Meteor showers (fully offline) ──
+        var MONTH_ORD = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        function mdOrd(m, d) { return MONTH_ORD[m - 1] + d; }
+        function inRange(m, d, s, e) {
+            var o = mdOrd(m, d), so = mdOrd(s[0], s[1]), eo = mdOrd(e[0], e[1]);
+            return so <= eo ? (o >= so && o <= eo) : (o >= so || o <= eo);   // handles year-wrap
+        }
+        function activeShowers(date) {
+            var m = date.getMonth() + 1, d = date.getDate();
+            var res = [];
+            METEOR_SHOWERS.forEach(function (s) {
+                if (!inRange(m, d, s.active[0], s.active[1])) return;
+                var diff = mdOrd(m, d) - mdOrd(s.peak[0], s.peak[1]);
+                if (diff > 183) diff -= 365; else if (diff < -183) diff += 365;
+                res.push({ s: s, daysToPeak: diff });
+            });
+            res.sort(function (a, b) { return Math.abs(a.daysToPeak) - Math.abs(b.daysToPeak) || b.s.zhr - a.s.zhr; });
+            return res;
+        }
+
+        // ── Bright-satellite passes (SGP4 via satellite.js) ──
+        var tleLive = false;   // set true once a live TLE fetch succeeds
+        function jdToDate(jd) { return new Date((jd - 2440587.5) * 86400000); }
+        function sunUnitVec(date) {
+            var v = Astronomy.GeoVector('Sun', date, false);   // AU, EQJ (≈TEME for a shadow test)
+            var m = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+            return { x: v.x / m, y: v.y / m, z: v.z / m };
+        }
+        function satSunlit(pos, sun) {
+            var d = pos.x * sun.x + pos.y * sun.y + pos.z * sun.z;
+            if (d > 0) return true;                            // sat on the sunward side
+            var px = pos.x - d * sun.x, py = pos.y - d * sun.y, pz = pos.z - d * sun.z;
+            return Math.sqrt(px * px + py * py + pz * pz) > 6378;   // outside Earth's shadow cylinder
+        }
+        function satPasses(win) {
+            if (typeof satellite === 'undefined' || !window.WHATSUP_TLE) return { passes: [], epoch: null, fresh: false };
+            var observerGd = { longitude: LNG * Math.PI / 180, latitude: LAT * Math.PI / 180, height: 0.5 };
+            var out = [], epoch = null, step = 20 * 1000;
+            WHATSUP_TLE.forEach(function (sat) {
+                var rec;
+                try { rec = satellite.twoline2satrec(sat.l1, sat.l2); } catch (e) { return; }
+                if (!rec || rec.error) return;
+                var ep = jdToDate(rec.jdsatepoch);
+                if (!epoch || Math.abs(ep - win.dark) < Math.abs(epoch - win.dark)) epoch = ep;
+                var cur = null, sunT = 0, sunV = null;
+                for (var t = win.sunset.getTime(); t <= win.scanEnd.getTime(); t += step) {
+                    var date = new Date(t), pv;
+                    try { pv = satellite.propagate(rec, date); } catch (err) { pv = null; }
+                    if (!pv || !pv.position || pv.position === true) { if (cur) { out.push(cur); cur = null; } continue; }
+                    var gmst = satellite.gstime(date);
+                    var look = satellite.ecfToLookAngles(observerGd, satellite.eciToEcf(pv.position, gmst));
+                    var el = look.elevation * 180 / Math.PI;
+                    var az = ((look.azimuth * 180 / Math.PI) % 360 + 360) % 360;
+                    var vis = false;
+                    if (el > 10) {
+                        if (t - sunT > 120000) { sunT = t; sunV = sunUnitVec(date); }
+                        vis = satSunlit(pv.position, sunV);
+                    }
+                    if (vis) {
+                        if (!cur) cur = { sat: sat, start: date, startAz: az, peakEl: el, peakTime: date, peakAz: az, end: date, endAz: az };
+                        else { if (el > cur.peakEl) { cur.peakEl = el; cur.peakTime = date; cur.peakAz = az; } cur.end = date; cur.endAz = az; }
+                    } else if (cur) { out.push(cur); cur = null; }
+                }
+                if (cur) out.push(cur);
+            });
+            out = out.filter(function (p) { return (p.end - p.start) >= 40000 && p.peakEl >= 12; });
+            out.sort(function (a, b) { return a.start - b.start; });
+            var fresh = epoch ? (Math.abs(win.dark - epoch) / 86400000 <= 12) : false;
+            return { passes: out, epoch: epoch, fresh: fresh };
+        }
+
+        function getMoonIcon(phase) {
+            if (phase < 0.03 || phase > 0.97) return '🌑';
+            if (phase < 0.22) return '🌒';
+            if (phase < 0.28) return '🌓';
+            if (phase < 0.47) return '🌔';
+            if (phase < 0.53) return '🌕';
+            if (phase < 0.72) return '🌖';
+            if (phase < 0.78) return '🌗';
+            return '🌘';
+        }
+        function getMoonPhaseName(phase) {
+            if (phase < 0.03 || phase > 0.97) return 'New Moon';
+            if (phase < 0.22) return 'Waxing Crescent';
+            if (phase < 0.28) return 'First Quarter';
+            if (phase < 0.47) return 'Waxing Gibbous';
+            if (phase < 0.53) return 'Full Moon';
+            if (phase < 0.72) return 'Waning Gibbous';
+            if (phase < 0.78) return 'Last Quarter';
+            return 'Waning Crescent';
+        }
+
+        // Sidereal ecliptic longitude -> nakshatra index (Lahiri, approx).
+        function nakshatraIndexForMoon(date) {
+            var ecl = Astronomy.EclipticGeoMoon(date); // tropical, of-date
+            var year = date.getFullYear();
+            var ayan = 24.10 + (year - 2024) * 0.01396; // Lahiri drift ~50.3"/yr
+            var sidereal = ((ecl.lon - ayan) % 360 + 360) % 360;
+            return Math.floor(sidereal / (360 / 27)) % 27;
+        }
+
+        // ── Escape helper ──
+        function esc(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Build an inline SVG asterism.
+        // fig.s = [[raHours, decDeg], …] real star positions; fig.l = line
+        // pairs; fig.b = bright indices. We tangent-plane project the real
+        // sky coordinates and fit them to the box, so shapes are accurate.
+        function asterSVG(fig) {
+            var W = 100, H = 74, pad = 12;
+            var ra0 = fig.s[0][0];
+            var pts = fig.s.map(function (st) {
+                var ra = st[0];
+                var dr = ra - ra0;
+                if (dr > 12) ra -= 24; else if (dr < -12) ra += 24;   // RA wrap
+                return { ra: ra, dec: st[1] };
+            });
+            var raM = 0, decM = 0;
+            pts.forEach(function (p) { raM += p.ra; decM += p.dec; });
+            raM /= pts.length; decM /= pts.length;
+            var cosD = Math.cos(decM * Math.PI / 180);
+            var xs = [], ys = [];
+            pts.forEach(function (p) {
+                p.x = -((p.ra - raM) * 15) * cosD;   // RA increases eastward → left
+                p.y = -(p.dec - decM);               // Dec north → up
+                xs.push(p.x); ys.push(p.y);
+            });
+            var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+            var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+            var spanX = (maxX - minX) || 1, spanY = (maxY - minY) || 1;
+            var scale = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
+            var offX = (W - spanX * scale) / 2 - minX * scale;
+            var offY = (H - spanY * scale) / 2 - minY * scale;
+            pts.forEach(function (p) { p.px = +(p.x * scale + offX).toFixed(1); p.py = +(p.y * scale + offY).toFixed(1); });
+
+            var svg = '<svg class="aster" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">';
+            (fig.l || []).forEach(function (pair) {
+                var a = pts[pair[0]], b = pts[pair[1]];
+                svg += '<line x1="' + a.px + '" y1="' + a.py + '" x2="' + b.px + '" y2="' + b.py + '"/>';
+            });
+            var bright = fig.b || [];
+            pts.forEach(function (p, i) {
+                var isB = bright.indexOf(i) !== -1;
+                var r = isB ? 2.9 : 1.7;
+                svg += '<circle class="star-halo" cx="' + p.px + '" cy="' + p.py + '" r="' + (r + 2.2) + '"/>';
+                svg += '<circle class="' + (isB ? 'bright' : '') + '" cx="' + p.px + '" cy="' + p.py + '" r="' + r + '"/>';
+            });
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Realistic-but-simple Moon: grey disk + real phase (elliptical
+        // terminator) + a few faint maria. `waxing` lights the right limb.
+        function moonSVG(fraction, waxing) {
+            var f = Math.max(0.001, Math.min(0.999, fraction));
+            var R = 46, cx = 50, cy = 50;
+            var arx = (R * Math.abs(1 - 2 * f)).toFixed(2);
+            var gibbous = f > 0.5;
+            var limbSweep = waxing ? 1 : 0;
+            var termSweep;
+            if (!gibbous) termSweep = waxing ? 0 : 1;   // crescent: terminator bulges toward lit limb
+            else termSweep = waxing ? 1 : 0;            // gibbous: terminator bulges into the dark side
+            var lit = 'M ' + cx + ',' + (cy - R)
+                + ' A ' + R + ',' + R + ' 0 0 ' + limbSweep + ' ' + cx + ',' + (cy + R)
+                + ' A ' + arx + ',' + R + ' 0 0 ' + termSweep + ' ' + cx + ',' + (cy - R) + ' Z';
+            var s = '<svg class="moon-svg" viewBox="0 0 100 100" aria-hidden="true">';
+            s += '<defs><radialGradient id="moonLit" cx="40%" cy="36%" r="72%">'
+                + '<stop offset="0%" stop-color="#f7f4ee"/>'
+                + '<stop offset="60%" stop-color="#dad4c8"/>'
+                + '<stop offset="100%" stop-color="#a8a196"/>'
+                + '</radialGradient>'
+                + '<clipPath id="moonClip"><path d="' + lit + '"/></clipPath></defs>';
+            s += '<circle cx="50" cy="50" r="46" fill="#232a35"/>';        // unlit face
+            s += '<path d="' + lit + '" fill="url(#moonLit)"/>';           // lit part
+            s += '<g clip-path="url(#moonClip)" fill="#b3ab9e" opacity="0.45">'   // faint maria
+                + '<ellipse cx="41" cy="39" rx="9" ry="7"/>'
+                + '<ellipse cx="59" cy="33" rx="5.5" ry="4.5"/>'
+                + '<ellipse cx="54" cy="60" rx="8" ry="6"/>'
+                + '<circle cx="64" cy="52" r="3.4"/>'
+                + '<circle cx="37" cy="58" r="4"/>'
+                + '</g>';
+            s += '<circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="0.6"/>';
+            s += '</svg>';
+            return s;
+        }
+
+        // A radiant with a few meteor streaks shooting out of it.
+        function meteorSVG() {
+            var cx = 34, cy = 26;   // radiant point (upper-left)
+            var streaks = [[62, 60], [78, 40], [70, 82], [48, 78], [86, 62]];
+            var s = '<svg class="meteor-svg" viewBox="0 0 100 100" aria-hidden="true">'
+                + '<defs><linearGradient id="mtail" x1="0" y1="0" x2="1" y2="1">'
+                + '<stop offset="0%" stop-color="rgba(255,229,138,0)"/>'
+                + '<stop offset="70%" stop-color="rgba(255,229,138,.55)"/>'
+                + '<stop offset="100%" stop-color="#fff"/></linearGradient></defs>';
+            // faint scatter stars
+            var pts = [[18, 60], [24, 82], [58, 18], [84, 24], [90, 84], [46, 46], [70, 20]];
+            pts.forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="0.9" fill="#cdd8ea" opacity="0.6"/>'; });
+            streaks.forEach(function (e) {
+                var dx = e[0] - cx, dy = e[1] - cy, len = Math.sqrt(dx * dx + dy * dy);
+                var sx = cx + dx / len * (len * 0.45), sy = cy + dy / len * (len * 0.45);
+                s += '<line x1="' + sx.toFixed(1) + '" y1="' + sy.toFixed(1) + '" x2="' + e[0] + '" y2="' + e[1] + '" stroke="url(#mtail)" stroke-width="1.5" stroke-linecap="round"/>';
+                s += '<circle cx="' + e[0] + '" cy="' + e[1] + '" r="1.4" fill="#fff"/>';
+            });
+            s += '<circle cx="' + cx + '" cy="' + cy + '" r="2.4" fill="none" stroke="rgba(255,204,51,.5)" stroke-width="0.8"/>';
+            s += '<circle cx="' + cx + '" cy="' + cy + '" r="1.1" fill="var(--gold)"/>';
+            s += '</svg>';
+            return s;
+        }
+
+        // A satellite arcing across a horizon.
+        function satTrailSVG() {
+            var s = '<svg class="sat-svg" viewBox="0 0 100 100" aria-hidden="true">';
+            // horizon
+            s += '<path d="M6,82 Q50,74 94,82" fill="none" stroke="rgba(159,179,200,.35)" stroke-width="1"/>';
+            // pass arc (rise left → set right)
+            s += '<path d="M12,80 Q50,14 88,80" fill="none" stroke="rgba(255,204,51,.45)" stroke-width="1.2" stroke-dasharray="2 3"/>';
+            // sat body at apex
+            s += '<g transform="translate(50,18)">'
+                + '<rect x="-3.4" y="-2.4" width="6.8" height="4.8" rx="1" fill="#e8eefb"/>'
+                + '<rect x="-11" y="-1.5" width="6" height="3" fill="#7fa8d8"/>'
+                + '<rect x="5" y="-1.5" width="6" height="3" fill="#7fa8d8"/>'
+                + '<circle cx="0" cy="0" r="7.5" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="0.8"/>'
+                + '</g>';
+            // endpoints
+            s += '<circle cx="12" cy="80" r="1.4" fill="#9fb3c8"/><circle cx="88" cy="80" r="1.4" fill="#9fb3c8"/>';
+            return s + '</svg>';
+        }
+
+        // A scatter of random twinkling stars for the cover slide.
+        function starfieldSVG() {
+            var W = 260, H = 120, n = 26, s = '';
+            for (var i = 0; i < n; i++) {
+                var x = (Math.random() * W).toFixed(1);
+                var y = (Math.random() * H).toFixed(1);
+                var r = (Math.random() * 1.3 + 0.4).toFixed(2);
+                var gold = Math.random() < 0.15;
+                var op = (0.35 + Math.random() * 0.6).toFixed(2);
+                s += '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (gold ? '#ffcc33' : '#eaf2ff') + '" opacity="' + op + '">';
+                if (!reduced) {
+                    var dur = (2 + Math.random() * 3).toFixed(2);
+                    var delay = (Math.random() * 3).toFixed(2);
+                    s += '<animate attributeName="opacity" values="' + op + ';' + (op * 0.25).toFixed(2) + ';' + op + '" dur="' + dur + 's" begin="' + delay + 's" repeatCount="indefinite"/>';
+                }
+                s += '</circle>';
+            }
+            return '<svg class="starfield" viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="100%" aria-hidden="true">' + s + '</svg>';
+        }
+
+        // Orb markup for each planet id.
+        function planetVisual(id) {
+            switch (id) {
+                case 'venus': return '<div class="visual"><div class="orb orb-venus small"></div></div>';
+                case 'jupiter': return '<div class="visual"><div class="orb orb-jupiter"><span class="spot"></span></div></div>';
+                case 'saturn': return '<div class="visual"><div class="saturn-wrap" style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span class="ring back"></span><div class="orb orb-saturn"></div><span class="ring front"></span></div></div>';
+                case 'mars': return '<div class="visual"><div class="orb orb-mars small"><span class="cap"></span></div></div>';
+                case 'mercury': return '<div class="visual"><div class="orb orb-mercury small"></div></div>';
+                default: return '';
+            }
+        }
+
+        // ── Slide builders ─────────────────────────────────────────
+        function chip(vis, faint) {
+            var cls = (faint || !vis.visible) ? 'vischip faint' : 'vischip';
+            return '<div class="' + cls + '"><span class="when">' + esc(vis.when) + '</span>'
+                + '<span class="where">' + esc(vis.where) + '</span></div>';
+        }
+        function factsHTML(arr) {
+            if (!arr || !arr.length) return '';
+            return '<ul class="facts"><li>' + arr.join('</li><li>') + '</li></ul>';
+        }
+
+        function buildSlides(date) {
+            var slides = [];
+
+            // Sun / twilight times
+            var times = SunCalc.getTimes(date, LAT, LNG);
+            var sunset = times.sunset;
+            var dusk = times.dusk;            // civil
+            var night = times.night;          // astronomical dusk (full dark)
+            if (!night || isNaN(night)) night = times.nauticalDusk;
+            if (!night || isNaN(night)) night = new Date(sunset.getTime() + 80 * 60000);
+            var dark = night;
+
+            // evening viewing window
+            var scanEnd = new Date(date); scanEnd.setHours(23, 30, 0, 0);
+            var win = { sunset: sunset, dark: dark, scanStart: sunset, scanEnd: scanEnd };
+
+            // Moon data
+            var moonIllum = SunCalc.getMoonIllumination(date);
+            var moonVis = computeVis(function (d) { return bodyAltAz('Moon', d); }, win, 3);
+            var phaseName = getMoonPhaseName(moonIllum.phase);
+            var illumPct = Math.round(moonIllum.fraction * 100);
+            var nakIdx = nakshatraIndexForMoon(dark);
+
+            // pre-compute planet & object visibility
+            var planetVis = {};
+            PLANETS.forEach(function (p) {
+                planetVis[p.id] = computeVis(function (d) { return bodyAltAz(p.body, d); }, win, p.minAlt);
+            });
+            var visPlanets = PLANETS.filter(function (p) { return planetVis[p.id].visible; });
+            var constVis = {};
+            CONSTELLATIONS.forEach(function (c) {
+                constVis[c.id] = computeVis(function (d) { return fixedAltAz(c.ra, c.dec, d); }, win, c.minAlt);
+            });
+            var visConst = CONSTELLATIONS.filter(function (c) { return constVis[c.id].visible; });
+            var dsoVis = {};
+            DSOS.forEach(function (o) {
+                dsoVis[o.id] = computeVis(function (d) { return fixedAltAz(o.ra, o.dec, d); }, win, o.minAlt);
+            });
+            var visDso = DSOS.filter(function (o) { return dsoVis[o.id].visible; });
+
+            var dateLong = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+            // ── 1. INTRO / cover ──
+            slides.push({
+                dur: 7000,
+                html:
+                    '<div class="slide-inner cover">'
+                    + '<div class="visual-stars">' + starfieldSVG() + '</div>'
+                    + '<p class="kicker">Tonight under the stars</p>'
+                    + '<h2>What you\'ll<br>see this <em>evening</em></h2>'
+                    + '<p class="body dim">' + esc(dateLong) + ' · 📍 ' + esc(PLACE) + '</p>'
+                    + '<div class="timecard">'
+                    + '  <div class="timerow"><span class="lft"><span class="ico">🌇</span><span class="lbl"><span class="t">Sunset</span><span class="s">the show begins to set up</span></span></span><span class="val">' + fmtTime(sunset) + '</span></div>'
+                    + '  <div class="timerow"><span class="lft"><span class="ico">🌌</span><span class="lbl"><span class="t">Full darkness</span><span class="s">astronomical twilight ends</span></span></span><span class="val">' + fmtTime(dark) + '</span></div>'
+                    + '</div>'
+                    + '<p class="countline">Waiting for you: <b>' + visPlanets.length + ' planet' + (visPlanets.length === 1 ? '' : 's') + '</b>, '
+                    + '<b>' + visConst.length + ' constellations</b> and <b>' + visDso.length + ' deep-sky object' + (visDso.length === 1 ? '' : 's') + '</b>.</p>'
+                    + '<div class="cover-brand">'
+                    + '  <div class="cover-title">What\'s Up</div>'
+                    + '  <img class="cover-logo" src="images/aryabhat.svg" alt="Aryabhat">'
+                    + '</div>'
+                    + '</div>'
+            });
+
+            // ── 2. MOON ──
+            (function () {
+                var scope = 'The Moon is the best first target — point the telescope at the line between light and dark (the terminator), where the low Sun throws long shadows and every crater and mountain leaps out.';
+                var extra;
+                if (illumPct <= 6) {
+                    extra = 'Tonight the Moon is essentially absent from the evening — and that is good news. A moonless sky is darker, so the faint galaxies and clusters later in this story will show far better.';
+                } else if (illumPct >= 94) {
+                    extra = 'Tonight it is nearly full — dazzlingly bright and beautiful to look at, though its glare washes out fainter stars and galaxies. Great for the Moon itself, harder for deep-sky hunting.';
+                } else {
+                    extra = 'A fine phase for the telescope, with plenty of shadowed craters standing out in relief along the terminator.';
+                }
+                slides.push({
+                    dur: 8000,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<div class="visual">' + moonSVG(moonIllum.fraction, moonIllum.phase < 0.5) + '</div>'
+                        + '<p class="kicker">Our nearest neighbour</p>'
+                        + '<h2>The <em>Moon</em></h2>'
+                        + '<p class="devnag">चन्द्रमा · Chandra</p>'
+                        + '<p class="body">' + esc(phaseName) + ' · ' + illumPct + '% lit. ' + esc(extra) + '</p>'
+                        + chip(moonVis, illumPct <= 6)
+                        + '<p class="scope-note">🔭 ' + esc(scope) + '</p>'
+                        + factsHTML(['<b>3,84,400 km</b> away', 'Keeps <b>one face</b> toward us', 'Light gets here in <b>1.3 seconds</b>'])
+                        + '</div>'
+                });
+            })();
+
+            // ── 3. PLANETS ──
+            visPlanets.forEach(function (p) {
+                var vis = planetVis[p.id];
+                slides.push({
+                    dur: 7500,
+                    html:
+                        '<div class="slide-inner">'
+                        + planetVisual(p.id)
+                        + '<p class="kicker">' + esc(p.kicker) + '</p>'
+                        + '<h2>' + esc(p.name) + '</h2>'
+                        + '<p class="devnag">' + esc(p.dev) + ' · ' + esc(p.translit) + '</p>'
+                        + '<p class="body">' + p.body_text + '</p>'
+                        + chip(vis)
+                        + (p.scope ? '<p class="scope-note">🔭 ' + p.telescope + '</p>' : '<p class="body dim">🔭 ' + p.telescope + '</p>')
+                        + factsHTML(p.facts)
+                        + '</div>'
+                });
+            });
+
+            // ── 4. CONSTELLATIONS ──
+            visConst.forEach(function (c) {
+                var vis = constVis[c.id];
+                var visual = c.fig ? asterSVG(c.fig) : '<div class="visual"><span class="glyph">' + (c.glyph || '✦') + '</span></div>';
+                var sub = (c.dev ? '<p class="devnag">' + esc(c.dev) + ' · ' + esc(c.translit) + '</p>'
+                    : '<p class="translit">' + esc(c.translit) + '</p>');
+                slides.push({
+                    dur: 7500,
+                    html:
+                        '<div class="slide-inner">'
+                        + visual
+                        + '<p class="kicker">Constellation</p>'
+                        + '<h2>' + esc(c.name) + '</h2>'
+                        + sub
+                        + '<p class="body">' + c.body_text + '</p>'
+                        + chip(vis)
+                        + '<p class="body dim">👁️ ' + c.find + '</p>'
+                        + factsHTML(c.facts)
+                        + '</div>'
+                });
+            });
+
+            // ── 5. ZODIAC OVERVIEW ──
+            (function () {
+                var moonRashiIdx = -1;
+                var eclMoon = Astronomy.EclipticGeoMoon(dark);
+                var ayan = 24.10 + (dark.getFullYear() - 2024) * 0.01396;
+                var moonSid = ((eclMoon.lon - ayan) % 360 + 360) % 360;
+                moonRashiIdx = Math.floor(moonSid / 30) % 12;
+
+                var items = '', upCount = 0;
+                ZODIAC.forEach(function (z, i) {
+                    var aa = fixedAltAz(z.ra, z.dec, dark);
+                    var up = aa.alt > 6;
+                    var cls = 'ov-item' + (up ? ' up' : '') + (i === moonRashiIdx ? ' moon-here' : '');
+                    if (up) upCount++;
+                    var tag = up ? cardinal(aa.az, true) : '—';
+                    items += '<div class="' + cls + '"><span class="dv">' + z.dev + '</span>'
+                        + '<span class="en">' + z.en + '</span>'
+                        + '<span class="tag">' + (i === moonRashiIdx ? '🌙 ' : '') + tag + '</span></div>';
+                });
+                slides.push({
+                    dur: 11000,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<p class="kicker">The highway of the sky</p>'
+                        + '<h2>Tonight\'s <em>Rashis</em></h2>'
+                        + '<p class="body dim">The twelve zodiac constellations lie along the ecliptic — the path the Sun, Moon and planets all travel. About half sit above the horizon at any moment. As darkness falls tonight, these <b style="color:var(--gold-soft)">' + upCount + '</b> are up (highlighted).</p>'
+                        + '<div class="ov-grid zod">' + items + '</div>'
+                        + '<p class="ov-legend">🌙 marks the rashi the <b>Moon</b> sits in tonight. Faded names are below the horizon this evening.</p>'
+                        + '</div>'
+                });
+            })();
+
+            // ── 6. NAKSHATRA OVERVIEW ──
+            (function () {
+                var items = '', upCount = 0;
+                NAKSHATRA.forEach(function (n, i) {
+                    var aa = fixedAltAz(n.ra, n.dec, dark);
+                    var up = aa.alt > 6;
+                    var cls = 'ov-item' + (up ? ' up' : '') + (i === nakIdx ? ' moon-here' : '');
+                    if (up) upCount++;
+                    var tag = up ? cardinal(aa.az, true) : '—';
+                    items += '<div class="' + cls + '"><span class="dv">' + n.dev + '</span>'
+                        + '<span class="en">' + n.en + '</span>'
+                        + '<span class="tag">' + (i === nakIdx ? '🌙 ' : '') + tag + '</span></div>';
+                });
+                slides.push({
+                    dur: 12000,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<p class="kicker">27 lunar mansions</p>'
+                        + '<h2>Tonight\'s <em>Nakshatras</em></h2>'
+                        + '<p class="body dim">The Moon takes about a month to circle the sky, spending roughly one night in each of the 27 nakshatras. Tonight it rests in <b style="color:var(--gold)">' + NAKSHATRA[nakIdx].dev + ' (' + NAKSHATRA[nakIdx].en + ')</b>. <b style="color:var(--gold-soft)">' + upCount + '</b> nakshatras are above the horizon this evening.</p>'
+                        + '<div class="ov-grid nak">' + items + '</div>'
+                        + '<p class="ov-legend">🌙 marks the Moon\'s nakshatra tonight. Each is named for its brightest star.</p>'
+                        + '</div>'
+                });
+            })();
+
+            // ── 7. DEEP-SKY OBJECTS ──
+            visDso.forEach(function (o) {
+                var vis = dsoVis[o.id];
+                var sub = (o.dev ? '<p class="devnag">' + esc(o.dev) + ' · ' + esc(o.translit) + '</p>'
+                    : '<p class="translit">' + esc(o.translit) + '</p>');
+                slides.push({
+                    dur: 7500,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<div class="visual"><span class="glyph">' + (o.glyph || '✦') + '</span></div>'
+                        + '<p class="kicker">Deep sky · needs a dark night</p>'
+                        + '<h2>' + esc(o.name) + '</h2>'
+                        + sub
+                        + '<p class="body">' + o.body_text + '</p>'
+                        + chip(vis)
+                        + '<p class="scope-note">🔭 ' + o.telescope + '</p>'
+                        + factsHTML(o.facts)
+                        + '</div>'
+                });
+            });
+
+            // ── 7b. METEOR SHOWER (if one is active) ──
+            (function () {
+                var act = activeShowers(date);
+                if (!act.length) return;
+                var top = act[0].s, dtp = act[0].daysToPeak;
+                var radMap = { 'Quadrantids': 'Boötes', 'Lyrids': 'Lyra', 'Eta Aquariids': 'Aquarius', 'Southern Delta Aquariids': 'Aquarius', 'Perseids': 'Perseus', 'Orionids': 'Orion', 'Leonids': 'Leo', 'Geminids': 'Gemini', 'Ursids': 'Ursa Minor' };
+                var rIn = radMap[top.name] || 'its constellation';
+                var peakTxt = dtp === 0 ? 'Peaks tonight' : dtp === 1 ? 'Peaks tomorrow night'
+                    : dtp === -1 ? 'Peaked last night' : dtp > 0 ? 'Peaks in ' + dtp + ' nights' : 'Peaked ' + (-dtp) + ' nights ago';
+                var aaDark = fixedAltAz(top.ra, top.dec, dark);
+                var whenTxt = peakTxt + ' · up to ~' + top.zhr + '/hour under a dark sky';
+                var whereTxt = aaDark.alt > 25
+                    ? 'Its radiant (near ' + rIn + ') rides high in the ' + cardinal(aaDark.az) + ' — well placed all evening. Meteors can streak anywhere, so watch the whole sky.'
+                    : aaDark.alt > 3
+                        ? 'Its radiant (near ' + rIn + ') sits low in the ' + cardinal(aaDark.az) + ' now — expect more as it climbs after midnight.'
+                        : 'Its radiant near ' + rIn + ' rises late — the real show is well after midnight.';
+                var moonNote = illumPct > 45
+                    ? 'A ' + illumPct + '%-lit Moon will drown the faintest streaks tonight, but the bright ones still cut through.'
+                    : 'Little Moon to spoil it tonight — good conditions under a dark sky.';
+                var others = act.length > 1 ? ' The ' + act[1].s.name + ' are gently active too.' : '';
+                slides.push({
+                    dur: 9500,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<div class="visual">' + meteorSVG() + '</div>'
+                        + '<p class="kicker">Shooting stars</p>'
+                        + '<h2>The <em>' + esc(top.name) + '</em></h2>'
+                        + '<p class="translit">Meteor shower</p>'
+                        + '<p class="body">' + esc(top.blurb + others) + '</p>'
+                        + '<div class="vischip"><span class="when">' + esc(whenTxt) + '</span><span class="where">' + esc(whereTxt) + '</span></div>'
+                        + '<p class="body dim">🌙 ' + esc(moonNote) + '</p>'
+                        + factsHTML(['<b>' + top.zhr + '</b>/hr at peak', 'Dust of <b>' + top.parent + '</b>', 'No telescope — <b>just your eyes</b>'])
+                        + '</div>'
+                });
+            })();
+
+            // ── 7c. BRIGHT SATELLITES (only with fresh orbital data) ──
+            (function () {
+                var sr = satPasses(win);
+                if (!sr.fresh || !sr.passes.length) return;
+                var rows = sr.passes.slice(0, 3).map(function (p) {
+                    var word = p.peakEl > 60 ? 'a brilliant overhead pass' : p.peakEl > 35 ? 'a bright, high pass' : 'a low pass';
+                    return '<li><span class="pass-head"><span class="pass-name">' + esc(p.sat.short) + '</span>'
+                        + '<span class="pass-time">' + fmtTime(p.start) + '</span></span>'
+                        + '<span class="pass-desc">' + word + ' — from the <b>' + cardinal(p.startAz, true) + '</b> to the <b>' + cardinal(p.endAz, true) + '</b>, up to ' + Math.round(p.peakEl) + '° high</span></li>';
+                }).join('');
+                var srcNote = tleLive ? 'live orbital data from Celestrak'
+                    : 'orbital data updated ' + sr.epoch.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                slides.push({
+                    dur: 9500,
+                    html:
+                        '<div class="slide-inner">'
+                        + '<div class="visual">' + satTrailSVG() + '</div>'
+                        + '<p class="kicker">Passing overhead</p>'
+                        + '<h2>Catch a <em>Space Station</em></h2>'
+                        + '<p class="translit">Bright satellites</p>'
+                        + '<p class="body">A big satellite catches the sunlight and glides across the sky like a fast, steady star — no blinking, no sound. Tonight there ' + (sr.passes.length === 1 ? 'is a pass' : 'are passes') + ' to catch:</p>'
+                        + '<ul class="pass-list">' + rows + '</ul>'
+                        + '<p class="body dim">Steady and silent, with no flashing lights — that is how you tell it from a plane, and it never twinkles like a star.</p>'
+                        + '<p class="pass-src">📡 ' + esc(srcNote) + '</p>'
+                        + '</div>'
+                });
+            })();
+
+            // ── 8. OUTRO / tips ──
+            slides.push({
+                dur: 10000,
+                html:
+                    '<div class="slide-inner center">'
+                    + '<p class="kicker">Before you look up</p>'
+                    + '<h2>Make the most<br>of the <em>night</em></h2>'
+                    + '<ul class="outro-tips">'
+                    + '<li><span class="ti">👁️</span><span>Give your eyes <b>20 minutes</b> in the dark. After that you\'ll see many more stars — one bright phone screen resets it.</span></li>'
+                    + '<li><span class="ti">🔴</span><span>Use a <b>red light</b>, not white, to read or walk. Red keeps your night-vision intact.</span></li>'
+                    + '<li><span class="ti">🌙</span><span>Start with the <b>Moon and planets</b> while it\'s early, then hunt fainter objects once it\'s fully dark.</span></li>'
+                    + '<li><span class="ti">🔭</span><span>Look with your <b>eyes first</b>, then binoculars, then the telescope. Learning the sky is half the joy.</span></li>'
+                    + '</ul>'
+                    + '<p class="body dim" style="margin-top:20px">Clear skies from <b style="color:var(--gold-soft)">Aryabhat</b>. 🔭</p>'
+                    + '<a class="story-btn" href="sky.html">← Back to the Sky Map</a>'
+                    + '</div>'
+            });
+
+            return slides;
+        }
+
+        // ── Stories engine ─────────────────────────────────────────
+        var slidesEl = document.getElementById('slides');
+        var progressEl = document.getElementById('progress');
+        var frame = document.getElementById('frame');
+        var current = 0;
+        var slideData = [];
+        var slideEls = [];
+        var segEls = [];
+        var paused = false;
+
+        function render(date) {
+            slideData = buildSlides(date);
+            slidesEl.innerHTML = '';
+            progressEl.innerHTML = '';
+            slideEls = [];
+            segEls = [];
+            slideData.forEach(function (sl, i) {
+                var d = document.createElement('div');
+                d.className = 'slide';
+                d.innerHTML = sl.html;
+                slidesEl.appendChild(d);
+                slideEls.push(d);
+
+                var seg = document.createElement('div');
+                seg.className = 'pseg';
+                var fill = document.createElement('span');
+                fill.className = 'pseg-fill';
+                seg.appendChild(fill);
+                progressEl.appendChild(seg);
+                segEls.push(seg);
+            });
+            current = 0;
+            show(0);
+        }
+
+        // Progress is driven by requestAnimationFrame rather than CSS
+        // animation — deterministic across browsers, and pause/resume is
+        // just a flag. Each segment's fill is a scaleX(0..1) transform.
+        var rafId = null, lastTs = 0, segElapsed = 0, segDur = 0;
+
+        function setFill(fill, p) {
+            if (fill) fill.style.transform = 'scaleX(' + Math.max(0, Math.min(1, p)) + ')';
+        }
+        function stopRaf() {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+        function frameStep(ts) {
+            var dt = lastTs ? (ts - lastTs) : 0;
+            lastTs = ts;
+            if (!paused && segDur > 0) {
+                segElapsed += dt;
+                var p = segElapsed / segDur;
+                setFill(segEls[current] && segEls[current].firstChild, p);
+                if (p >= 1) { rafId = null; next(); return; }
+            }
+            rafId = requestAnimationFrame(frameStep);
+        }
+        function startRaf() {
+            stopRaf();
+            lastTs = 0;
+            segElapsed = 0;
+            rafId = requestAnimationFrame(frameStep);
+        }
+
+        function show(idx) {
+            stopRaf();
+            current = idx;
+            slideEls.forEach(function (el, i) { el.classList.toggle('active', i === idx); });
+            frame.classList.toggle('cover', idx === 0);  // hide corner watermark on the cover
+            // reset active slide scroll
+            var inner = slideEls[idx].querySelector('.slide-inner');
+            if (inner) inner.scrollTop = 0;
+
+            segEls.forEach(function (seg, i) {
+                seg.classList.toggle('active', i === idx);
+                seg.classList.toggle('done', i < idx);
+                // Explicitly set every fill so there's no ambiguity:
+                // past = full, current = empty (about to grow), future = empty.
+                setFill(seg.firstChild, i < idx ? 1 : 0);
+            });
+
+            segDur = slideData[idx].dur;
+            if (reduced) { setFill(segEls[idx].firstChild, 1); return; } // manual advance
+            startRaf();
+        }
+
+        function next() { if (current < slideData.length - 1) show(current + 1); else exit(); }
+        function prev() { if (current > 0) show(current - 1); else show(0); }
+
+        function pause() {
+            paused = true;
+            frame.classList.add('paused');
+            var hint = document.getElementById('tapHint');
+            if (hint) hint.style.opacity = '0';
+        }
+        function resume() {
+            paused = false;
+            frame.classList.remove('paused');
+            var hint = document.getElementById('tapHint');
+            if (hint) hint.style.opacity = '';
+        }
+
+        function exit() {
+            if (document.referrer && document.referrer.indexOf('sky.html') !== -1) {
+                history.back();
+            } else {
+                window.location.href = 'sky.html';
+            }
+        }
+
+        // ── Gestures: tap zones, hold-to-pause, swipe ──
+        var pdown = null, holdTimer = null, holding = false;
+        frame.addEventListener('pointerdown', function (e) {
+            if (e.target.closest('.story-top')) return; // don't hijack controls
+            pdown = { x: e.clientX, y: e.clientY, t: Date.now() };
+            holding = false;
+            holdTimer = setTimeout(function () { holding = true; pause(); }, 220);
+        });
+        frame.addEventListener('pointerup', function (e) {
+            if (!pdown) return;
+            clearTimeout(holdTimer);
+            var dx = e.clientX - pdown.x;
+            var dy = e.clientY - pdown.y;
+            if (holding) { holding = false; resume(); pdown = null; return; }
+            pdown = null;
+            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+                if (dx < 0) next(); else prev();
+                return;
+            }
+            if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                var rect = frame.getBoundingClientRect();
+                if ((e.clientX - rect.left) < rect.width * 0.32) prev(); else next();
+            }
+        });
+        frame.addEventListener('pointercancel', function () {
+            clearTimeout(holdTimer);
+            if (holding) { holding = false; resume(); }
+            pdown = null;
+        });
+        frame.addEventListener('pointerleave', function () {
+            clearTimeout(holdTimer);
+            if (holding) { holding = false; resume(); }
+            pdown = null;
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            else if (e.key === 'Escape') { exit(); }
+        });
+
+        document.getElementById('closeBtn').addEventListener('click', function (e) {
+            e.preventDefault(); exit();
+        });
+
+        // ── Date control ──
+        function toInputValue(d) {
+            var m = (d.getMonth() + 1).toString().padStart(2, '0');
+            var day = d.getDate().toString().padStart(2, '0');
+            return d.getFullYear() + '-' + m + '-' + day;
+        }
+        function isTonight(d) {
+            var t = new Date(); return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate();
+        }
+        function updateDateLabel() {
+            document.getElementById('dateBtnLabel').textContent =
+                isTonight(selectedDate) ? 'Tonight' : selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+        var dateInput = document.getElementById('dateInput');
+        dateInput.value = toInputValue(selectedDate);
+        dateInput.addEventListener('change', function () {
+            var d = parseDateParam(this.value);
+            if (d) { selectedDate = d; updateDateLabel(); syncURL(); render(selectedDate); }
+        });
+        // Desktop browsers don't pop the calendar on a plain click of a
+        // (transparent) date field — open it explicitly on the pill.
+        document.getElementById('dateBtn').addEventListener('click', function (e) {
+            if (e.target === dateInput) return;      // native tap already handles it
+            if (dateInput.showPicker) { try { dateInput.showPicker(); } catch (err) { dateInput.focus(); } }
+        });
+
+        // ── City control ──
+        var citySel = document.getElementById('citySelect');
+        function updateCityLabel() {
+            document.getElementById('cityLabel').textContent = loc.name;
+        }
+        function renderCityOptions() {
+            var html = '';
+            if (loc.custom) html += '<option value="__custom" selected>' + esc(loc.name) + '</option>';
+            CITIES.forEach(function (c) {
+                var isSel = !loc.custom && c.name === loc.name;
+                html += '<option value="' + esc(c.name) + '"' + (isSel ? ' selected' : '') + '>' + esc(c.name) + '</option>';
+            });
+            citySel.innerHTML = html;
+        }
+        function applyLocation(newLoc, redraw) {
+            loc = newLoc;
+            LAT = loc.lat; LNG = loc.lng; PLACE = loc.name;
+            observer = new Astronomy.Observer(LAT, LNG, 500);
+            renderCityOptions();
+            updateCityLabel();
+            syncURL();
+            if (redraw) render(selectedDate);
+        }
+        citySel.onchange = function () {
+            var c = findCity(this.value);
+            if (c) applyLocation({ name: c.name, lat: c.lat, lng: c.lng }, true);
+        };
+        renderCityOptions();
+
+        // Nearest listed city to a lat/lng (flat approx — fine at city scale).
+        function nearestCity(lat, lng) {
+            var best = null, bestD = Infinity;
+            var kx = Math.cos(lat * Math.PI / 180);
+            CITIES.forEach(function (c) {
+                var dLat = c.lat - lat, dLng = (c.lng - lng) * kx;
+                var d = dLat * dLat + dLng * dLng;
+                if (d < bestD) { bestD = d; best = c; }
+            });
+            return { city: best, deg: Math.sqrt(bestD) };
+        }
+        // Seed the location from the browser's geolocation when the URL
+        // gave us no city (and no explicit lat/lng). Falls back silently.
+        function seedFromGeolocation() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(function (pos) {
+                // Don't yank the viewer if they've already left the cover.
+                if (current !== 0) return;
+                var la = pos.coords.latitude, lo = pos.coords.longitude;
+                var nc = nearestCity(la, lo);
+                if (nc.city && nc.deg < 1.8) {           // ~200 km: use the named city
+                    applyLocation({ name: nc.city.name, lat: nc.city.lat, lng: nc.city.lng }, true);
+                } else {                                  // far from any listed city
+                    applyLocation({ name: 'Your location', lat: la, lng: lo, custom: true }, true);
+                }
+            }, function () { /* denied / unavailable — keep default */ },
+                { timeout: 8000, maximumAge: 30 * 60 * 1000 });
+        }
+
+        // Try to pull fresh TLEs live from Celestrak (a stable, CORS-enabled
+        // source); fall back silently to the bundled ones on any failure.
+        function refreshTLEs() {
+            if (typeof fetch === 'undefined' || !window.WHATSUP_TLE) return;
+            var byId = {};
+            WHATSUP_TLE.forEach(function (s) { if (s.catnr) byId[String(s.catnr)] = s; });
+            if (!Object.keys(byId).length) return;
+            var ctrl = new AbortController();
+            var to = setTimeout(function () { ctrl.abort(); }, 6000);
+            fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=TLE', { signal: ctrl.signal })
+                .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+                .then(function (txt) {
+                    clearTimeout(to);
+                    var lines = txt.split(/\r?\n/), updated = 0;
+                    for (var i = 0; i < lines.length - 1; i++) {
+                        var l1 = lines[i].trim(), l2 = (lines[i + 1] || '').trim();
+                        if (l1.charAt(0) === '1' && l2.charAt(0) === '2') {
+                            var id = l1.substring(2, 7).replace(/\D/g, '');
+                            if (byId[id]) { byId[id].l1 = l1; byId[id].l2 = l2; updated++; }
+                        }
+                    }
+                    if (updated > 0) { tleLive = true; if (current === 0) render(selectedDate); }
+                })
+                .catch(function () { clearTimeout(to); /* keep bundled TLEs */ });
+        }
+
+        // ── Shareable URL (city + date embedded, on the .html page) ──
+        function currentShareURL() {
+            var p = new URLSearchParams();
+            if (loc.custom) {
+                p.set('lat', LAT); p.set('lng', LNG);
+                if (PLACE) p.set('place', PLACE);
+            } else {
+                p.set('city', loc.name);
+            }
+            p.set('date', toInputValue(selectedDate));
+            // Base off the full href (strip any query/hash). Using
+            // origin+pathname breaks on file:// where origin is "null".
+            var base = window.location.href.split('#')[0].split('?')[0];
+            return base + '?' + p.toString();
+        }
+        // Keep the address bar in sync so a manual copy also works.
+        function syncURL() {
+            try { window.history.replaceState(null, '', currentShareURL()); } catch (e) { /* file:// etc. */ }
+        }
+
+        var toastTimer = null;
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+        }
+        function doShare() {
+            var url = currentShareURL();
+            var when = isTonight(selectedDate) ? 'tonight' : 'on ' + selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            var shareData = {
+                title: "What's Up · " + loc.name,
+                text: "What's up in the sky over " + loc.name + ' ' + when + ' — a quick tour:',
+                url: url
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(function () { /* user cancelled */ });
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () { showToast('Link copied'); },
+                    function () { window.prompt('Copy this link:', url); });
+            } else {
+                window.prompt('Copy this link:', url);
+            }
+        }
+        document.getElementById('shareBtn').addEventListener('click', function (e) {
+            e.preventDefault(); doShare();
+        });
+
+        // Did the URL pin a location? If not, we may seed from geolocation.
+        var hadLocationParam = !!params.get('city') || (!isNaN(qLat) && !isNaN(qLng));
+
+        // ── Boot ──
+        function boot() {
+            updateCityLabel();
+            updateDateLabel();
+            syncURL();
+            render(selectedDate);
+            // Optional deep-link to a specific slide (?slide=N), handy for
+            // jumping straight to a topic during a talk.
+            var startAt = parseInt(params.get('slide'), 10);
+            if (!isNaN(startAt) && startAt > 0 && startAt < slideData.length) show(startAt);
+            // No city given → try to centre on the viewer's location.
+            if (!hadLocationParam) seedFromGeolocation();
+            // Pull fresh satellite elements in the background.
+            refreshTLEs();
+            // hide the tap hint after a few slides worth of time
+            setTimeout(function () {
+                var hint = document.getElementById('tapHint');
+                if (hint) hint.style.transition = 'opacity .6s', hint.style.opacity = '0';
+            }, 6000);
+        }
+        if (typeof Astronomy === 'undefined' || typeof SunCalc === 'undefined') {
+            // libraries still loading; wait a tick
+            window.addEventListener('load', boot);
+        } else {
+            boot();
+        }
+    })();
+    </script>
+</body>
+
+</html>
