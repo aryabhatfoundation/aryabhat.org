@@ -7,6 +7,11 @@
       "**/node_modules/**"
     ],
     "redirects": [
+       {
+        "source": "/quizform",
+        "destination": "https://aryabhat.org/files/Institutional_format.xlsx",
+        "type": 301
+      },
       {
         "source": "/study1",
         "destination": "https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study1.pdf",
