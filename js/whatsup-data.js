@@ -289,7 +289,7 @@ window.WHATSUP_DATA = (function () {
             {
                 id: 'm31', star: 'DSO_m31', ra: 0.712, dec: 41.27, dist: 2537000, minAlt: 18,
                 name: 'The Andromeda Galaxy', dev: '', translit: 'M31', glyph: '🌌',
-                body_text: 'The farthest object a human eye can see without any aid — a whole separate galaxy of a trillion stars. Its light set out 25 lakh years ago, before our species existed, and lands in your eye tonight.',
+                body_text: 'The farthest object a human eye can see without any aid — a whole separate galaxy of a trillion stars. Its light set out 25 lakh years ago, before our species existed, and only now reaches your eye.',
                 telescope: 'To the eye and in binoculars it is a soft, elongated smudge under a dark sky. Its size fools people — it spans several full-Moon widths, but only the bright core is easy to see.',
                 facts: ['<b>25 lakh light-years</b> away', 'Holds <b>~1 trillion</b> stars', 'Heading toward us — a <b>merger</b> in 4 billion yrs']
             },

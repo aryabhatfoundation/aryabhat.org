@@ -878,7 +878,7 @@
                 out.when = 'Not up this evening';
                 out.where = anyUp
                     ? 'Rises too late for the session — only clears the horizon after 10 PM.'
-                    : 'Below the horizon all evening tonight.';
+                    : 'Below the horizon all evening.';
                 return out;
             }
             if (upAtDusk) {
@@ -1257,6 +1257,14 @@
 
             var dateLong = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
+            // Copy adapts to the chosen date: the warm word "tonight" only when
+            // it really is today, otherwise the date-neutral "this evening" (the
+            // cover already states the full date, so the night is never ambiguous).
+            var isToday = isTonight(date);
+            var eve = isToday ? 'tonight' : 'this evening';          // mid-sentence
+            var Eve = isToday ? 'Tonight' : 'This evening';          // sentence start
+            var evePoss = isToday ? "Tonight's" : "This evening's";  // possessive heading
+
             // ── 1. INTRO / cover ──
             slides.push({
                 dur: 7000,
@@ -1292,9 +1300,9 @@
                 var scope = 'The Moon is the best first target — point the telescope at the line between light and dark (the terminator), where the low Sun throws long shadows and every crater and mountain leaps out.';
                 var extra;
                 if (illumPct <= 6) {
-                    extra = 'Only a slender crescent tonight — a delicate sight to catch low in the twilight before it sets. Its slim lighting also means darker skies for the faint galaxies and clusters later in this story.';
+                    extra = 'Only a slender crescent ' + eve + ' — a delicate sight to catch low in the twilight before it sets. Its slim lighting also means darker skies for the faint galaxies and clusters later in this story.';
                 } else if (illumPct >= 94) {
-                    extra = 'Tonight it is nearly full — dazzlingly bright and beautiful to look at, though its glare washes out fainter stars and galaxies. Great for the Moon itself, harder for deep-sky hunting.';
+                    extra = Eve + ' it is nearly full — dazzlingly bright and beautiful to look at, though its glare washes out fainter stars and galaxies. Great for the Moon itself, harder for deep-sky hunting.';
                 } else {
                     extra = 'A fine phase for the telescope, with plenty of shadowed craters standing out in relief along the terminator.';
                 }
@@ -1379,10 +1387,10 @@
                     html:
                         '<div class="slide-inner">'
                         + '<p class="kicker">The highway of the sky</p>'
-                        + '<h2>Tonight\'s <em>Rashis</em></h2>'
-                        + '<p class="body dim">The twelve zodiac constellations lie along the ecliptic — the path the Sun, Moon and planets all travel. About half sit above the horizon at any moment. As darkness falls tonight, these <b style="color:var(--gold-soft)">' + upCount + '</b> are up (highlighted).</p>'
+                        + '<h2>' + evePoss + ' <em>Rashis</em></h2>'
+                        + '<p class="body dim">The twelve zodiac constellations lie along the ecliptic — the path the Sun, Moon and planets all travel. About half sit above the horizon at any moment. As darkness falls ' + eve + ', these <b style="color:var(--gold-soft)">' + upCount + '</b> are up (highlighted).</p>'
                         + '<div class="ov-grid zod">' + items + '</div>'
-                        + '<p class="ov-legend">🌙 marks the rashi the <b>Moon</b> sits in tonight. Faded names are below the horizon this evening.</p>'
+                        + '<p class="ov-legend">🌙 marks the rashi the <b>Moon</b> sits in ' + eve + '. Faded names are below the horizon this evening.</p>'
                         + '</div>'
                 });
             })();
@@ -1405,10 +1413,10 @@
                     html:
                         '<div class="slide-inner">'
                         + '<p class="kicker">27 lunar mansions</p>'
-                        + '<h2>Tonight\'s <em>Nakshatras</em></h2>'
-                        + '<p class="body dim">The Moon takes about a month to circle the sky, spending roughly one night in each of the 27 nakshatras. Tonight it rests in <b style="color:var(--gold)">' + NAKSHATRA[nakIdx].dev + ' (' + NAKSHATRA[nakIdx].en + ')</b>. <b style="color:var(--gold-soft)">' + upCount + '</b> nakshatras are above the horizon this evening.</p>'
+                        + '<h2>' + evePoss + ' <em>Nakshatras</em></h2>'
+                        + '<p class="body dim">The Moon takes about a month to circle the sky, spending roughly one night in each of the 27 nakshatras. ' + Eve + ' it rests in <b style="color:var(--gold)">' + NAKSHATRA[nakIdx].dev + ' (' + NAKSHATRA[nakIdx].en + ')</b>. <b style="color:var(--gold-soft)">' + upCount + '</b> nakshatras are above the horizon this evening.</p>'
                         + '<div class="ov-grid nak">' + items + '</div>'
-                        + '<p class="ov-legend">🌙 marks the Moon\'s nakshatra tonight. Each is named for its brightest star.</p>'
+                        + '<p class="ov-legend">🌙 marks the Moon\'s nakshatra ' + eve + '. Each is named for its brightest star.</p>'
                         + '</div>'
                 });
             })();
@@ -1460,7 +1468,7 @@
                     whereTxt = 'The bright core sits low in the ' + cardinal(aaEve.az) + ' this evening and lifts through the night. The faint band already arches overhead — a dark site is everything.';
                 } else {
                     whenTxt = 'Faint band overhead · bright core after ' + fmtTime(peakTime);
-                    whereTxt = 'The dense core rises into the ' + cardinal(peakAz) + ' later tonight, but on a Moonless night the softer band is already worth hunting straight up.';
+                    whereTxt = 'The dense core rises into the ' + cardinal(peakAz) + ' later ' + eve + ', but on a Moonless night the softer band is already worth hunting straight up.';
                 }
                 sMilky.push({
                     dur: 9000,
@@ -1485,8 +1493,8 @@
                 var top = act[0].s, dtp = act[0].daysToPeak;
                 var radMap = { 'Quadrantids': 'Boötes', 'Lyrids': 'Lyra', 'Eta Aquariids': 'Aquarius', 'Southern Delta Aquariids': 'Aquarius', 'Perseids': 'Perseus', 'Orionids': 'Orion', 'Leonids': 'Leo', 'Geminids': 'Gemini', 'Ursids': 'Ursa Minor' };
                 var rIn = radMap[top.name] || 'its constellation';
-                var peakTxt = dtp === 0 ? 'Peaks tonight' : dtp === 1 ? 'Peaks tomorrow night'
-                    : dtp === -1 ? 'Peaked last night' : dtp > 0 ? 'Peaks in ' + dtp + ' nights' : 'Peaked ' + (-dtp) + ' nights ago';
+                var peakTxt = dtp === 0 ? 'Peaks ' + eve : dtp === 1 ? 'Peaks the next night'
+                    : dtp === -1 ? 'Peaked the night before' : dtp > 0 ? 'Peaks in ' + dtp + ' nights' : 'Peaked ' + (-dtp) + ' nights earlier';
                 var aaDark = fixedAltAz(top.ra, top.dec, dark);
                 var whenTxt = peakTxt + ' · up to ~' + top.zhr + '/hour under a dark sky';
                 var whereTxt = aaDark.alt > 25
@@ -1495,8 +1503,8 @@
                         ? 'Its radiant (near ' + rIn + ') sits low in the ' + cardinal(aaDark.az) + ' now — expect more as it climbs after midnight.'
                         : 'Its radiant near ' + rIn + ' rises late — the real show is well after midnight.';
                 var moonNote = illumPct > 45
-                    ? 'A ' + illumPct + '%-lit Moon will drown the faintest streaks tonight, but the bright ones still cut through.'
-                    : 'Little Moon to spoil it tonight — good conditions under a dark sky.';
+                    ? 'A ' + illumPct + '%-lit Moon will drown the faintest streaks ' + eve + ', but the bright ones still cut through.'
+                    : 'Little Moon to spoil it ' + eve + ' — good conditions under a dark sky.';
                 var others = act.length > 1 ? ' The ' + act[1].s.name + ' are gently active too.' : '';
                 sEvents.push({
                     dur: 9500,
@@ -1534,7 +1542,7 @@
                         + '<p class="kicker">Passing overhead</p>'
                         + '<h2>Catch a <em>Space Station</em></h2>'
                         + '<p class="translit">Bright satellites</p>'
-                        + '<p class="body">A big satellite catches the sunlight and glides across the sky like a fast, steady star — no blinking, no sound. Tonight there ' + (sr.passes.length === 1 ? 'is a pass' : 'are passes') + ' to catch:</p>'
+                        + '<p class="body">A big satellite catches the sunlight and glides across the sky like a fast, steady star — no blinking, no sound. ' + Eve + ' there ' + (sr.passes.length === 1 ? 'is a pass' : 'are passes') + ' to catch:</p>'
                         + '<ul class="pass-list">' + rows + '</ul>'
                         + '<p class="body dim">Steady and silent, with no flashing lights — that is how you tell it from a plane, and it never twinkles like a star.</p>'
                         + '<p class="pass-src">📡 ' + esc(srcNote) + '</p>'
