@@ -112,8 +112,39 @@ window.WHATSUP_DATA = (function () {
             { name: 'Vidisha', lat: 23.5251, lng: 77.8081 },
             { name: 'Vijayawada', lat: 16.5062, lng: 80.648 },
             { name: 'Visakhapatnam', lat: 17.6868, lng: 83.2185 },
-            { name: 'Warangal', lat: 17.9689, lng: 79.5941 }
+            { name: 'Warangal', lat: 17.9689, lng: 79.5941 },
+
+            // ── Dark-sky sites & astronomy observatories ──────────────────
+            // Smaller places, but the ones that matter most for stargazing:
+            // high-altitude Ladakh/Himalaya, observatory towns, and India's
+            // best-known dark-sky destinations. (The list is sorted below, so
+            // new entries can be dropped in here in any order.)
+            { name: 'Leh', lat: 34.1642, lng: 77.5848 },
+            { name: 'Hanle', lat: 32.7794, lng: 78.9642 },              // Indian Astronomical Observatory; Hanle Dark Sky Reserve
+            { name: 'Kargil', lat: 34.5539, lng: 76.1349 },
+            { name: 'Diskit (Nubra)', lat: 34.5462, lng: 77.5540 },
+            { name: 'Pangong Tso', lat: 33.7500, lng: 78.6600 },
+            { name: 'Tso Moriri', lat: 32.9083, lng: 78.3200 },
+            { name: 'Kaza (Spiti)', lat: 32.2257, lng: 78.0716 },
+            { name: 'Gulmarg', lat: 34.0484, lng: 74.3805 },
+            { name: 'Chopta', lat: 30.4922, lng: 79.0212 },
+            { name: 'Nainital', lat: 29.3919, lng: 79.4542 },           // ARIES
+            { name: 'Devasthal', lat: 29.3614, lng: 79.6839 },          // ARIES 3.6m optical telescope
+            { name: 'Mount Abu', lat: 24.5926, lng: 72.7156 },          // PRL infrared observatory (Gurushikhar)
+            { name: 'Kavalur', lat: 12.5765, lng: 78.8253 },            // Vainu Bappu Observatory
+            { name: 'Kodaikanal', lat: 10.2381, lng: 77.4892 },         // solar observatory
+            { name: 'Gauribidanur', lat: 13.6086, lng: 77.4344 },       // radio observatory
+            { name: 'Ooty', lat: 11.4102, lng: 76.6950 },               // Ooty Radio Telescope
+            { name: 'Jaisalmer', lat: 26.9157, lng: 70.9083 },          // Thar desert skies
+            { name: 'Rann of Kutch', lat: 23.9060, lng: 69.6710 },
+            { name: 'Coorg (Madikeri)', lat: 12.4208, lng: 75.7397 },
+            { name: 'Munnar', lat: 10.0889, lng: 77.0595 },
+            { name: 'Mahabaleshwar', lat: 17.9307, lng: 73.6477 },
+            { name: 'Savandurga', lat: 12.9190, lng: 77.2900 },
+            { name: 'Pench (Dark Sky Park)', lat: 21.7167, lng: 79.2833 } // India's first Dark Sky Park
         ];
+        // Keep the picker alphabetical no matter the insertion order above.
+        CITIES.sort(function (a, b) { return a.name.localeCompare(b.name); });
 
         var PLANETS = [
             {

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>The Quiz Journey for Schools : Aryabhat</title>
+  <meta name="description"
+    content="How a school takes part in the Aryabhat Astronomy Quiz — the full journey from registration to results, told step by step.">
+  <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+       quizflow.html — story-style walkthrough of the school flow
+       (source: files/2026/Flow.pdf). Design system per design.md;
+       navbar / tokens / buttons ported from quiz.html.
+       ========================================================== */
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR — lifted from newindex.html (portable block)
+       ============================================================ */
+    .navbar {
+      position: relative;
+      height: auto;
+      min-height: 4.4rem;
+      background:
+        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.18) 15%,
+          rgba(255, 204, 51, 0.7) 50%,
+          rgba(255, 204, 51, 0.18) 85%,
+          transparent 100%);
+      pointer-events: none;
+    }
+
+    .navbar > .container {
+      width: max-content;
+      min-width: 100%;
+      min-height: 4.4rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-list {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .navbar-item {
+      float: none !important;
+      flex: 0 0 auto;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    .navbar-item.current { background: transparent; border-radius: 0; }
+
+    .navbar-link {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: none;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+      padding: 11px 20px;
+      border-radius: 999px;
+      position: relative;
+      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+    }
+
+    .navbar-link:hover,
+    .navbar-link:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.10);
+      outline: 0;
+    }
+
+    .navbar-link.active {
+      color: var(--gold);
+      background: rgba(255, 204, 51, 0.12);
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-transform: none;
+      border-radius: var(--brand-shape-tight);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+    }
+
+    .navbar-link.active:hover,
+    .navbar-link.active:focus {
+      color: var(--gold-soft);
+      background: rgba(255, 204, 51, 0.18);
+    }
+
+    @media (max-width: 700px) {
+      .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar, .navbar > .container { min-height: 3.5rem; }
+      .navbar > .container { padding: 0 6px; }
+      .navbar-list { gap: 4px; }
+      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
+    }
+
+    /* ============================================================
+       TOKENS
+       ============================================================ */
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --brand-shape: 10px;
+      --brand-shape-tight: 8px;
+    }
+
+    html, body {
+      font-family: var(--font-body);
+    }
+
+    .main {
+      background-color: #0a131ccc;
+      padding: 1.5rem 0 0;
+      border-radius: 0;
+    }
+
+    /* ============================================================
+       BUTTONS — lifted from newindex.html (portable block)
+       ============================================================ */
+    .main .button,
+    .main button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      text-transform: none;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: var(--brand-shape);
+      border: 1px solid rgba(255, 204, 51, 0.5);
+      background: transparent;
+      background-image: none;
+      color: var(--gold);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .25s ease, color .25s ease, border-color .25s ease, box-shadow .3s ease, transform .15s ease;
+    }
+
+    .main .button:hover,
+    .main .button:focus {
+      background: rgba(255, 204, 51, 0.08);
+      color: var(--gold-soft);
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+      transform: translateY(-1px);
+      outline: 0;
+    }
+
+    .main .button:active {
+      transform: translateY(0);
+      background: rgba(255, 204, 51, 0.14);
+      box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    .main .button.button-primary {
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: .03em;
+      background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+      border: 1.5px solid var(--gold);
+      box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+      text-shadow: none;
+    }
+
+    .main .button.button-primary:hover {
+      color: var(--gold-soft);
+      background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+      border-color: var(--gold-soft);
+      box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+      transform: translateY(-2px);
+    }
+
+    .main .button.button-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 16px rgba(255, 204, 51, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       HERO — single-line variant (design.md §2.4, lighter form)
+       ============================================================ */
+    .flow-hero {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.2rem 16px 1.6rem;
+      text-align: center;
+      animation: fadeUp .8s ease-out both;
+    }
+
+    .flow-hero .kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .8rem;
+    }
+
+    .flow-hero h1 {
+      font-family: var(--font-brand);
+      font-size: clamp(2rem, 5.5vw, 3.2rem);
+      line-height: 1.15;
+      letter-spacing: 0;
+      color: var(--ink);
+      margin: 0 0 1rem;
+    }
+
+    .flow-hero h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .flow-hero .hero-lede {
+      color: var(--ink-dim);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .flow-hero { animation: none; }
+    }
+
+    /* ============================================================
+       LANE LEGEND — the two voices of the story
+       ============================================================ */
+    .lane-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 auto 2.2rem;
+      padding: 0 16px;
+    }
+
+    .lane-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .lane-chip::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .lane-chip.lane-school { color: var(--gold-soft); }
+    .lane-chip.lane-school::before { background: var(--gold); box-shadow: 0 0 8px rgba(255, 204, 51, .7); }
+
+    .lane-chip.lane-aryabhat { color: #9fd9ee; }
+    .lane-chip.lane-aryabhat::before { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(30, 174, 219, .7); }
+
+    /* ============================================================
+       STORY TIMELINE — centre spine on desktop, left rail on mobile.
+       School chapters sit left of the spine, Aryabhat chapters right,
+       mirroring the two columns of the flow chart.
+       ============================================================ */
+    .flow-timeline {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      padding: 0 16px;
+      list-style: none;
+    }
+
+    .flow-timeline::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg,
+          transparent 0%,
+          rgba(255, 204, 51, 0.35) 6%,
+          rgba(255, 204, 51, 0.35) 94%,
+          transparent 100%);
+    }
+
+    .flow-step {
+      position: relative;
+      width: 50%;
+      margin: 0 0 1.6rem;
+    }
+
+    .flow-step.lane-school { padding-right: 44px; text-align: right; }
+    .flow-step.lane-aryabhat { margin-left: 50%; padding-left: 44px; text-align: left; }
+
+    /* Node on the spine */
+    .flow-step::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #0d1722;
+      z-index: 1;
+    }
+
+    .flow-step.lane-school::before {
+      right: -7px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 10px rgba(255, 204, 51, 0.55);
+    }
+
+    .flow-step.lane-aryabhat::before {
+      left: -7px;
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(30, 174, 219, 0.55);
+    }
+
+    .step-card {
+      display: inline-block;
+      width: 100%;
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px 16px;
+      text-align: left;
+      transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+    .flow-step.lane-school .step-card:hover {
+      border-color: rgba(255, 204, 51, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .flow-step.lane-aryabhat .step-card:hover {
+      border-color: rgba(30, 174, 219, 0.45);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .step-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: .5rem;
+    }
+
+    .step-num {
+      font-family: var(--font-brand);
+      font-size: 1.7rem;
+      line-height: 1;
+      color: rgba(255, 204, 51, 0.35);
+    }
+
+    .flow-step.lane-aryabhat .step-num { color: rgba(30, 174, 219, 0.45); }
+
+    .step-lane {
+      font-family: var(--font-display);
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .flow-step.lane-school .step-lane { color: var(--gold); }
+    .flow-step.lane-aryabhat .step-lane { color: var(--accent-cyan); }
+
+    .step-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 0 0 .55rem;
+    }
+
+    .step-card p {
+      color: var(--ink);
+      font-size: .97rem;
+      line-height: 1.65;
+      margin: 0 0 .7rem;
+    }
+
+    .step-card p:last-child { margin-bottom: .2rem; }
+
+    .step-card p b { color: var(--gold-soft); font-weight: 600; }
+
+    .step-card a:not(.button) {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 204, 51, 0.45);
+      transition: color .2s ease, border-color .2s ease;
+      word-break: break-word;
+    }
+
+    .step-card a:not(.button):hover {
+      color: var(--gold-soft);
+      border-bottom-color: var(--gold);
+    }
+
+    .step-card .button {
+      margin: .2rem 8px .6rem 0;
+      font-size: .82rem;
+      height: 38px;
+      padding: 0 16px;
+    }
+
+    .step-aside {
+      font-size: .85rem;
+      color: var(--ink-dim);
+      border-top: 1px dashed rgba(255, 204, 51, 0.18);
+      padding-top: .55rem;
+      margin-top: .3rem;
+    }
+
+    /* ============================================================
+       REQUIRED DATA — the two lists from the flow chart
+       ============================================================ */
+    .data-section {
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      padding: 0 16px;
+    }
+
+    .section-label {
+      text-align: center;
+      margin-bottom: 1.4rem;
+    }
+
+    .section-label .kicker {
+      display: block;
+      font-family: var(--font-display);
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .5rem;
+    }
+
+    .section-label h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: 0;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .section-label h2 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .section-label p {
+      color: var(--ink-dim);
+      max-width: 640px;
+      margin: .7rem auto 0;
+      line-height: 1.65;
+    }
+
+    .data-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 760px) {
+      .data-cards { grid-template-columns: 1fr 1fr; }
+    }
+
+    .data-card {
+      background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px 16px;
+    }
+
+    .data-card h3 {
+      font-family: var(--font-display);
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 .7rem;
+    }
+
+    .data-card ol {
+      margin: 0;
+      padding: 0 0 0 1.3rem;
+      color: var(--ink);
+      font-size: .95rem;
+      line-height: 1.5;
+    }
+
+    .data-card ol li {
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(255, 204, 51, 0.12);
+    }
+
+    .data-card ol li:last-child { border-bottom: none; }
+
+    .data-card ol li::marker {
+      color: rgba(255, 204, 51, 0.6);
+      font-family: var(--font-display);
+      font-size: .85rem;
+    }
+
+    /* ============================================================
+       DATES STRIP — the calendar of the journey
+       ============================================================ */
+    .dates-strip {
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 760px) {
+      .dates-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .date-tile {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-align: center;
+    }
+
+    .date-tile .when {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: .02em;
+      margin-bottom: .25rem;
+    }
+
+    .date-tile .what {
+      display: block;
+      font-size: .88rem;
+      color: var(--ink-dim);
+      line-height: 1.45;
+    }
+
+    /* ============================================================
+       JOIN BANNER — closing CTA (design.md §2.8)
+       ============================================================ */
+    .join-banner {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      padding: 2rem 1.6rem 1.6rem;
+      border-radius: 18px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 18% 25%, rgba(255, 204, 51, 0.16), transparent 55%),
+        radial-gradient(ellipse at 82% 75%, rgba(30, 174, 219, 0.10), transparent 55%),
+        linear-gradient(180deg, #142132, #0a131c);
+      border: 1px solid rgba(255, 204, 51, 0.35);
+      box-shadow: 0 0 24px rgba(255, 204, 51, 0.10);
+      overflow: hidden;
+    }
+
+    .join-banner::before {
+      content: "✦";
+      position: absolute;
+      top: 12px;
+      left: 18px;
+      color: rgba(255, 204, 51, 0.4);
+      font-size: 1rem;
+    }
+
+    .join-banner::after {
+      content: "✦";
+      position: absolute;
+      bottom: 12px;
+      right: 18px;
+      color: rgba(30, 174, 219, 0.5);
+      font-size: 1rem;
+    }
+
+    .join-banner h2 {
+      font-family: var(--font-brand);
+      font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: 0;
+      color: var(--ink);
+      margin: 0 0 .6rem;
+    }
+
+    .join-banner h2 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .join-banner p {
+      color: var(--ink-dim);
+      margin: 0 auto 1.2rem;
+      max-width: 560px;
+      line-height: 1.65;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer-line {
+      text-align: center;
+      color: var(--ink-dim);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 3rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ============================================================
+       MOBILE — timeline collapses to a single left rail
+       ============================================================ */
+    @media (max-width: 759px) {
+      .main { padding-top: 1rem; }
+
+      .flow-hero { padding: 1.6rem 12px 1.2rem; }
+
+      .flow-timeline { padding: 0 12px; }
+
+      .flow-timeline::before {
+        left: 22px;
+        transform: none;
+      }
+
+      .flow-step,
+      .flow-step.lane-school,
+      .flow-step.lane-aryabhat {
+        width: 100%;
+        margin-left: 0;
+        padding: 0 0 0 44px;
+        text-align: left;
+        margin-bottom: 1.2rem;
+      }
+
+      .flow-step.lane-school::before,
+      .flow-step.lane-aryabhat::before {
+        left: 16px;
+        right: auto;
+      }
+
+      .step-card { padding: 16px 16px 12px; }
+
+      .step-card h2 { font-size: 1.08rem; }
+
+      .step-card p { font-size: .93rem; }
+
+      .data-section, .dates-strip, .join-banner { padding-left: 12px; padding-right: 12px; }
+
+      .join-banner { margin-left: .5rem; margin-right: .5rem; padding: 1.6rem 1rem 1.3rem; border-radius: 14px; }
+
+      .main .button {
+        font-size: .85rem;
+        height: 40px;
+        padding: 0 18px;
+      }
+
+      .footer-line {
+        font-size: .75rem;
+        letter-spacing: .12em;
+        margin: 1.8rem 0 2.2rem;
+        padding-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68513114-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <div class="container">
+    <section class="header">
+      <!-- Injected by js/layout.js -->
+    </section>
+
+    <nav class="navbar">
+      <!-- Injected by js/layout.js -->
+    </nav>
+
+    <div class="main">
+
+      <!-- ============================================================
+           HERO — the story begins
+           ============================================================ -->
+      <section class="flow-hero">
+        <span class="kicker">Astro Quiz 2026&ndash;27 &middot; For Schools</span>
+        <h1>From your staff room to the <em>stars</em>.</h1>
+        <p class="hero-lede">Every year, schools across Madhya Pradesh walk their students through the Aryabhat
+          Astronomy Quiz — and every year the journey follows the same simple path. Here is that story, step by step,
+          from the first email to the final result. Your school does one half; we do the other.</p>
+      </section>
+
+      <div class="lane-legend" aria-hidden="true">
+        <span class="lane-chip lane-school">At your school</span>
+        <span class="lane-chip lane-aryabhat">At Aryabhat</span>
+      </div>
+
+      <!-- ============================================================
+           THE STORY — school steps left of the spine, Aryabhat right,
+           mirroring the two columns of the flow chart (Flow.pdf).
+           ============================================================ -->
+      <ol class="flow-timeline">
+
+        <li class="flow-step lane-school">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">01</span><span class="step-lane">At your school</span></div>
+            <h2>It begins with a list</h2>
+            <p>A teacher decides the school will take part. The first stop is our website — download the entry format
+              from <a href="https://aryabhat.org/quizform" target="_blank">aryabhat.org/quizform</a>, or find it under
+              <b>Registration for Schools</b> on the quiz page.</p>
+            <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Download the
+              Format</a>
+            <p class="step-aside">Any student of class 6 to 9 can join in. There is no entry fee — for the quiz, and for
+              everything that follows.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-school">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">02</span><span class="step-lane">At your school</span></div>
+            <h2>The list takes shape</h2>
+            <p>Fill the format with your school's details and one row per participant — names, class, section and the
+              rest. When it is ready, email it to
+              <a href="mailto:aryabhat.foundation@gmail.com">aryabhat.foundation@gmail.com</a> any time between
+              <b>1 April and 25 July 2026</b>.</p>
+            <p class="step-aside">Exactly what goes in the format is listed a little further down this page.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-aryabhat">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">03</span><span class="step-lane">At Aryabhat</span></div>
+            <h2>Meanwhile, in Bhopal</h2>
+            <p>Your list reaches our desk. We allot a roll number to every student, prepare the quiz software for your
+              school, and settle a quiz date with you — one that suits your school's calendar.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-aryabhat">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">04</span><span class="step-lane">At Aryabhat</span></div>
+            <h2>The software travels to you</h2>
+            <p>Once the date is fixed, we send the quiz software to your school along with the list of roll numbers.
+              Everything your students need on quiz day is now in your hands.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-school">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">05</span><span class="step-lane">At your school</span></div>
+            <h2>Word goes around</h2>
+            <p>The school informs the participants — this is your date, this is your roll number. Meanwhile the computer
+              room gets ready: install the software, or set up network access, on the machines the students will use.</p>
+            <p class="step-aside">The quiz runs on all normal computers. No special hardware, and it can work without
+              the Internet too.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-school">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">06</span><span class="step-lane">At your school</span></div>
+            <h2>Quiz day</h2>
+            <p>Sometime between <b>7 August and 3 September 2026</b>, the day arrives. Students sit at the computers and
+              take the quiz in the presence of a person authorised by Aryabhat — <b>20 questions, 180 seconds</b>, five
+              marks for a right answer, two off for a wrong one. Each student's score appears on screen the moment they
+              finish.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-school">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">07</span><span class="step-lane">At your school</span></div>
+            <h2>One last email</h2>
+            <p>After the quiz, the school exports the result data from the software and sends it back to
+              <a href="mailto:aryabhat.foundation@gmail.com">aryabhat.foundation@gmail.com</a>. That is the school's
+              part of the story done — and it was mostly just two emails.</p>
+          </div>
+        </li>
+
+        <li class="flow-step lane-aryabhat">
+          <div class="step-card">
+            <div class="step-meta"><span class="step-num">08</span><span class="step-lane">At Aryabhat</span></div>
+            <h2>All the threads come together</h2>
+            <p>Data flows in from every school and centre across the state. We collect it, process the results, and
+              draw up the merit list for the secondary level.</p>
+            <p class="step-aside">Students who make the cut are invited to our Bhopal Centre for training in
+              telescope-operation, sky reading and practical astronomy — lodging and boarding free. The secondary
+              examination follows on <b>26 December 2026</b>, and the final winners travel to India's great
+              observatories the following summer.</p>
+          </div>
+        </li>
+
+      </ol>
+
+      <!-- ============================================================
+           REQUIRED DATA — from the flow chart
+           ============================================================ -->
+      <section class="data-section">
+        <div class="section-label">
+          <span class="kicker">Before you begin</span>
+          <h2>What the <em>format</em> asks for</h2>
+          <p>Keep these details at hand and the format fills itself in minutes.</p>
+        </div>
+        <div class="data-cards">
+          <div class="data-card">
+            <h3>🏫 About the school</h3>
+            <ol>
+              <li>Name &amp; Address of the School</li>
+              <li>District</li>
+              <li>School's Email ID</li>
+              <li>Contact person's name</li>
+              <li>Whatsapp No</li>
+            </ol>
+          </div>
+          <div class="data-card">
+            <h3>🎓 About each participant</h3>
+            <ol>
+              <li>First Name of the participant</li>
+              <li>Last Name</li>
+              <li>Gender</li>
+              <li>Fathers Name (without Last Name)</li>
+              <li>Date of Birth (dd.mm.yy)</li>
+              <li>Class (6 to 9)</li>
+              <li>Section</li>
+              <li>Contact Number</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DATES AT A GLANCE
+           ============================================================ -->
+      <section class="data-section" style="margin-bottom: 1.4rem;">
+        <div class="section-label">
+          <span class="kicker">Mark the calendar</span>
+          <h2>Three dates to <em>remember</em></h2>
+        </div>
+      </section>
+      <div class="dates-strip">
+        <div class="date-tile">
+          <span class="when">1 Apr &ndash; 25 Jul 2026</span>
+          <span class="what">Send your school's entries by email</span>
+        </div>
+        <div class="date-tile">
+          <span class="when">7 Aug &ndash; 3 Sep 2026</span>
+          <span class="what">Quiz conducted at schools &amp; common centres</span>
+        </div>
+        <div class="date-tile">
+          <span class="when">26 Dec 2026</span>
+          <span class="what">Secondary level examination at Bhopal</span>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           CLOSING CTA
+           ============================================================ -->
+      <section class="join-banner">
+        <h2>Ready to begin your school's <em>journey</em>?</h2>
+        <p>Download the format, gather your stargazers, and send the list our way. For any clarification, write to us
+          or call the Quiz Coordinator, Alok Mandavgane, at +91 9425631310.</p>
+        <div class="cta-row">
+          <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Download the
+            Format</a>
+          <a class="button" href="mailto:aryabhat.foundation@gmail.com">Email your entries</a>
+          <a class="button" href="quiz.html">Full quiz details</a>
+        </div>
+      </section>
+
+      <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+    </div>
+  </div>
+
+  <!-- Background Animation -->
+  <script src="js/cosmos-bg.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+
+</html>
