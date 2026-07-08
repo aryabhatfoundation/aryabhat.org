@@ -344,6 +344,17 @@
       color: #fff;
     }
 
+    .quiz-portal-title-sm {
+      font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+    }
+
+    .quiz-portal-action {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
     /* ============================================================
        PAGE LAYOUT — sidebar (details cards) + main (prose)
        ============================================================ */
@@ -798,6 +809,21 @@
         </div>
       </section>
 
+      <!-- Second banner — school registration, promoted from the sidebar -->
+      <section class="quiz-portal quiz-portal-schools">
+        <span class="quiz-portal-kicker">🏫 Registration for Schools</span>
+        <div class="quiz-portal-line">
+          <div class="quiz-portal-title-box">
+            <span class="quiz-portal-title quiz-portal-title-sm" id="institutional">Last date 25 July 2026</span>
+          </div>
+          <div class="quiz-portal-action">
+            <a class="button button-primary" href="astroquiz-guide.html">📖 Guide for Schools</a>
+            <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart</a>
+            <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Format for Entries</a>
+          </div>
+        </div>
+      </section>
+
       <div class="quiz-layout">
 
         <aside class="quiz-sidebar">
@@ -835,23 +861,6 @@
               <br>
               <a class="button button-primary" target="_blank" href="https://youtu.be/J3jZ-qx9B24">▶️ Video Lesson</a>
               <br>Updated on 1 July 2026
-            </div>
-          </details>
-
-          <details class="card-container">
-            <summary>
-              <h5 id="institutional">🏫 Registration for Schools</h5>
-            </summary>
-            <div class="card-content" id="card-institutional">
-              <!--, for individual registration go
-              <a target="_blank" href="https://quiz.aryabhat.org">here</a> ) -->
-              <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart </a>
-
-
-              <a class="button button-primary" target="_blank" href="files/Institutional_format.xlsx">Format for Entries
-              </a>
-
-              <br>1 April 2026 to 25 July 2026
             </div>
           </details>
 

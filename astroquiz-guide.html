@@ -44,6 +44,17 @@
             --brand-shape: 10px;
         }
 
+        /* Aryabhat brand wordmark font (design.md §1) — same face the main
+           site uses; needed here for the "Aryabhat Foundation" sign-off. */
+        @font-face {
+            font-family: 'renfrewregular';
+            src: url('css/renfrew-webfont.woff2') format('woff2'),
+                 url('css/renfrew-webfont.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         * { box-sizing: border-box; }
 
         html, body {
@@ -572,7 +583,7 @@
             padding: 15px 17px;
             text-align: left;
         }
-        .contact-card .org { font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--gold); }
+        .contact-card .org { font-family: var(--font-brand); font-weight: 400; font-size: 1.25rem; letter-spacing: .01em; color: var(--gold); text-shadow: 0 0 10px rgba(255, 204, 51, .2); }
         .contact-card .addr { font-size: .82rem; color: var(--ink-dim); margin: 3px 0 11px; }
         .contact-card a.crow {
             display: flex; align-items: center; gap: 10px;
@@ -609,6 +620,40 @@
         /* Only stretch to share the row on the contact slide. */
         .btnrow .story-btn { flex: 1 1 auto; }
         .story-btn.wa { color: #b7f5c0; border-color: rgba(102, 187, 106, .7); box-shadow: 0 0 22px rgba(102, 187, 106, .15); }
+
+        /* ---- closing "Best of Luck" sign-off (centered in the space left
+               below the buttons on the last slide) ---- */
+        .signoff {
+            margin: auto 0;          /* absorb the leftover space above & below → vertically centered */
+            padding-top: 14px;
+            width: 100%;
+            max-width: min(27rem, 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .best-luck {
+            font-family: var(--font-brand);
+            font-size: clamp(1.9rem, 9.5vw, 2.5rem);
+            line-height: 1.02;
+            letter-spacing: .01em;
+            /* sweeping gold shimmer clipped to the text */
+            background: linear-gradient(100deg, var(--gold-deep) 0%, var(--gold-soft) 28%, #fff 48%, var(--gold-soft) 68%, var(--gold-deep) 100%);
+            background-size: 220% auto;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+            filter: drop-shadow(0 0 14px rgba(255, 204, 51, .35));
+            animation: luckShimmer 3.4s linear infinite, luckPulse 2.8s ease-in-out infinite;
+        }
+        .best-luck-sub {
+            font-family: var(--font-dev);
+            font-size: 1.22rem;
+            color: var(--gold-soft);
+            margin: 2px 0 0;
+        }
+        @keyframes luckShimmer { to { background-position: 220% center; } }
+        @keyframes luckPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
         /* ---- cover ---- */
         .visual-stars {
@@ -674,6 +719,7 @@
             .slide { transition: none; }
             .slide.active .slide-inner > * { animation: none; }
             .wheel-spin { animation: none; }
+            .best-luck { animation: none; background-position: 50% center; }
         }
         @media (max-width: 384px) {
             .story-brand { display: none; }
@@ -986,10 +1032,10 @@
                 html:
                     '<p class="kicker">You\'re ready</p>' +
                     '<h2>Register your <em>school</em></h2>' +
-                    '<p class="body dev">कोई सवाल हो तो आर्यभट से समाधान लें। हम आपके students के पुरज़ोर प्रदर्शन की कामना करते हैं! 🌟</p>' +
+                    '<p class="body dev">कोई सवाल हो तो आर्यभट से बेझिझक पूछें।</p>' +
                     '<div class="contact-card">' +
                     '<div class="org">Aryabhat Foundation</div>' +
-                    '<div class="addr">258, Trilanga, Bhopal 462039</div>' +
+                    '<div class="addr">S-1, Swapnil Apartment VIII<br>258, Trilanga, Shahpura, Bhopal 462039</div>' +
                     '<a class="crow" href="mailto:aryabhat.foundation@gmail.com"><span class="em">✉️</span><span><b>aryabhat.foundation@gmail.com</b></span></a>' +
                     '<a class="crow" href="https://wa.me/919425674075" target="_blank" rel="noopener"><span class="em">💬</span><span>WhatsApp / Phone · <b>9425674075</b></span></a>' +
                     '<a class="crow" href="https://aryabhat.org" target="_blank" rel="noopener"><span class="em">🌐</span><span><b>aryabhat.org</b></span></a>' +
@@ -997,6 +1043,10 @@
                     '<div class="btnrow">' +
                     '<a class="story-btn" href="files/Institutional_format.xlsx" target="_blank" rel="noopener">⬇ Format</a>' +
                     '<a class="story-btn wa" href="https://wa.me/919425674075" target="_blank" rel="noopener">💬 WhatsApp us</a>' +
+                    '</div>' +
+                    '<div class="signoff">' +
+                    '<div class="best-luck">Best of Luck!</div>' +
+                    '<p class="best-luck-sub">शुभकामनाएँ! 🌟</p>' +
                     '</div>'
             }
         ];
