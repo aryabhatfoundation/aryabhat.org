@@ -446,6 +446,54 @@
     .cg-toobig b { color: var(--ink); }
     .cg-toobig .btn-sm { margin-top: 12px; }
 
+    /* Dense-graph notice: a slim bar, not a blocker — the graph is drawn
+       behind it and stays fully interactive. */
+    .cg-dense {
+      /* fixed to the viewport, not the (taller-than-screen) graph wrap, so
+         it stays on-screen; scoped to graph view because its parent is
+         display:none in the table. Sits above the bottom curriculum bar. */
+      position: fixed;
+      left: 50%;
+      bottom: 64px;
+      transform: translateX(-50%);
+      max-width: min(38rem, calc(100% - 28px));
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .8rem;
+      line-height: 1.4;
+      color: var(--ink-dim);
+      background: rgba(10, 19, 28, 0.86);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 14px 7px 16px;
+      z-index: 6;
+      backdrop-filter: blur(3px);
+    }
+    .cg-dense b { color: var(--ink); }
+    .cg-dense-link {
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      font: inherit;
+      text-decoration: underline;
+      padding: 0;
+      white-space: nowrap;
+    }
+    .cg-dense-x {
+      background: none;
+      border: none;
+      color: var(--ink-dim);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 0 2px;
+      margin-left: auto;
+      order: 3;
+    }
+    .cg-dense-x:hover { color: var(--ink); }
+
     /* SVG nodes */
     .cnode { cursor: pointer; }
     .cnode rect { fill: #101d2c; stroke-width: 1.3; rx: 8; transition: opacity .2s ease; }
@@ -863,8 +911,10 @@
       var domainKeys = Object.keys(DOMAINS);
       var bandKeys = Object.keys(BANDS);
 
-      // Above this many nodes the DAG layout stops being readable (and
-      // starts being slow). We refuse to draw it and point at the table.
+      // Above this many nodes the DAG is dense at fit-zoom. We still draw
+      // it — pan and zoom handle the rest — and show a dismissible notice
+      // pointing at the focused paths. Readability alone is not a reason to
+      // withhold the picture.
       var GRAPH_LIMIT = 220;
 
       // ---------------- State ----------------
@@ -1167,6 +1217,8 @@
         var wrap = document.getElementById("graph-wrap");
         var old = wrap.querySelector(".cg-toobig");
         if (old) old.remove();
+        var oldDense = wrap.querySelector(".cg-dense");
+        if (oldDense) oldDense.remove();
         svg.innerHTML = "";
         nodeEls = {}; edgeEls = [];
 
@@ -1174,17 +1226,6 @@
           wrap.insertAdjacentHTML("beforeend",
             '<div class="cg-toobig">No concepts match these filters.<br>' +
             '<b>Widen the level, grade or subject chips.</b></div>');
-          return;
-        }
-        // A 450-node DAG is a hairball, not a diagram. Say so plainly and
-        // send people to the view that actually answers their question.
-        if (visible.length > GRAPH_LIMIT) {
-          wrap.insertAdjacentHTML("beforeend",
-            '<div class="cg-toobig"><b>' + visible.length + ' concepts is too many to draw legibly.</b><br>' +
-            'The graph earns its keep on a focused slice — pick one subject, a grade band, ' +
-            'or a lower level cap, and it will appear.<br>' +
-            '<button class="btn-sm primary" id="toobig-table">&#9776; Browse the table instead</button></div>');
-          document.getElementById("toobig-table").addEventListener("click", function () { setView("table"); });
           return;
         }
 
@@ -1235,6 +1276,23 @@
 
         fitView();
         updateHighlights();
+
+        // A few-hundred-node DAG is dense, not undrawable. Draw it — pan and
+        // zoom exist for exactly this — but say once that it is dense and
+        // offer the focused paths, without withholding the picture.
+        if (visible.length > GRAPH_LIMIT) {
+          wrap.insertAdjacentHTML("beforeend",
+            '<div class="cg-dense">' +
+            '<button class="cg-dense-x" id="dense-dismiss" title="Dismiss">&times;</button>' +
+            '<b>' + visible.length + ' concepts</b> — dense at this zoom. ' +
+            'Scroll or pinch to zoom in, drag to pan; or narrow by subject, grade or level. ' +
+            '<button class="cg-dense-link" id="dense-table">open the table instead</button>' +
+            '</div>');
+          document.getElementById("dense-table").addEventListener("click", function () { setView("table"); });
+          document.getElementById("dense-dismiss").addEventListener("click", function () {
+            var b = wrap.querySelector(".cg-dense"); if (b) b.remove();
+          });
+        }
       }
 
       function updateHighlights() {
