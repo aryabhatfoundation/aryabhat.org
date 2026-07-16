@@ -1,0 +1,615 @@
+// ============================================================
+// CHEMISTRY concepts.
+//
+// Requires data/_schema.js to have run first (it creates
+// window.CONCEPTS and the taxonomy tables).
+//
+// Domains: c-matter (Matter & Its States), c-atomic (Atoms &
+// Molecules), c-periodic (Periodic Table & Bonding), c-reaction
+// (Chemical Reactions), c-acid (Acids, Bases & Salts), c-metal
+// (Metals & Non-metals), c-organic (Carbon & Organic Chemistry).
+//
+// SEED FILE. This is the NCERT chemistry backbone for classes 6–12,
+// not exhaustive coverage: the spine of concepts that PDF-driven
+// expansion will hang finer-grained topics off. Every record is
+// status:"review" — it is a seed pass awaiting a human read.
+//
+// NOTE ON OVERLAP: this file owns the COMPOSITIONAL side of matter
+// (particle model, states, mixtures, solutions, separation). The
+// MECHANICAL side — density, pressure, buoyancy, elasticity — lives
+// in physics under `p-matter`. Likewise chemistry owns atomic
+// structure only as far as bonding needs it; radioactivity, fission,
+// fusion and the photoelectric effect are physics `p-modern`.
+// Check ConceptDB.match() before adding, so the two do not duplicate.
+// ============================================================
+
+window.CONCEPTS.push(
+
+    // ============================== MATTER & ITS STATES ==============================
+    {
+        id: "particle-model", name: "The Particle Model of Matter", domain: "c-matter", level: 2,
+        desc: "Everything is built from particles too small to see, with empty space between them and constant jiggling motion. Almost every everyday fact about matter — smells travelling, sugar vanishing into tea, ice melting — falls out of this one picture.",
+        grades: [6, 7, 9],
+        syllabusRefs: ["ncert:9:sci:1"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: [],
+        related: ["states-of-matter", "model-thinking"],
+        aliases: ["kinetic particle theory", "particulate nature of matter", "kinetic molecular theory"],
+        keywords: ["particles", "kinetic theory", "intermolecular force", "diffusion", "empty space", "brownian motion"],
+        misconceptions: ["Imagining the particles themselves expand when a substance is heated", "Thinking the gaps between particles are filled with air"],
+        tools: [{ k: "activity", label: "Dissolve salt in a brim-full glass of water — the level barely rises, so where did the salt go?" }, { k: "activity", label: "Drop ink into still hot and cold water side by side and time the spread" }],
+        status: "review"
+    },
+    {
+        id: "states-of-matter", name: "Solids, Liquids & Gases", domain: "c-matter", level: 2,
+        desc: "The same particles, packed three different ways: locked in place, sliding past each other, or flying free. Shape, volume and compressibility are simply what those three packings look like from the outside.",
+        grades: [6, 9, 11],
+        syllabusRefs: ["ncert:9:sci:1"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["particle-model"],
+        related: ["changes-of-state", "air-atmosphere"],
+        aliases: ["three states of matter", "physical states"],
+        keywords: ["solid", "liquid", "gas", "vapour", "compressibility", "fluidity", "plasma", "rigidity"],
+        misconceptions: ["Believing gases weigh nothing because you cannot feel them"],
+        tools: [{ k: "activity", label: "Block a syringe nozzle with your thumb: air compresses, water refuses" }],
+        status: "review"
+    },
+    {
+        id: "changes-of-state", name: "Changes of State", domain: "c-matter", level: 2,
+        desc: "Heat does not always raise temperature — at the melting and boiling point it goes into breaking particles apart instead, which is why ice water stays at 0 °C until the last ice is gone. That hidden energy is the latent heat.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:1"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["states-of-matter", "temperature-heat"],
+        related: ["evaporation"],
+        aliases: ["interconversion of states", "melting and boiling", "phase change", "latent heat"],
+        keywords: ["melting point", "boiling point", "fusion", "vaporisation", "sublimation", "condensation", "freezing", "latent heat"],
+        misconceptions: ["Assuming the temperature keeps climbing while ice is melting", "Thinking the bubbles in boiling water are air"],
+        tools: [{ k: "activity", label: "Plot temperature every 30 s as ice-water is heated to boiling — find the two flat stretches" }, { k: "activity", label: "Warm camphor or naphthalene gently in a covered dish and watch it sublime and re-form as crystals" }],
+        status: "review"
+    },
+    {
+        id: "evaporation", name: "Evaporation & Cooling", domain: "c-matter", level: 2,
+        desc: "A liquid loses particles from its surface at any temperature — only the fastest ones escape, so what stays behind is colder. This is why sweat, wet earthen pots and khus screens all cool you.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:1"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["changes-of-state"],
+        related: ["air-atmosphere"],
+        aliases: ["evaporation causes cooling", "surface vaporisation"],
+        keywords: ["humidity", "surface area", "wind speed", "matka", "cooling effect", "drying"],
+        misconceptions: ["Thinking a liquid can only evaporate once it reaches its boiling point"],
+        tools: [{ k: "activity", label: "Dab spirit and water on opposite hands — the spirit hand feels much colder" }, { k: "activity", label: "Spread the same spoon of water on a plate and in a cup; time which dries first" }],
+        status: "review"
+    },
+    {
+        id: "pure-substances-mixtures", name: "Pure Substances & Mixtures", domain: "c-matter", level: 2,
+        desc: "'Pure' in chemistry does not mean wholesome — it means made of one kind of particle only, so milk and air are mixtures no matter how clean they are. Mixtures keep their ingredients' properties and can be separated by physical means.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["particle-model"],
+        related: ["elements-compounds", "separation-techniques", "solutions"],
+        aliases: ["is matter around us pure", "homogeneous and heterogeneous mixtures", "types of mixtures"],
+        keywords: ["homogeneous", "heterogeneous", "pure substance", "component", "alloy", "constituent"],
+        misconceptions: ["Reading 'pure' on a food label as the chemist's meaning of pure"],
+        tools: [{ k: "activity", label: "Sort a tray of samples — sugar, salt water, sand-and-iron filings, milk — into pure vs mixture and defend each call" }],
+        status: "review"
+    },
+    {
+        id: "solutions", name: "Solutions", domain: "c-matter", level: 2,
+        desc: "A solute breaks up and scatters among the solvent particles so evenly that no filter and no microscope can find it again. Solubility has a ceiling that usually rises with temperature — which is why a cooling saturated solution grows crystals.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["pure-substances-mixtures", "particle-model"],
+        related: ["concentration", "colloids-suspensions", "acids-bases"],
+        aliases: ["true solution", "solute and solvent", "solubility"],
+        keywords: ["solute", "solvent", "aqueous", "saturated", "unsaturated", "solubility", "dissolution", "crystallisation"],
+        misconceptions: ["Believing dissolved sugar has been destroyed rather than dispersed", "Thinking stirring increases how much sugar can dissolve, rather than just how fast"],
+        tools: [{ k: "activity", label: "Dissolve alum in hot water to saturation, then let it cool overnight and harvest the crystals" }],
+        status: "review"
+    },
+    {
+        id: "concentration", name: "Concentration of a Solution", domain: "c-matter", level: 4,
+        desc: "'Strong tea' is a feeling; concentration is the number behind it — how much solute per how much solution, in mass %, volume % or ppm. Getting the denominator right (solution, not solvent) is where most of the marks are lost.",
+        grades: [9, 11, 12],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["solutions", "percentages"],
+        related: ["mole-concept", "ratio-proportion", "ph-scale"],
+        aliases: ["mass by mass percentage", "strength of a solution", "molarity"],
+        keywords: ["mass percent", "volume percent", "w/w", "v/v", "ppm", "parts per million", "molarity", "molality", "mole fraction"],
+        misconceptions: ["Dividing the solute mass by the solvent mass instead of by the total solution mass"],
+        tools: [{ k: "activity", label: "Make a 10% w/w salt solution on a kitchen scale, then dilute it by half and check the sums" }],
+        status: "review"
+    },
+    {
+        id: "colloids-suspensions", name: "Colloids & Suspensions", domain: "c-matter", level: 3,
+        desc: "Between a true solution and a bucket of sand sits a middle world — particles big enough to scatter a torch beam but too small to settle. Milk, fog, smoke, jelly and blood all live there, and the Tyndall effect is how you catch them.",
+        grades: [9],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["solutions"],
+        related: ["separation-techniques", "light-shadow"],
+        aliases: ["tyndall effect", "colloidal solution", "dispersed phase"],
+        keywords: ["colloid", "suspension", "emulsion", "aerosol", "gel", "foam", "dispersion medium", "scattering", "centrifugation"],
+        misconceptions: ["Calling milk a solution because it looks uniform"],
+        tools: [{ k: "activity", label: "Shine a torch through salt water, milk and muddy water in three glasses — only one beam is invisible" }],
+        status: "review"
+    },
+    {
+        id: "separation-techniques", name: "Separating Mixtures", domain: "c-matter", level: 2,
+        desc: "Every separation method exploits one property the components do not share — size, density, magnetism, boiling point, solubility. Choosing the technique is really the skill of spotting which difference is available.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["pure-substances-mixtures"],
+        related: ["colloids-suspensions", "changes-of-state"],
+        aliases: ["separation of substances", "purification methods"],
+        keywords: ["filtration", "evaporation", "distillation", "fractional distillation", "sublimation", "chromatography", "sedimentation", "decantation", "winnowing", "sieving", "centrifugation", "separating funnel"],
+        misconceptions: ["Expecting filter paper to remove dissolved salt from water"],
+        tools: [{ k: "activity", label: "Run paper chromatography on a sketch-pen dot with a strip of blotting paper and water" }, { k: "activity", label: "Separate a sand + salt + iron-filings mixture using only a magnet, water and a filter" }],
+        status: "review"
+    },
+
+    // ============================== ATOMS & MOLECULES ==============================
+    {
+        id: "elements-compounds", name: "Elements & Compounds", domain: "c-atomic", level: 2,
+        desc: "An element cannot be broken down further by chemistry; a compound can, and when it splits its parts behave nothing like it — hydrogen burns, oxygen feeds fire, water puts it out. Roughly a hundred elements make every substance there is.",
+        grades: [6, 9],
+        syllabusRefs: ["ncert:9:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["pure-substances-mixtures"],
+        related: ["atoms-molecules", "periodic-table", "stellar-fusion"],
+        aliases: ["element compound and mixture", "classification of pure substances"],
+        keywords: ["element", "compound", "symbol", "fixed proportion", "constituent element", "metalloid"],
+        misconceptions: ["Treating a compound as a fine mixture of its elements, so it should keep their properties"],
+        tools: [{ k: "activity", label: "Compare a heap of iron filings + sulphur powder with the black solid you get after heating them — magnet test tells them apart" }],
+        status: "review"
+    },
+    {
+        id: "atoms-molecules", name: "Atoms & Molecules", domain: "c-atomic", level: 3,
+        desc: "Atoms are the smallest units that keep an element's identity; molecules are the groups they travel in — and most elements do not travel alone (O₂, N₂, S₈). Dalton's insight was that atoms combine in small whole-number ratios, which is why formulae exist at all.",
+        grades: [9],
+        syllabusRefs: ["ncert:9:sci:3"],
+        tracks: ["school-high"],
+        prereqs: ["particle-model", "elements-compounds"],
+        related: ["atomic-structure", "chemical-formulae-equations", "big-numbers"],
+        aliases: ["dalton's atomic theory", "atomicity", "law of constant proportions"],
+        keywords: ["atom", "molecule", "atomicity", "diatomic", "polyatomic ion", "law of definite proportions", "Dalton", "radical"],
+        misconceptions: ["Using 'atom' and 'molecule' interchangeably", "Imagining atoms as tiny hard balls of the bulk substance — a copper atom that is orange and shiny"],
+        tools: [{ k: "activity", label: "Build H₂O, CO₂ and CH₄ from clay balls and matchsticks, then count atoms vs molecules" }],
+        status: "review"
+    },
+    {
+        id: "atomic-structure", name: "Inside the Atom", domain: "c-atomic", level: 3,
+        desc: "The atom is almost entirely empty — a dense nucleus of protons and neutrons with electrons far out, discovered because Rutherford's alpha particles mostly sailed straight through gold foil. Chemistry is what the outermost electrons do; the nucleus just sits there setting the rules.",
+        grades: [9, 11],
+        syllabusRefs: ["ncert:9:sci:4", "ncert:11:chem:2"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["atoms-molecules", "model-thinking"],
+        related: ["electron-shells", "ions", "atomic-number-mass-number"],
+        aliases: ["structure of the atom", "subatomic particles", "rutherford model", "bohr model"],
+        keywords: ["electron", "proton", "neutron", "nucleus", "alpha scattering", "Thomson", "Rutherford", "Bohr", "charge", "orbit"],
+        misconceptions: ["Picturing electrons orbiting the nucleus like planets round the Sun", "Thinking the nucleus takes up most of the atom's size because it has most of its mass"],
+        tools: [{ k: "activity", label: "Scale it: if the nucleus were a marble on the pitch, the atom's edge is the boundary — pace it out" }],
+        status: "review"
+    },
+    {
+        id: "atomic-number-mass-number", name: "Atomic Number & Mass Number", domain: "c-atomic", level: 3,
+        desc: "The proton count alone decides which element you have — change it and carbon becomes nitrogen. Mass number just adds the neutrons, and the gap between the two is the whole story of isotopes.",
+        grades: [9, 11],
+        syllabusRefs: ["ncert:9:sci:4"],
+        tracks: ["school-high"],
+        prereqs: ["atomic-structure"],
+        related: ["isotopes", "periodic-table", "whole-numbers"],
+        aliases: ["Z and A", "nucleon number", "proton number"],
+        keywords: ["atomic number", "mass number", "Z", "A", "nucleon", "neutral atom", "notation"],
+        misconceptions: ["Thinking the atomic mass on the periodic table is a neutron-plus-proton count, so it should be a whole number"],
+        tools: [{ k: "activity", label: "Deal out proton/neutron/electron counters and have a partner name the element from the pile" }],
+        status: "review"
+    },
+    {
+        id: "electron-shells", name: "Electron Shells & Configuration", domain: "c-atomic", level: 3,
+        desc: "Electrons fill shells from the inside out — 2, 8, 8 — and an atom's entire chemical personality is decided by how far its outermost shell is from full. The octet urge is the engine behind every bond in school chemistry.",
+        grades: [9, 11],
+        syllabusRefs: ["ncert:9:sci:4", "ncert:11:chem:2"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["atomic-structure"],
+        related: ["valency", "periodic-table", "ions"],
+        aliases: ["electronic configuration", "bohr-bury rules", "shell filling", "octet rule"],
+        keywords: ["shell", "K L M N", "valence shell", "octet", "duplet", "2n squared", "noble gas configuration", "orbital"],
+        misconceptions: ["Believing atoms 'want' full shells as a goal, rather than that full-shell arrangements are simply lower in energy"],
+        tools: [{ k: "activity", label: "Draw Bohr diagrams for the first 20 elements on one sheet and circle every atom with a full outer shell" }],
+        status: "review"
+    },
+    {
+        id: "isotopes", name: "Isotopes", domain: "c-atomic", level: 3,
+        desc: "Same element, different neutron count — chemically near-identical twins with different masses, which is why chlorine's atomic mass is a stubborn 35.5. Nature supplies fixed mixtures, so the 'wrong' decimal is really a weighted average.",
+        grades: [9, 11],
+        syllabusRefs: ["ncert:9:sci:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["atomic-number-mass-number"],
+        related: ["periodic-table", "meteorites"],
+        aliases: ["isotopes and isobars", "nuclides"],
+        keywords: ["isotope", "isobar", "C-12", "C-14", "U-235", "deuterium", "relative abundance", "average atomic mass"],
+        misconceptions: ["Assuming isotopes of an element react differently because their masses differ", "Thinking every isotope is radioactive"],
+        tools: [{ k: "activity", label: "Weighted average by hand: mix 75 beads of mass 35 with 25 of mass 37 and show why chlorine reads 35.5" }],
+        status: "review"
+    },
+    {
+        id: "mole-concept", name: "The Mole & Molar Mass", domain: "c-atomic", level: 4,
+        desc: "Atoms are too small to count and too light to weigh one at a time, so chemists invented a bulk unit: 6.022 × 10²³ particles, chosen so that one mole of any substance weighs its formula mass in grams. The mole is the bridge between the balance in your hand and the equation on the board.",
+        grades: [9, 11],
+        syllabusRefs: ["ncert:9:sci:3", "ncert:11:chem:1"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["atoms-molecules", "atomic-number-mass-number", "scientific-notation"],
+        related: ["chemical-formulae-equations", "concentration", "big-numbers", "unit-conversion", "ratio-proportion"],
+        aliases: ["mole concept", "avogadro number", "gram atomic mass", "molar mass", "relative molecular mass"],
+        keywords: ["mole", "Avogadro constant", "6.022e23", "molar mass", "formula unit mass", "gram molecular mass", "n = m/M", "amu", "u"],
+        misconceptions: ["Treating a mole as a mass or a volume rather than a count", "Assuming a mole of every substance weighs the same because it is the same number of particles"],
+        tools: [{ k: "activity", label: "Weigh a mole of water (18 g) and a mole of salt (58.5 g) into two cups — same particle count, wildly different piles" }, { k: "activity", label: "Estimate the number of rice grains in a kilo by weighing 100 — the mole idea in miniature" }],
+        status: "review"
+    },
+
+    // ============================== PERIODIC TABLE & BONDING ==============================
+    {
+        id: "periodic-table", name: "The Periodic Table", domain: "c-periodic", level: 3,
+        desc: "Line the elements up by atomic number and their properties repeat on a beat — that rhythm is what the rows and columns capture. Mendeleev trusted the pattern enough to leave gaps and predict the missing elements' properties, and he was right.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:11:chem:3"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["atomic-number-mass-number", "electron-shells"],
+        related: ["periodic-trends", "valency", "metals-nonmetals", "spectroscopy"],
+        aliases: ["periodic classification of elements", "mendeleev periodic table", "modern periodic law"],
+        keywords: ["group", "period", "Mendeleev", "Newlands octaves", "Dobereiner triads", "alkali metals", "halogens", "noble gases", "modern periodic law", "block"],
+        misconceptions: ["Thinking the table is ordered by atomic mass rather than atomic number", "Reading group number as a count of shells rather than of valence electrons"],
+        tools: [{ k: "activity", label: "Hand out 20 element cards with only properties on them and have the class rebuild the first three periods before seeing the answer" }],
+        status: "review"
+    },
+    {
+        id: "periodic-trends", name: "Periodic Trends", domain: "c-periodic", level: 4,
+        desc: "Across a period the nucleus pulls harder on the same shell, so atoms shrink and cling to electrons; down a group a new shell is added, so they swell and let go. Size, metallic character, valency and reactivity all follow from that tug-of-war.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:11:chem:3"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["periodic-table", "electron-shells"],
+        related: ["reactivity-series", "ions", "metals-nonmetals"],
+        aliases: ["periodicity in properties", "periodic properties", "atomic size trend"],
+        keywords: ["atomic radius", "ionic radius", "ionisation enthalpy", "electron affinity", "electronegativity", "metallic character", "shielding", "effective nuclear charge"],
+        misconceptions: ["Expecting atoms to get bigger across a period because electrons are being added"],
+        tools: [{ k: "activity", label: "Plot atomic radius against atomic number for the first 20 elements on graph paper — the sawtooth is the whole lesson" }],
+        status: "review"
+    },
+    {
+        id: "valency", name: "Valency", domain: "c-periodic", level: 3,
+        desc: "Valency is an atom's combining capacity — how many electrons it must lose, gain or share to settle its outer shell. It is the number that lets you write a formula you have never seen before and get it right.",
+        grades: [9, 10],
+        syllabusRefs: ["ncert:9:sci:4"],
+        tracks: ["school-high"],
+        prereqs: ["electron-shells"],
+        related: ["chemical-formulae-equations", "periodic-table", "ions"],
+        aliases: ["combining capacity", "valence", "variable valency"],
+        keywords: ["valency", "valence electrons", "criss-cross method", "polyatomic ion", "radical", "ferrous ferric", "cuprous cupric"],
+        misconceptions: ["Reading valency as a charge, so a valency of 2 must mean a 2+ ion"],
+        tools: [{ k: "activity", label: "Valency snap: match cation and anion cards until the charges cancel, then write the formula" }],
+        status: "review"
+    },
+    {
+        id: "ions", name: "Ions", domain: "c-periodic", level: 3,
+        desc: "Lose an electron and the atom is left positive; gain one and it goes negative — the nucleus never changes, only the electron count. Ions explain why salt water conducts and why plain sugar water does not.",
+        grades: [9, 10],
+        syllabusRefs: ["ncert:9:sci:4"],
+        tracks: ["school-high"],
+        prereqs: ["atomic-structure", "electron-shells"],
+        related: ["ionic-bonding", "ph-scale", "oxidation-reduction"],
+        aliases: ["cations and anions", "charged particles", "ionisation"],
+        keywords: ["cation", "anion", "charge", "Na+", "Cl-", "SO4 2-", "polyatomic ion", "electrolyte", "dissociation"],
+        misconceptions: ["Thinking a sodium ion is a different element from a sodium atom", "Believing ions form by adding or removing protons"],
+        tools: [{ k: "activity", label: "Wire a battery, bulb and two spoons into a glass: test tap water, salt water and sugar water for conduction" }],
+        status: "review"
+    },
+    {
+        id: "ionic-bonding", name: "Ionic Bonding", domain: "c-periodic", level: 3,
+        desc: "A metal hands electrons to a non-metal and the resulting opposite charges lock into a rigid three-dimensional lattice — which is why salt is hard, high-melting, and conducts only once melted or dissolved. There is no such thing as one NaCl molecule.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:11:chem:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["ions", "valency"],
+        related: ["covalent-bonding", "metals-nonmetals", "neutralisation-salts"],
+        aliases: ["electrovalent bond", "ionic bond", "electrovalency"],
+        keywords: ["lattice", "electron transfer", "crystal", "electrostatic attraction", "high melting point", "molten conduction", "NaCl", "MgO"],
+        misconceptions: ["Speaking of an 'NaCl molecule' rather than a formula unit of a lattice", "Thinking solid salt conducts electricity because it is made of ions"],
+        tools: [{ k: "activity", label: "Build a NaCl lattice from two colours of clay balls and toothpicks — then look for the molecule" }],
+        status: "review"
+    },
+    {
+        id: "covalent-bonding", name: "Covalent Bonding", domain: "c-periodic", level: 3,
+        desc: "When neither atom can afford to lose an electron they share instead, and the shared pair belongs to both nuclei at once. Sharing makes discrete molecules with weak forces between them — hence low melting points, poor conduction, and the whole of organic chemistry.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:11:chem:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["valency", "electron-shells"],
+        related: ["ionic-bonding", "carbon-bonding", "atoms-molecules"],
+        aliases: ["covalent bond", "electron sharing", "lewis structure", "molecular bond"],
+        keywords: ["shared pair", "single bond", "double bond", "triple bond", "lone pair", "electron dot structure", "Lewis", "polar covalent", "H2O", "CH4", "N2"],
+        misconceptions: ["Assuming covalent compounds must have low melting points — diamond and quartz say otherwise"],
+        tools: [{ k: "activity", label: "Draw electron dot structures for H₂, O₂, N₂, H₂O and CH₄ and count every shared pair" }],
+        status: "review"
+    },
+
+    // ============================== CHEMICAL REACTIONS ==============================
+    {
+        id: "conservation-of-mass", name: "Conservation of Mass", domain: "c-reaction", level: 3,
+        desc: "In a reaction atoms are only rearranged, never created or destroyed, so the mass of the products equals the mass of the reactants — provided you remember to weigh the gases. This one law is why equations must balance.",
+        grades: [9],
+        syllabusRefs: ["ncert:9:sci:3"],
+        tracks: ["school-high"],
+        prereqs: ["atoms-molecules"],
+        related: ["balancing-equations", "chemical-formulae-equations"],
+        aliases: ["law of conservation of mass", "lavoisier's law"],
+        keywords: ["conservation", "reactant", "product", "closed system", "Lavoisier", "rearrangement"],
+        misconceptions: ["Concluding that mass is destroyed when a candle burns away or a log turns to ash", "Thinking rusted iron weighs less than the iron it came from"],
+        tools: [{ k: "activity", label: "Weigh a sealed bottle of vinegar with baking soda inside a balloon before and after the fizz — the reading holds" }],
+        status: "review"
+    },
+    {
+        id: "chemical-formulae-equations", name: "Chemical Formulae & Equations", domain: "c-reaction", level: 3,
+        desc: "A formula records exactly which atoms in what ratio; an equation records what turned into what. It is a language with strict grammar — subscripts, coefficients and state symbols each mean one thing and cannot be swapped.",
+        grades: [9, 10],
+        syllabusRefs: ["ncert:9:sci:3", "ncert:10:sci:1"],
+        tracks: ["school-high"],
+        prereqs: ["valency", "atoms-molecules"],
+        related: ["balancing-equations", "mole-concept", "reaction-types"],
+        aliases: ["writing chemical formulae", "chemical equation", "molecular formula", "skeletal equation"],
+        keywords: ["formula", "subscript", "coefficient", "reactant", "product", "state symbol", "aq", "arrow", "word equation", "empirical formula"],
+        misconceptions: ["Changing a subscript instead of a coefficient — quietly inventing a new substance"],
+        tools: [{ k: "activity", label: "Translate five word equations from a news story or food label into symbols, states and all" }],
+        status: "review"
+    },
+    {
+        id: "balancing-equations", name: "Balancing Equations", domain: "c-reaction", level: 3,
+        desc: "Equal atoms of every element on both sides — you may only add coefficients in front, never touch a subscript. It looks like a puzzle, but it is conservation of mass being enforced one element at a time.",
+        grades: [9, 10],
+        syllabusRefs: ["ncert:10:sci:1"],
+        tracks: ["school-high"],
+        prereqs: ["chemical-formulae-equations", "conservation-of-mass"],
+        related: ["mole-concept", "reaction-types", "whole-numbers"],
+        aliases: ["balanced chemical equation", "hit and trial method"],
+        keywords: ["coefficient", "atom count", "balanced", "skeletal equation", "stoichiometry", "hit and trial"],
+        misconceptions: ["Balancing by editing subscripts, e.g. turning H₂O into H₂O₂ to find an extra oxygen"],
+        tools: [{ k: "activity", label: "Balance with counters: lay out atoms on both sides of a line and add whole molecules until the piles match" }],
+        status: "review"
+    },
+    {
+        id: "reaction-types", name: "Types of Chemical Reaction", domain: "c-reaction", level: 3,
+        desc: "Most school reactions fall into a handful of shapes: two things joining, one thing splitting, one element shouldering another out, or two partners swapping. Naming the shape lets you predict products for a reaction you have never met.",
+        grades: [10],
+        syllabusRefs: ["ncert:10:sci:1"],
+        tracks: ["school-high"],
+        prereqs: ["chemical-formulae-equations"],
+        related: ["oxidation-reduction", "reactivity-series", "neutralisation-salts"],
+        aliases: ["combination decomposition displacement", "classification of reactions", "double displacement reaction"],
+        keywords: ["combination", "decomposition", "displacement", "double displacement", "precipitation", "exothermic", "endothermic", "thermal decomposition", "electrolysis"],
+        misconceptions: ["Assuming every reaction that gives off heat is a combination reaction"],
+        tools: [{ k: "activity", label: "Mix Epsom salt solution with baking soda solution — the instant cloudiness is a double displacement precipitate" }, { k: "activity", label: "Drop an iron nail into blue copper sulphate solution and watch displacement over an hour" }],
+        status: "review"
+    },
+    {
+        id: "oxidation-reduction", name: "Oxidation & Reduction", domain: "c-reaction", level: 3,
+        desc: "Oxidation began as 'gains oxygen' and grew into 'loses electrons' — and reduction is always its mirror image, happening in the same breath. Nothing is oxidised unless something else is reduced.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:10:sci:1"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["reaction-types", "ions"],
+        related: ["corrosion-rusting", "metal-extraction", "reactivity-series"],
+        aliases: ["redox reaction", "oxidation reduction", "oxidising agent"],
+        keywords: ["redox", "oxidising agent", "reducing agent", "electron loss", "electron gain", "OIL RIG", "oxidation number", "oxidation state"],
+        misconceptions: ["Thinking oxidation must involve oxygen", "Treating the oxidising agent as the thing being oxidised"],
+        tools: [{ k: "activity", label: "Shine a blackened copper wire by holding it in a candle flame's inner cone — reduction you can see" }],
+        status: "review"
+    },
+    {
+        id: "corrosion-rusting", name: "Corrosion & Rusting", domain: "c-reaction", level: 3,
+        desc: "Reactive metals slowly return to their ore-like state, and iron needs both oxygen and water to do it — which is why a nail rusts in damp air but not in boiled, sealed water. Rancidity is the same chemistry attacking food.",
+        grades: [8, 10],
+        syllabusRefs: ["ncert:10:sci:1"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["oxidation-reduction", "reactivity-series"],
+        related: ["alloys", "metal-extraction", "air-atmosphere"],
+        aliases: ["rusting of iron", "corrosion of metals", "rancidity"],
+        keywords: ["rust", "Fe2O3.xH2O", "galvanisation", "tarnish", "patina", "anodising", "rancidity", "antioxidant", "painting", "oiling"],
+        misconceptions: ["Believing iron rusts in dry air alone, or in pure water alone", "Thinking rusting makes iron lighter because rust flakes off"],
+        tools: [{ k: "activity", label: "Four test tubes with nails: dry air, tap water, boiled water under oil, salt water — read the result after a week" }],
+        status: "review"
+    },
+
+    // ============================== ACIDS, BASES & SALTS ==============================
+    {
+        id: "acids-bases", name: "Acids & Bases", domain: "c-acid", level: 2,
+        desc: "Acids taste sour and hand out H⁺ ions in water; bases feel soapy and hand out OH⁻ — and both are dangerous exactly when they are good at it. Half your kitchen is on one side of this divide and half on the other.",
+        grades: [7, 10],
+        syllabusRefs: ["ncert:10:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["solutions"],
+        related: ["indicators", "ph-scale", "neutralisation-salts", "ions"],
+        aliases: ["acids bases and salts", "alkalis", "acidic and basic solutions"],
+        keywords: ["acid", "base", "alkali", "H+", "OH-", "hydronium", "HCl", "NaOH", "citric acid", "acetic acid", "corrosive", "strong acid", "weak acid"],
+        misconceptions: ["Thinking every acid is dangerous and every base is safe", "Believing an acid is only an acid once it is dissolved in water — actually it needs water to show its acidic behaviour"],
+        tools: [{ k: "activity", label: "Sort lemon, curd, soap, baking soda, vinegar and antacid into acid or base using only red and blue litmus" }],
+        status: "review"
+    },
+    {
+        id: "indicators", name: "Indicators", domain: "c-acid", level: 2,
+        desc: "Some dyes change colour depending on whether H⁺ or OH⁻ is winning — litmus from lichen, turmeric, red cabbage, china rose. An indicator is a chemical that answers a question you cannot safely taste.",
+        grades: [7, 10],
+        syllabusRefs: ["ncert:10:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["acids-bases"],
+        related: ["ph-scale", "neutralisation-salts", "spectrum-color"],
+        aliases: ["acid base indicator", "natural indicators", "litmus test", "olfactory indicator"],
+        keywords: ["litmus", "phenolphthalein", "methyl orange", "turmeric", "red cabbage", "china rose", "hibiscus", "universal indicator", "olfactory indicator"],
+        misconceptions: ["Thinking an indicator measures how strong the acid is, when plain litmus only says which side it is on"],
+        tools: [{ k: "activity", label: "Boil red cabbage, keep the purple water, and build a home pH colour chart with lemon juice, soap and baking soda" }, { k: "activity", label: "Turmeric stain on cloth turns red with soap and back to yellow with lemon" }],
+        status: "review"
+    },
+    {
+        id: "ph-scale", name: "The pH Scale", domain: "c-acid", level: 3,
+        desc: "pH puts acidity on a 0–14 number line, and each step is a factor of ten — pH 3 is a hundred times more acidic than pH 5, not a bit. It runs our blood, our soil, our tooth enamel and the fish in our rivers.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:10:sci:2"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["acids-bases", "ions"],
+        related: ["indicators", "neutralisation-salts", "concentration", "exponents-powers"],
+        aliases: ["pH value", "potential of hydrogen", "measuring acidity"],
+        keywords: ["pH", "logarithmic scale", "universal indicator", "pH paper", "neutral", "acid rain", "soil pH", "tooth decay", "antacid"],
+        misconceptions: ["Reading pH as a measure of strength rather than of hydrogen-ion concentration — so a dilute strong acid must have a low pH", "Assuming the scale is linear, so pH 4 is just 'a bit more acidic' than pH 5"],
+        tools: [{ k: "activity", label: "Strip pH paper across rainwater, tap water, cola, soap and antacid, then rank them" }, { k: "activity", label: "Dilute lemon juice ten-fold three times and watch the pH climb one step each time" }],
+        status: "review"
+    },
+    {
+        id: "neutralisation-salts", name: "Neutralisation & Salts", domain: "c-acid", level: 3,
+        desc: "Acid plus base gives salt plus water, and the salt's own pH remembers its parents — sodium carbonate from a weak acid stays basic. Antacids, lime on sour soil and a paste for a bee sting are all this reaction, used deliberately.",
+        grades: [7, 10],
+        syllabusRefs: ["ncert:10:sci:2"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["acids-bases", "chemical-formulae-equations"],
+        related: ["ph-scale", "ionic-bonding", "indicators", "reaction-types"],
+        aliases: ["neutralisation reaction", "preparation of salts", "family of salts"],
+        keywords: ["salt", "neutralisation", "antacid", "washing soda", "baking soda", "bleaching powder", "plaster of paris", "gypsum", "water of crystallisation", "common salt", "chlor-alkali"],
+        misconceptions: ["Assuming every salt solution is neutral because it came from a neutralisation"],
+        tools: [{ k: "activity", label: "Add baking soda to vinegar drop by drop with red cabbage indicator until the colour settles neutral" }, { k: "activity", label: "Leave a spoon of the neutralised solution to dry and find the salt crystals it leaves" }],
+        status: "review"
+    },
+
+    // ============================== METALS & NON-METALS ==============================
+    {
+        id: "metals-nonmetals", name: "Metals & Non-metals", domain: "c-metal", level: 2,
+        desc: "Metals are shiny, bendable, conducting electron-donors; non-metals are usually dull, brittle electron-takers — and the exceptions (liquid mercury, soft sodium, conducting graphite) are the ones worth remembering. The divide runs down the periodic table as a staircase.",
+        grades: [8, 10],
+        syllabusRefs: ["ncert:10:sci:3"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["elements-compounds"],
+        related: ["periodic-table", "reactivity-series", "ionic-bonding", "alloys"],
+        aliases: ["materials metals and non-metals", "properties of metals", "metalloids"],
+        keywords: ["malleable", "ductile", "sonorous", "lustre", "conductor", "brittle", "metalloid", "amphoteric oxide", "basic oxide", "acidic oxide", "graphite", "mercury"],
+        misconceptions: ["Believing all metals are hard, solid and heavy — sodium floats and can be cut with a knife", "Thinking non-metals never conduct electricity"],
+        tools: [{ k: "activity", label: "Test a tray of samples for lustre, sound when struck, and whether they complete a torch-bulb circuit" }],
+        status: "review"
+    },
+    {
+        id: "reactivity-series", name: "The Reactivity Series", domain: "c-metal", level: 3,
+        desc: "Rank metals by how eagerly they give up electrons and you get a league table that predicts everything — who displaces whom, which metals fizz in water, which sit in the ground as nuggets. Potassium at the top, gold at the bottom, and the whole of metallurgy in between.",
+        grades: [10],
+        syllabusRefs: ["ncert:10:sci:3"],
+        tracks: ["school-high"],
+        prereqs: ["metals-nonmetals", "reaction-types"],
+        related: ["oxidation-reduction", "metal-extraction", "corrosion-rusting", "periodic-trends"],
+        aliases: ["activity series of metals", "reactivity of metals", "displacement series"],
+        keywords: ["reactivity series", "displacement", "thermite reaction", "aqua regia", "noble metal", "K Na Ca Mg Al Zn Fe Pb Cu Ag Au", "electropositivity"],
+        misconceptions: ["Confusing reactivity with hardness or density, so lead must be more reactive than aluminium"],
+        tools: [{ k: "activity", label: "Rank iron, copper and zinc yourself: leave each in copper sulphate and in zinc sulphate overnight and record who coats whom" }],
+        status: "review"
+    },
+    {
+        id: "metal-extraction", name: "Extraction of Metals", domain: "c-metal", level: 4,
+        desc: "Ores are metals already reacted with oxygen or sulphur, so extraction is reduction — and how hard you must push depends on where the metal sits in the reactivity series. Aluminium needed electricity; copper needed only a hot fire, which is why the Bronze Age came first.",
+        grades: [10, 12],
+        syllabusRefs: ["ncert:10:sci:3"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["reactivity-series", "oxidation-reduction"],
+        related: ["alloys", "corrosion-rusting", "meteorites"],
+        aliases: ["metallurgy", "occurrence of metals", "extraction of metals from ores"],
+        keywords: ["ore", "mineral", "gangue", "roasting", "calcination", "smelting", "electrolytic reduction", "thermite", "refining", "electrorefining", "bauxite", "haematite"],
+        misconceptions: ["Assuming metals are found in the ground as the shiny metal itself"],
+        tools: [{ k: "activity", label: "Trace the reactivity series onto a timeline of gold, copper, iron and aluminium's discovery dates — the correlation is the point" }],
+        status: "review"
+    },
+    {
+        id: "alloys", name: "Alloys", domain: "c-metal", level: 3,
+        desc: "Mix a foreign atom into a metal and you jam its neat layers so they cannot slide — steel, brass, bronze and solder are all deliberate imperfection. An alloy is a mixture, yet it can beat every one of its ingredients.",
+        grades: [8, 10],
+        syllabusRefs: ["ncert:10:sci:3"],
+        tracks: ["school-middle", "school-high"],
+        prereqs: ["metals-nonmetals", "pure-substances-mixtures"],
+        related: ["corrosion-rusting", "metal-extraction"],
+        aliases: ["alloying", "steel and brass", "amalgam"],
+        keywords: ["alloy", "steel", "stainless steel", "brass", "bronze", "solder", "amalgam", "duralumin", "wootz", "corrosion resistance", "hardness"],
+        misconceptions: ["Thinking an alloy is a compound with a fixed formula"],
+        tools: [{ k: "activity", label: "Hunt your home for five alloys — utensils, locks, coins, taps, wiring — and look up what is in each" }],
+        status: "review"
+    },
+
+    // ============================== CARBON & ORGANIC CHEMISTRY ==============================
+    {
+        id: "carbon-bonding", name: "Why Carbon Is Special", domain: "c-organic", level: 3,
+        desc: "Four bonds, all covalent, and — uniquely — a willingness to bond to itself in chains, branches and rings without end. Catenation plus tetravalency is why there are millions of carbon compounds and only thousands of everything else.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:10:sci:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["covalent-bonding"],
+        related: ["hydrocarbons", "atoms-molecules", "stellar-fusion"],
+        aliases: ["carbon and its compounds", "catenation", "versatile nature of carbon", "allotropes of carbon"],
+        keywords: ["catenation", "tetravalency", "allotrope", "diamond", "graphite", "fullerene", "graphene", "chain", "branch", "ring", "isomer"],
+        misconceptions: ["Assuming diamond and graphite differ because they contain different atoms"],
+        tools: [{ k: "activity", label: "Build every C₄H₁₀ you can from clay and sticks — you will find exactly two, and that is isomerism" }],
+        status: "review"
+    },
+    {
+        id: "hydrocarbons", name: "Hydrocarbons", domain: "c-organic", level: 3,
+        desc: "Carbon and hydrogen only — and yet that covers cooking gas, petrol, candle wax and the ripening agent in mangoes. Whether the carbons are joined by single, double or triple bonds decides how saturated, how sooty and how reactive the compound is.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:10:sci:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["carbon-bonding"],
+        related: ["functional-groups", "homologous-series", "sun-energy"],
+        aliases: ["saturated and unsaturated hydrocarbons", "alkanes alkenes alkynes", "aliphatic compounds"],
+        keywords: ["alkane", "alkene", "alkyne", "methane", "ethane", "ethene", "ethyne", "saturated", "unsaturated", "combustion", "sooty flame", "LPG", "CNG", "petroleum"],
+        misconceptions: ["Thinking a yellow sooty flame means the fuel is dirty rather than under-supplied with oxygen or unsaturated"],
+        tools: [{ k: "activity", label: "Compare a candle flame with a well-adjusted gas burner: hold a white tile briefly in each and compare the soot" }],
+        status: "review"
+    },
+    {
+        id: "functional-groups", name: "Functional Groups", domain: "c-organic", level: 3,
+        desc: "Swap one hydrogen on a carbon chain for an –OH, a –COOH or a –CHO and the whole molecule changes job — the chain is scaffolding, the group is the business end. Ethane is a gas you burn; ethanol you drink; ethanoic acid is vinegar.",
+        grades: [10, 11, 12],
+        syllabusRefs: ["ncert:10:sci:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["hydrocarbons"],
+        related: ["homologous-series", "soaps-detergents", "acids-bases"],
+        aliases: ["functional group", "nomenclature of carbon compounds", "IUPAC naming"],
+        keywords: ["alcohol", "aldehyde", "ketone", "carboxylic acid", "halo group", "-OH", "-COOH", "-CHO", "ethanol", "ethanoic acid", "esterification", "IUPAC", "heteroatom"],
+        misconceptions: ["Expecting compounds with the same carbon count to behave alike regardless of their functional group"],
+        tools: [{ k: "activity", label: "Add baking soda to vinegar (ethanoic acid) — the fizz is the –COOH group announcing itself" }],
+        status: "review"
+    },
+    {
+        id: "homologous-series", name: "Homologous Series", domain: "c-organic", level: 3,
+        desc: "Compounds with the same functional group line up in a family where each member adds one –CH₂–, so properties march in step and you can predict member six from member three. Millions of carbon compounds become learnable because they come in families.",
+        grades: [10, 11],
+        syllabusRefs: ["ncert:10:sci:4"],
+        tracks: ["school-high", "olympiad"],
+        prereqs: ["functional-groups"],
+        related: ["hydrocarbons", "carbon-bonding", "ratio-proportion"],
+        aliases: ["homologous series", "general formula", "homologues"],
+        keywords: ["CH2 difference", "general formula", "CnH2n+2", "homologue", "gradation", "boiling point trend", "molecular mass 14"],
+        misconceptions: ["Thinking a homologous series is just a list of similar-looking names rather than a family with one general formula"],
+        tools: [{ k: "activity", label: "Plot boiling point against carbon number for the first six alkanes — a smooth climb you can extrapolate" }],
+        status: "review"
+    },
+    {
+        id: "soaps-detergents", name: "Soaps & Detergents", domain: "c-organic", level: 3,
+        desc: "A soap molecule is a compromise: a greasy hydrocarbon tail and a water-loving ionic head, so it can hold onto dirt with one end and water with the other. Micelles are what cleaning actually is — and hard water is what breaks soap but not detergent.",
+        grades: [10],
+        syllabusRefs: ["ncert:10:sci:4"],
+        tracks: ["school-high"],
+        prereqs: ["functional-groups", "solutions"],
+        related: ["colloids-suspensions", "acids-bases"],
+        aliases: ["soaps and detergents", "micelle formation", "cleansing action of soap", "saponification"],
+        keywords: ["micelle", "hydrophobic", "hydrophilic", "emulsion", "saponification", "hard water", "scum", "surfactant", "detergent", "biodegradable"],
+        misconceptions: ["Thinking soap dissolves grease the way water dissolves salt", "Believing more lather always means better cleaning"],
+        tools: [{ k: "activity", label: "Shake oil and water with and without a drop of dish soap — only one bottle stays mixed" }, { k: "activity", label: "Compare lather from soap vs detergent in tap water and in water with a spoon of Epsom salt stirred in" }],
+        status: "review"
+    }
+);

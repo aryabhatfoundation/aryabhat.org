@@ -3,15 +3,17 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Astronomy Concept Graph</title>
+  <title>Concept Map — School Science &amp; Maths</title>
   <meta name="description"
-    content="An explorable map of astronomy concepts — from day & night to deep-sky imaging — as a prerequisite graph for schools, clubs and astrophotographers.">
+    content="An explorable map of school science and maths concepts — astronomy, physics, chemistry, biology, earth science and mathematics — as a prerequisite graph for schools, clubs and astrophotographers.">
   <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- This page is self-contained: no external stylesheet, no site assets.
-       Its only companion file is js/concepts-data.js. Google Fonts below is
-       optional (system-font fallbacks are defined); remove it to go fully offline. -->
+  <!-- Self-contained: no external stylesheet, no site assets. Companion
+       files are data/*.js (the concepts) and db.js (the query layer).
+       Google Fonts below is optional — system-font fallbacks are
+       defined; remove it to go fully offline.
+       Schema & authoring contract: README.md -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -19,18 +21,16 @@
     rel="stylesheet">
   <style>
     /* ==========================================================
-       concepts.html — Astronomy Concept Graph explorer.
+       concepts/index.html — Concept Map explorer.
+       Flat table is the default view; the DAG is a toggle.
        Design-system port per design.md (tokens, navbar, footer).
        ========================================================== */
 
-    /* Base reset — inlined from the former css/style.css so this page
-       stands alone with no external stylesheet. */
     * { box-sizing: border-box; }
     html, body { overflow-x: hidden; }
     body {
       margin: 0;
       color: #e6eef7;
-      /* deep-space fallback; the animated starfield canvas paints over it */
       background: radial-gradient(ellipse at 50% 120%, #1a2a40 0%, #0a1018 55%, #04060a 100%);
       background-attachment: fixed;
     }
@@ -55,7 +55,6 @@
 
     body { font-family: var(--font-body); }
 
-    /* Full-width container (replaces the portal's 960px-capped .container). */
     .container {
       position: relative;
       width: auto;
@@ -65,135 +64,9 @@
     }
 
     /* ============================================================
-       NAVBAR — lifted from newindex.html
-       ============================================================ */
-    .navbar {
-      position: relative;
-      height: auto;
-      min-height: 4.4rem;
-      background:
-        linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
-      -webkit-backdrop-filter: blur(16px) saturate(150%);
-      backdrop-filter: blur(16px) saturate(150%);
-      border-bottom: 1px solid rgba(255, 204, 51, 0.18);
-      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-
-    .navbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
-
-    .navbar::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -1px;
-      height: 2px;
-      background: linear-gradient(90deg,
-          transparent 0%,
-          rgba(255, 204, 51, 0.18) 15%,
-          rgba(255, 204, 51, 0.7) 50%,
-          rgba(255, 204, 51, 0.18) 85%,
-          transparent 100%);
-      pointer-events: none;
-    }
-
-    .navbar > .container {
-      width: max-content;
-      min-width: 100%;
-      min-height: 4.4rem;
-      padding: 0 14px;
-      display: flex;
-      align-items: center;
-    }
-
-    .navbar-list {
-      display: flex;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .navbar-item {
-      float: none !important;
-      flex: 0 0 auto;
-      border-bottom: none;
-      padding: 0;
-      margin-bottom: 0;
-    }
-
-    .navbar-item.current { background: transparent; border-radius: 0; }
-
-    .navbar-link {
-      display: inline-flex;
-      align-items: center;
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 500;
-      letter-spacing: .05em;
-      text-transform: none;
-      line-height: 1.3;
-      color: var(--ink);
-      margin: 0;
-      padding: 11px 20px;
-      border-radius: 999px;
-      position: relative;
-      transition: color .2s ease, background .2s ease, box-shadow .25s ease;
-    }
-
-    .navbar-link:hover,
-    .navbar-link:focus {
-      color: var(--gold-soft);
-      background: rgba(255, 204, 51, 0.10);
-      outline: 0;
-    }
-
-    .navbar-link.active {
-      color: var(--gold);
-      background: rgba(255, 204, 51, 0.12);
-      font-family: var(--font-display);
-      font-weight: 600;
-      text-transform: none;
-      border-radius: var(--brand-shape-tight);
-      box-shadow:
-        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
-        0 0 16px rgba(255, 204, 51, 0.12);
-    }
-
-    .navbar-link.active:hover,
-    .navbar-link.active:focus {
-      color: var(--gold-soft);
-      background: rgba(255, 204, 51, 0.18);
-    }
-
-    @media (max-width: 700px) {
-      .navbar {
-        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
-        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .navbar, .navbar > .container { min-height: 3.5rem; }
-      .navbar > .container { padding: 0 6px; }
-      .navbar-list { gap: 4px; }
-      .navbar-link { font-size: .88rem; padding: 8px 14px; letter-spacing: .04em; }
-    }
-
-    /* ============================================================
        PAGE
        ============================================================ */
-    .main h1,
-    .main h2,
-    .main h3 {
+    .main h1, .main h2, .main h3 {
       font-family: var(--font-display);
       font-weight: 500;
       letter-spacing: -0.01em;
@@ -254,7 +127,7 @@
 
     .cg-top-body {
       overflow: hidden;
-      max-height: 1200px;
+      max-height: 1400px;
       opacity: 1;
       transition: max-height .35s ease, opacity .25s ease, margin .35s ease;
     }
@@ -278,6 +151,8 @@
 
     .cg-lede { color: var(--ink-dim); max-width: 62rem; font-size: 1.02rem; line-height: 1.55; margin-bottom: 0; }
     .cg-lede b { color: var(--ink); font-weight: 600; }
+    .cg-lede a { color: var(--accent-cyan); text-decoration: none; }
+    .cg-lede a:hover { color: var(--gold-soft); }
 
     /* ---------- Controls ---------- */
     .cg-controls {
@@ -292,6 +167,7 @@
 
     .cg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
     .cg-row:last-child { margin-bottom: 0; }
+    .cg-row.hidden { display: none; }
 
     .cg-label {
       font-family: var(--font-display);
@@ -325,10 +201,35 @@
       font-weight: 600;
     }
 
-    .chip.domain-chip { display: inline-flex; align-items: center; gap: 7px; }
-    .chip.domain-chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .chip.domain-chip.off { opacity: .38; }
-    .chip.domain-chip.off:hover { opacity: .7; }
+    .chip.domain-chip, .chip.subject-chip { display: inline-flex; align-items: center; gap: 7px; }
+    .chip.domain-chip .dot, .chip.subject-chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .chip.domain-chip.off, .chip.subject-chip.off { opacity: .38; }
+    .chip.domain-chip.off:hover, .chip.subject-chip.off:hover { opacity: .7; }
+
+    /* View switch */
+    .view-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+    .view-switch button {
+      font-family: var(--font-display);
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--ink-dim);
+      background: transparent;
+      border: none;
+      padding: 6px 16px;
+      cursor: pointer;
+      margin: 0;
+      height: auto;
+      line-height: 1.3;
+      text-transform: none;
+      letter-spacing: .02em;
+      transition: all .15s ease;
+    }
+    .view-switch button:hover { color: var(--gold-soft); background: rgba(255, 204, 51, .08); }
+    .view-switch button.on {
+      color: #0b1a26;
+      background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+      font-weight: 600;
+    }
 
     .cg-search {
       font-family: var(--font-body);
@@ -338,7 +239,7 @@
       border: 1px solid var(--border);
       border-radius: var(--brand-shape-tight);
       padding: 7px 12px;
-      width: 220px;
+      width: 240px;
       outline: none;
       height: auto;
       margin-bottom: 0;
@@ -349,7 +250,121 @@
     .cg-stats { font-size: .85rem; color: var(--ink-dim); margin-left: auto; white-space: nowrap; }
     .cg-stats b { color: var(--gold); }
 
-    /* ---------- Graph ---------- */
+    .cg-hint-inline { font-size: .78rem; color: var(--ink-dim); font-style: italic; opacity: .8; }
+
+    /* ============================================================
+       FLAT TABLE VIEW — the default. Built for scanning.
+       ============================================================ */
+    .cg-table-wrap { padding-bottom: 4rem; }
+
+    .subj-block { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: rgba(10, 19, 28, 0.5); }
+
+    .subj-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--border);
+      transition: background .15s ease;
+    }
+    .subj-head:hover { background: rgba(255, 255, 255, 0.06); }
+    .subj-head .caret { color: var(--ink-dim); font-size: .7rem; width: 12px; transition: transform .2s ease; }
+    .subj-block.collapsed .subj-head .caret { transform: rotate(-90deg); }
+    .subj-head .nm { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+    .subj-head .blurb { color: var(--ink-dim); font-size: .84rem; }
+    .subj-head .ct { margin-left: auto; color: var(--ink-dim); font-size: .82rem; white-space: nowrap; }
+
+    .subj-body { display: block; }
+    .subj-block.collapsed .subj-body { display: none; }
+
+    .dom-head {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px 7px 20px;
+      font-family: var(--font-display);
+      font-size: .74rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      border-top: 1px solid rgba(42, 61, 85, 0.5);
+      background: rgba(0, 0, 0, 0.18);
+    }
+    .dom-head .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .dom-head .ct { margin-left: auto; letter-spacing: 0; text-transform: none; opacity: .75; }
+
+    .crow {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 7px 16px 7px 20px;
+      border-top: 1px solid rgba(42, 61, 85, 0.28);
+      cursor: pointer;
+      transition: background .12s ease;
+    }
+    .crow:hover { background: rgba(255, 204, 51, 0.07); }
+    .crow.sel { background: rgba(255, 204, 51, 0.13); box-shadow: inset 3px 0 0 var(--gold); }
+    .crow.hit .cr-name { color: var(--gold); }
+
+    .cr-star {
+      flex: 0 0 auto;
+      width: 20px;
+      text-align: center;
+      color: #3d5878;
+      font-size: .95rem;
+      cursor: pointer;
+      user-select: none;
+      align-self: center;
+      transition: color .15s ease, transform .1s ease;
+    }
+    .cr-star:hover { color: var(--gold-soft); transform: scale(1.25); }
+    .cr-star.on { color: var(--gold); }
+
+    .cr-main { flex: 1 1 auto; min-width: 0; }
+    .cr-name { font-weight: 500; font-size: .94rem; color: var(--ink); margin-right: 8px; }
+    .cr-desc {
+      color: var(--ink-dim);
+      font-size: .84rem;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    body.dense .cr-desc { display: none; }
+
+    .cr-meta { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; align-self: center; }
+
+    .mini {
+      font-family: var(--font-display);
+      font-size: .68rem;
+      letter-spacing: .04em;
+      color: var(--ink-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      white-space: nowrap;
+    }
+    .mini.lvl { color: var(--gold); border-color: rgba(255, 204, 51, .3); }
+    .mini.grade { color: var(--accent-cyan); border-color: rgba(30, 174, 219, .3); }
+    .mini.draft { color: #fbbf24; border-color: rgba(251, 191, 36, .4); background: rgba(251, 191, 36, .08); }
+    .mini.review { color: #a78bfa; border-color: rgba(167, 139, 250, .4); background: rgba(167, 139, 250, .08); }
+    .mini.deps { color: var(--ink-dim); opacity: .7; border-color: rgba(42, 61, 85, .6); }
+
+    .cg-empty {
+      text-align: center;
+      color: var(--ink-dim);
+      padding: 3rem 1rem;
+      font-size: .95rem;
+    }
+    .cg-empty b { color: var(--ink); }
+
+    /* ============================================================
+       GRAPH VIEW
+       ============================================================ */
     .cg-graph-wrap {
       position: relative;
       width: 100vw;
@@ -364,10 +379,7 @@
       cursor: grab;
       transition: height .35s ease;
     }
-
-    /* When the top panel is collapsed, the graph claims the viewport. */
     body.top-collapsed .cg-graph-wrap { height: calc(100vh - 118px); min-height: 460px; }
-
     .cg-graph-wrap.dragging { cursor: grabbing; }
 
     #graph { width: 100%; height: 100%; display: block; }
@@ -398,9 +410,7 @@
       text-transform: none;
       letter-spacing: 0;
       font-weight: 500;
-      height: 38px;
     }
-
     .cg-zoom button:hover { border-color: var(--gold); color: var(--gold); }
 
     .cg-hint {
@@ -417,25 +427,35 @@
       z-index: 5;
     }
 
+    .cg-toobig {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--ink-dim);
+      background: rgba(10, 19, 28, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      max-width: 30rem;
+      z-index: 7;
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+    .cg-toobig b { color: var(--ink); }
+    .cg-toobig .btn-sm { margin-top: 12px; }
+
     /* SVG nodes */
     .cnode { cursor: pointer; }
-    .cnode rect {
-      fill: #101d2c;
-      stroke-width: 1.3;
-      rx: 8;
-      transition: opacity .2s ease;
-    }
+    .cnode rect { fill: #101d2c; stroke-width: 1.3; rx: 8; transition: opacity .2s ease; }
     .cnode text {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 11.5px;
       fill: var(--ink);
       pointer-events: none;
     }
-    .cnode .lvl {
-      font-size: 9px;
-      fill: var(--ink-dim);
-      letter-spacing: .05em;
-    }
+    .cnode .lvl { font-size: 9px; fill: var(--ink-dim); letter-spacing: .05em; }
     .cnode .planmark { font-size: 11px; fill: var(--gold); font-weight: bold; }
     .cnode:hover rect { filter: brightness(1.45); }
 
@@ -449,26 +469,31 @@
     .cedge.anc { stroke: var(--gold); stroke-width: 2; opacity: .95; }
     .cedge.dec { stroke: var(--accent-cyan); stroke-width: 2; opacity: .95; }
 
-    /* ---------- Detail panel ---------- */
+    /* ============================================================
+       DETAIL PANEL — shared by both views
+       ============================================================ */
     .cg-detail {
-      position: absolute;
-      right: 14px;
-      top: 12px;
-      width: 340px;
-      max-width: calc(100vw - 28px);
-      max-height: calc(100% - 24px);
+      position: fixed;
+      right: 16px;
+      top: 76px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 150px);
       overflow-y: auto;
-      background: rgba(16, 26, 40, 0.94);
+      background: rgba(16, 26, 40, 0.97);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 16px 18px;
-      z-index: 6;
+      z-index: 30;
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
       display: none;
     }
-
     .cg-detail.open { display: block; }
+
+    /* Inside the graph the panel is absolute so it rides with the canvas. */
+    .cg-graph-wrap .cg-detail { position: absolute; right: 14px; top: 12px; max-height: calc(100% - 24px); }
 
     .cg-detail-close {
       position: absolute;
@@ -484,7 +509,6 @@
       height: auto;
       line-height: 1;
     }
-
     .cg-detail-close:hover { color: var(--gold); }
 
     .cg-detail h3 { font-size: 1.12rem; margin: 0 34px 6px 0; line-height: 1.25; }
@@ -500,8 +524,8 @@
       border: 1px solid var(--border);
       color: var(--ink-dim);
     }
-
     .badge.domain { border-width: 1px; font-weight: 600; }
+    .badge.warn { color: #fbbf24; border-color: rgba(251, 191, 36, .45); background: rgba(251, 191, 36, .08); }
 
     .cg-detail p.desc { font-size: .92rem; line-height: 1.5; color: var(--ink); margin-bottom: 12px; }
 
@@ -525,7 +549,6 @@
       padding: 3px 10px;
       cursor: pointer;
     }
-
     .rel-chip:hover { border-color: var(--gold); color: var(--gold-soft); }
     .rel-chip.outside { border-style: dashed; opacity: .65; }
 
@@ -542,6 +565,34 @@
       text-transform: uppercase;
       color: var(--gold);
       margin-right: 6px;
+    }
+
+    .misc-list { list-style: none; margin: 0; padding: 0; }
+    .misc-list li {
+      font-size: .84rem;
+      color: var(--ink-dim);
+      line-height: 1.45;
+      margin-bottom: 5px;
+      padding-left: 18px;
+      position: relative;
+    }
+    .misc-list li::before {
+      content: "\2717";
+      position: absolute;
+      left: 0;
+      color: #f87171;
+      font-size: .8rem;
+    }
+
+    .meta-line { font-size: .78rem; color: var(--ink-dim); line-height: 1.5; }
+    .meta-line b { color: var(--ink); font-weight: 500; }
+    .meta-line code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .74rem;
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 4px;
     }
 
     .cg-detail .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
@@ -562,15 +613,12 @@
       line-height: 1.2;
       text-transform: none;
     }
-
     .btn-sm:hover { border-color: var(--gold); color: var(--gold); }
-
     .btn-sm.primary {
       background: linear-gradient(180deg, var(--gold), var(--gold-deep));
       color: #0b1a26;
       border-color: var(--gold);
     }
-
     .btn-sm.primary:hover { filter: brightness(1.08); color: #0b1a26; }
 
     /* ---------- Curriculum drawer ---------- */
@@ -588,7 +636,6 @@
       transform: translateY(calc(100% - 46px));
       transition: transform .3s ease;
     }
-
     .cg-plan.open { transform: translateY(0); }
 
     .cg-plan-bar {
@@ -601,7 +648,6 @@
       height: 46px;
       box-sizing: border-box;
     }
-
     .cg-plan-bar .title {
       font-family: var(--font-display);
       font-weight: 600;
@@ -609,7 +655,6 @@
       color: var(--gold);
       letter-spacing: .04em;
     }
-
     .cg-plan-bar .count { font-size: .85rem; color: var(--ink-dim); }
     .cg-plan-bar .caret { margin-left: auto; color: var(--ink-dim); font-size: .8rem; }
 
@@ -619,7 +664,6 @@
     .cg-plan-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 
     .plan-list { list-style: none; margin: 0; padding: 0; }
-
     .plan-list li {
       display: flex;
       align-items: center;
@@ -629,7 +673,6 @@
       font-size: .9rem;
       margin-bottom: 0;
     }
-
     .plan-list .dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
     .plan-list .lvl-badge {
       font-family: var(--font-display);
@@ -661,11 +704,13 @@
     .cg-levels { display: flex; flex-wrap: wrap; gap: 14px 26px; margin: 14px 0 2rem; color: var(--ink-dim); font-size: .84rem; }
     .cg-levels span b { color: var(--gold); font-family: var(--font-display); font-weight: 600; margin-right: 5px; }
 
-    .footer-line {
-      text-align: center;
-      color: var(--ink-dim);
-      font-size: .85rem;
-      margin: 2.5rem 0 5rem;
+    .footer-line { text-align: center; color: var(--ink-dim); font-size: .85rem; margin: 2.5rem 0 5rem; }
+    .footer-line a { color: var(--accent-cyan); text-decoration: none; }
+    .footer-line a:hover { color: var(--gold-soft); }
+
+    @media (max-width: 900px) {
+      .cg-detail { position: fixed; left: 10px; right: 10px; top: auto; bottom: 56px; width: auto; max-height: 52vh; }
+      .cg-graph-wrap .cg-detail { position: fixed; }
     }
 
     @media (max-width: 720px) {
@@ -673,18 +718,11 @@
       .cg-top-bar { flex-wrap: wrap; gap: 6px 10px; }
       .cg-graph-wrap { height: 62vh; min-height: 380px; }
       body.top-collapsed .cg-graph-wrap { height: calc(100vh - 132px); }
-      .cg-detail {
-        position: fixed;
-        left: 10px;
-        right: 10px;
-        top: auto;
-        bottom: 56px;
-        width: auto;
-        max-height: 46vh;
-      }
       .cg-stats { margin-left: 0; width: 100%; }
       .cg-search { width: 100%; }
       .cg-label { min-width: 100%; }
+      .cr-desc { display: none; }
+      .subj-head .blurb { display: none; }
     }
   </style>
 </head>
@@ -694,7 +732,7 @@
     <div class="main">
 
       <div class="cg-top-bar" id="cg-top-bar" title="Collapse or expand the controls">
-        <span class="cg-top-title">The Astronomy Concept Graph</span>
+        <span class="cg-top-title">The Concept Map</span>
         <span class="cg-top-summary" id="cg-top-summary"></span>
         <span class="cg-top-toggle" id="cg-top-toggle">&#9650; Hide filters</span>
       </div>
@@ -703,29 +741,43 @@
         <section class="cg-intro">
           <div class="cg-kicker">Curriculum Lab</div>
           <p class="cg-lede">
-            Every concept in practical astronomy, kept <b>as small as possible</b>, connected by
-            <b>prerequisite arrows</b> — a map of what to learn before what. Pick an audience to see its
-            subset, click any concept for its story, tools and activities, and build a
-            <b>lesson sequence</b> you can export for a school, club, or astrophotography group.
+            Every concept in school science and maths, kept <b>as small as possible</b>, connected by
+            <b>prerequisite arrows</b> — a map of what to learn before what. Browse the
+            <b>table</b> to read, switch to the <b>graph</b> to see the dependencies, click any
+            concept for its story, tools and activities, and build a <b>lesson sequence</b> you can
+            export. Adding concepts? See <a href="README.md">the schema</a>.
           </p>
         </section>
 
         <section class="cg-controls">
           <div class="cg-row">
-            <span class="cg-label">Audience</span>
-            <div id="track-chips"></div>
+            <span class="cg-label">View</span>
+            <div class="view-switch">
+              <button id="view-table" class="on">&#9776; Table</button>
+              <button id="view-graph">&#9903; Graph</button>
+            </div>
+            <span class="cg-hint-inline" id="view-hint">Grouped by subject &amp; strand — click a row for detail</span>
+          </div>
+          <div class="cg-row">
+            <span class="cg-label">Subjects</span>
+            <div id="subject-chips"></div>
+          </div>
+          <div class="cg-row hidden" id="domain-row">
+            <span class="cg-label">Strands</span>
+            <div id="domain-chips"></div>
+          </div>
+          <div class="cg-row">
+            <span class="cg-label">Grades</span>
+            <div id="band-chips"></div>
           </div>
           <div class="cg-row">
             <span class="cg-label">Up to level</span>
             <div id="level-chips"></div>
           </div>
           <div class="cg-row">
-            <span class="cg-label">Domains</span>
-            <div id="domain-chips"></div>
-          </div>
-          <div class="cg-row">
             <span class="cg-label">Search</span>
-            <input id="search" class="cg-search" type="text" placeholder="e.g. eclipse, nakshatra, stacking…">
+            <input id="search" class="cg-search" type="text" placeholder="e.g. eclipse, fractions, photosynthesis…">
+            <div id="status-chips"></div>
             <span class="cg-stats" id="stats"></span>
           </div>
         </section>
@@ -733,7 +785,15 @@
     </div>
   </div>
 
-  <div class="cg-graph-wrap" id="graph-wrap">
+  <!-- ---------------- Flat table view ---------------- -->
+  <div class="container" id="table-view">
+    <div class="main">
+      <div class="cg-table-wrap" id="table-wrap"></div>
+    </div>
+  </div>
+
+  <!-- ---------------- Graph view ---------------- -->
+  <div class="cg-graph-wrap" id="graph-wrap" style="display:none">
     <div class="cg-hint">drag to pan &middot; scroll / pinch to zoom &middot; click a concept</div>
     <svg id="graph" xmlns="http://www.w3.org/2000/svg"></svg>
     <div class="cg-zoom">
@@ -741,22 +801,20 @@
       <button id="zoom-out" title="Zoom out">&minus;</button>
       <button id="zoom-fit" title="Fit to screen">&#8635;</button>
     </div>
-
-    <aside class="cg-detail" id="detail">
-      <button class="cg-detail-close" id="detail-close" title="Close">&times;</button>
-      <div id="detail-body"></div>
-    </aside>
   </div>
+
+  <aside class="cg-detail" id="detail">
+    <button class="cg-detail-close" id="detail-close" title="Close">&times;</button>
+    <div id="detail-body"></div>
+  </aside>
 
   <div class="container">
     <div class="main">
-      <div class="cg-levels">
-        <span><b>L1 Spark</b> first wonder, naked eye</span>
-        <span><b>L2 Explorer</b> patterns &amp; simple models</span>
-        <span><b>L3 Observer</b> charts, optics, coordinates</span>
-        <span><b>L4 Practitioner</b> quantitative &amp; instrumental</span>
-        <span><b>L5 Specialist</b> advanced technique</span>
-      </div>
+      <div class="cg-levels" id="levels-legend"></div>
+      <p class="footer-line">
+        A living map — <a href="README.md">README.md</a> explains the schema
+        and how to add concepts from a source document.
+      </p>
     </div>
   </div>
 
@@ -776,170 +834,275 @@
       </div>
       <ol class="plan-list" id="plan-list"></ol>
       <p class="plan-empty" id="plan-empty">Nothing yet — open a concept and press
-        &ldquo;Add to curriculum&rdquo;, or use &ldquo;Add all shown&rdquo; with an audience filter on.
+        &ldquo;Add to curriculum&rdquo;, or use &ldquo;Add all shown&rdquo; with a filter on.
         Prerequisites are pulled in automatically and the list comes out in teaching order.</p>
     </div>
   </div>
 
-  <script src="js/concepts-data.js"></script>
+  <!-- Data: _schema.js MUST come first (it creates window.CONCEPTS). -->
+  <script src="data/_schema.js"></script>
+  <script src="data/astronomy.js"></script>
+  <script src="data/maths.js"></script>
+  <script src="data/physics.js"></script>
+  <script src="data/chemistry.js"></script>
+  <script src="data/biology.js"></script>
+  <script src="data/earth.js"></script>
+  <script src="data/skills.js"></script>
+  <!-- Query layer: normalize, filter, validate, traverse. -->
+  <script src="db.js"></script>
+
   <script>
     (function () {
       "use strict";
 
-      var CONCEPTS = window.CONCEPTS,
-        DOMAINS = window.CONCEPT_DOMAINS,
-        LEVELS = window.CONCEPT_LEVELS,
-        TRACKS = window.CONCEPT_TRACKS,
-        KINDS = window.TOOL_KINDS;
+      var DB = window.ConceptDB;
+      var SUBJECTS = DB.subjects, DOMAINS = DB.domains, LEVELS = DB.levels,
+        BANDS = DB.gradeBands, KINDS = DB.toolKinds, STATUSES = DB.statuses;
 
-      var byId = {}, dependents = {};
-      CONCEPTS.forEach(function (c) { byId[c.id] = c; dependents[c.id] = []; });
-      CONCEPTS.forEach(function (c) {
-        c.prereqs.forEach(function (p) { dependents[p].push(c.id); });
-      });
-
-      // Full-graph depth (longest prerequisite chain) — used for teaching order.
-      var fullDepth = {};
-      function getFullDepth(id) {
-        if (fullDepth[id] != null) return fullDepth[id];
-        var c = byId[id];
-        fullDepth[id] = c.prereqs.length
-          ? 1 + Math.max.apply(null, c.prereqs.map(getFullDepth)) : 0;
-        return fullDepth[id];
-      }
-      CONCEPTS.forEach(function (c) { getFullDepth(c.id); });
-
+      var subjectKeys = Object.keys(SUBJECTS);
       var domainKeys = Object.keys(DOMAINS);
+      var bandKeys = Object.keys(BANDS);
+
+      // Above this many nodes the DAG layout stops being readable (and
+      // starts being slow). We refuse to draw it and point at the table.
+      var GRAPH_LIMIT = 220;
 
       // ---------------- State ----------------
       var state = {
-        track: null,            // null = all
+        view: "table",
+        subjects: {},         // key -> bool
+        domains: {},          // key -> bool  (only meaningful when 1 subject on)
+        bands: {},            // key -> bool; "none" = off-syllabus concepts
         maxLevel: 5,
-        domains: {},            // key -> bool
+        showDrafts: true,
         search: "",
         selected: null,
-        plan: []                // ordered ids
+        plan: [],
+        collapsed: {}         // subject key -> bool
       };
+      subjectKeys.forEach(function (k) { state.subjects[k] = true; });
       domainKeys.forEach(function (k) { state.domains[k] = true; });
+      bandKeys.concat("none").forEach(function (k) { state.bands[k] = true; });
 
       try {
         var saved = JSON.parse(localStorage.getItem("aryabhat-concept-plan") || "[]");
-        state.plan = saved.filter(function (id) { return byId[id]; });
+        state.plan = saved.filter(function (id) { return DB.byId(id); });
       } catch (e) { state.plan = []; }
 
-      // hash: #track=club or #c=moon-phases
+      // hash: #c=moon-phases · #subject=maths · #view=graph
       (function readHash() {
-        var m = location.hash.match(/track=([\w-]+)/);
-        if (m && TRACKS[m[1]]) state.track = m[1];
         var c = location.hash.match(/c=([\w-]+)/);
-        if (c && byId[c[1]]) state.selected = c[1];
+        if (c && DB.byId(c[1])) state.selected = c[1];
+        var s = location.hash.match(/subject=([\w-]+)/);
+        if (s && SUBJECTS[s[1]]) {
+          subjectKeys.forEach(function (k) { state.subjects[k] = false; });
+          state.subjects[s[1]] = true;
+        }
+        if (/view=graph/.test(location.hash)) state.view = "graph";
       })();
 
-      // ---------------- Helpers ----------------
-      function ancestorsOf(id) {
-        var out = {}, stack = byId[id].prereqs.slice();
-        while (stack.length) {
-          var n = stack.pop();
-          if (out[n]) continue;
-          out[n] = true;
-          byId[n].prereqs.forEach(function (p) { stack.push(p); });
-        }
-        return out;
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
 
-      function descendantsOf(id) {
-        var out = {}, stack = dependents[id].slice();
-        while (stack.length) {
-          var n = stack.pop();
-          if (out[n]) continue;
-          out[n] = true;
-          dependents[n].forEach(function (d) { stack.push(d); });
-        }
-        return out;
+      function onSubjects() { return subjectKeys.filter(function (k) { return state.subjects[k]; }); }
+
+      // Colour by subject normally; drill into strand colours once the
+      // user has narrowed to a single subject (44 domain hues are not
+      // legible side by side, 7 subject hues are).
+      function colorOf(c) {
+        var single = onSubjects().length === 1;
+        var d = DOMAINS[c.domain], s = SUBJECTS[c.subject];
+        return single ? (d ? d.color : "#888") : (s ? s.color : "#888");
       }
 
-      function matchesFilter(c) {
-        if (state.track && c.tracks.indexOf(state.track) === -1) return false;
-        if (c.level > state.maxLevel) return false;
-        if (!state.domains[c.domain]) return false;
-        return true;
-      }
+      // ---------------- Filtering ----------------
+      function bandOf(c) { return c.grades.length ? c.bands : ["none"]; }
 
-      function teachingSort(ids) {
-        return ids.slice().sort(function (a, b) {
-          var d = fullDepth[a] - fullDepth[b];
-          if (d) return d;
-          var l = byId[a].level - byId[b].level;
-          if (l) return l;
-          var dm = domainKeys.indexOf(byId[a].domain) - domainKeys.indexOf(byId[b].domain);
-          if (dm) return dm;
-          return byId[a].name < byId[b].name ? -1 : 1;
+      function visibleConcepts() {
+        var subs = onSubjects();
+        var single = subs.length === 1;
+        var doms = single
+          ? domainKeys.filter(function (k) { return DOMAINS[k].subject === subs[0] && state.domains[k]; })
+          : null;
+        var list = DB.filter({
+          subjects: subs,
+          domains: doms,
+          maxLevel: state.maxLevel,
+          status: state.showDrafts ? null : ["published"],
+          search: state.search
+        });
+        // Grade bands are an OR across the chips, with "none" standing in
+        // for deliberately off-syllabus concepts (empty `grades`).
+        return list.filter(function (c) {
+          return bandOf(c).some(function (b) { return state.bands[b]; });
         });
       }
 
-      // ---------------- Layout ----------------
+      var visible = [], visibleSet = {};
+      function recomputeVisible() {
+        visible = visibleConcepts();
+        visibleSet = {};
+        visible.forEach(function (c) { visibleSet[c.id] = true; });
+      }
+
+      // ---------------- Flat table ----------------
+      function renderTable() {
+        var wrap = document.getElementById("table-wrap");
+        if (!visible.length) {
+          wrap.innerHTML = '<div class="cg-empty">No concepts match these filters.<br>' +
+            '<b>Widen the level, grade or subject chips</b>, or clear the search.</div>';
+          return;
+        }
+
+        var q = DB.normText(state.search);
+
+        // subject -> domain -> [concepts], each in teaching order so a
+        // strand reads top-to-bottom as a sequence rather than a jumble.
+        var tree = {};
+        visible.forEach(function (c) {
+          ((tree[c.subject] = tree[c.subject] || {})[c.domain] =
+            tree[c.subject][c.domain] || []).push(c);
+        });
+
+        var html = "";
+        subjectKeys.forEach(function (sk) {
+          var doms = tree[sk];
+          if (!doms) return;
+          var s = SUBJECTS[sk];
+          var total = 0;
+          Object.keys(doms).forEach(function (d) { total += doms[d].length; });
+          var isCol = !!state.collapsed[sk];
+
+          html += '<div class="subj-block' + (isCol ? " collapsed" : "") + '" data-subject="' + sk + '">';
+          html += '<div class="subj-head" style="border-left-color:' + s.color + '">' +
+            '<span class="caret">&#9660;</span>' +
+            '<span class="dot" style="width:11px;height:11px;border-radius:50%;background:' + s.color + '"></span>' +
+            '<span class="nm">' + esc(s.name) + "</span>" +
+            '<span class="blurb">' + esc(s.blurb || "") + "</span>" +
+            '<span class="ct">' + total + " concepts</span>" +
+            "</div>";
+          html += '<div class="subj-body">';
+
+          domainKeys.forEach(function (dk) {
+            var list = doms[dk];
+            if (!list) return;
+            var d = DOMAINS[dk];
+            html += '<div class="dom-head">' +
+              '<span class="dot" style="background:' + d.color + '"></span>' +
+              esc(d.name) +
+              '<span class="ct">' + list.length + "</span></div>";
+
+            var ordered = DB.teachingSort(list.map(function (c) { return c.id; }))
+              .map(function (id) { return DB.byId(id); });
+
+            ordered.forEach(function (c) {
+              var inPlan = state.plan.indexOf(c.id) !== -1;
+              var hit = q && DB.normText(c.name + " " + c.aliases.join(" ")).indexOf(q) !== -1;
+              var deps = DB.dependentsOf(c.id).length;
+              html += '<div class="crow' + (state.selected === c.id ? " sel" : "") +
+                (hit ? " hit" : "") + '" data-id="' + c.id + '">';
+              html += '<span class="cr-star' + (inPlan ? " on" : "") +
+                '" data-star="' + c.id + '" title="' +
+                (inPlan ? "Remove from curriculum" : "Add to curriculum (pulls in prerequisites)") +
+                '">' + (inPlan ? "★" : "☆") + "</span>";
+              html += '<span class="cr-main">' +
+                '<span class="cr-name">' + esc(c.name) + "</span>" +
+                '<span class="cr-desc">' + esc(c.desc) + "</span></span>";
+              html += '<span class="cr-meta">';
+              if (c.prereqs.length) html += '<span class="mini deps" title="' + c.prereqs.length + ' prerequisite' + (c.prereqs.length > 1 ? "s" : "") + '">&#8592;' + c.prereqs.length + "</span>";
+              if (deps) html += '<span class="mini deps" title="unlocks ' + deps + ' concept' + (deps > 1 ? "s" : "") + '">' + deps + "&#8594;</span>";
+              html += '<span class="mini grade">' + gradeLabel(c) + "</span>";
+              html += '<span class="mini lvl">L' + c.level + "</span>";
+              if (c.status !== "published") html += '<span class="mini ' + c.status + '">' + c.status + "</span>";
+              html += "</span></div>";
+            });
+          });
+          html += "</div></div>";
+        });
+        wrap.innerHTML = html;
+
+        wrap.querySelectorAll(".subj-head").forEach(function (h) {
+          h.addEventListener("click", function () {
+            var k = h.parentNode.getAttribute("data-subject");
+            state.collapsed[k] = !state.collapsed[k];
+            h.parentNode.classList.toggle("collapsed", state.collapsed[k]);
+          });
+        });
+        wrap.querySelectorAll(".crow").forEach(function (r) {
+          r.addEventListener("click", function (ev) {
+            if (ev.target.hasAttribute("data-star")) return;
+            selectNode(r.getAttribute("data-id"));
+          });
+        });
+        wrap.querySelectorAll("[data-star]").forEach(function (s) {
+          s.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            var id = s.getAttribute("data-star");
+            if (state.plan.indexOf(id) !== -1) planRemove(id); else planAdd(id);
+          });
+        });
+      }
+
+      // "Class 6–8" / "Class 6, 9" / "off-syllabus" — compact and honest.
+      function gradeLabel(c) {
+        var g = c.grades;
+        if (!g.length) return "off-syl";
+        if (g.length === 1) return "Class " + g[0];
+        var contiguous = g.every(function (v, i) { return i === 0 || v === g[i - 1] + 1; });
+        if (contiguous) return "Class " + g[0] + "–" + g[g.length - 1];
+        return "Class " + g.join(",");
+      }
+
+      // ---------------- Graph layout ----------------
       var NODE_W = 168, NODE_H = 42, COL_GAP = 84, ROW_GAP = 13;
-      var layout = {};   // id -> {x, y}
-      var visibleIds = [];
-      var contentW = 0, contentH = 0;
+      var layout = {}, contentW = 0, contentH = 0;
 
       function computeLayout() {
-        var visible = CONCEPTS.filter(matchesFilter);
-        visibleIds = visible.map(function (c) { return c.id; });
-        var vset = {};
-        visibleIds.forEach(function (id) { vset[id] = true; });
+        var ids = visible.map(function (c) { return c.id; });
 
-        // depth within the induced subgraph, so filtered views stay compact
+        // Depth within the induced subgraph, so a filtered view stays
+        // compact instead of inheriting the full graph's 14-deep spine.
         var depth = {};
         function d(id) {
           if (depth[id] != null) return depth[id];
-          depth[id] = 0; // guard (DAG, but be safe)
-          var ps = byId[id].prereqs.filter(function (p) { return vset[p]; });
+          depth[id] = 0;
+          var ps = DB.byId(id).prereqs.filter(function (p) { return visibleSet[p]; });
           depth[id] = ps.length ? 1 + Math.max.apply(null, ps.map(d)) : 0;
           return depth[id];
         }
-        visibleIds.forEach(d);
+        ids.forEach(d);
 
         var cols = [];
-        visibleIds.forEach(function (id) {
-          var k = depth[id];
-          (cols[k] = cols[k] || []).push(id);
-        });
+        ids.forEach(function (id) { (cols[depth[id]] = cols[depth[id]] || []).push(id); });
 
-        // initial order: domain, then level, then name
         cols.forEach(function (col) {
           col.sort(function (a, b) {
-            var dm = domainKeys.indexOf(byId[a].domain) - domainKeys.indexOf(byId[b].domain);
-            if (dm) return dm;
-            var l = byId[a].level - byId[b].level;
-            if (l) return l;
-            return byId[a].name < byId[b].name ? -1 : 1;
+            var A = DB.byId(a), B = DB.byId(b);
+            return (subjectKeys.indexOf(A.subject) - subjectKeys.indexOf(B.subject)) ||
+              (domainKeys.indexOf(A.domain) - domainKeys.indexOf(B.domain)) ||
+              (A.level - B.level) || (A.name < B.name ? -1 : 1);
           });
         });
 
-        // barycenter sweeps to reduce crossings
+        // Barycentre sweeps to cut edge crossings.
         var pos = {};
-        function reindex() {
-          cols.forEach(function (col) {
-            col.forEach(function (id, i) { pos[id] = i; });
-          });
-        }
+        function reindex() { cols.forEach(function (col) { col.forEach(function (id, i) { pos[id] = i; }); }); }
         reindex();
         for (var sweep = 0; sweep < 4; sweep++) {
           var leftToRight = sweep % 2 === 0;
-          cols.forEach(function (col) {
-            col.sort(function (a, b) { return bary(a) - bary(b); });
-          });
-          reindex();
-          function bary(id) {
+          var bary = function (id) {
             var nbrs = leftToRight
-              ? byId[id].prereqs.filter(function (p) { return vset[p]; })
-              : dependents[id].filter(function (q) { return vset[q]; });
+              ? DB.byId(id).prereqs.filter(function (p) { return visibleSet[p]; })
+              : DB.dependentsOf(id).filter(function (q) { return visibleSet[q]; });
             if (!nbrs.length) return pos[id];
             var s = 0;
             nbrs.forEach(function (n) { s += pos[n]; });
             return s / nbrs.length;
-          }
+          };
+          cols.forEach(function (col) { col.sort(function (a, b) { return bary(a) - bary(b); }); });
+          reindex();
         }
 
         var maxRows = 0;
@@ -952,10 +1115,7 @@
           var colH = col.length * (NODE_H + ROW_GAP);
           var y0 = (contentH - colH) / 2;
           col.forEach(function (id, ri) {
-            layout[id] = {
-              x: 40 + ci * (NODE_W + COL_GAP),
-              y: 30 + y0 + ri * (NODE_H + ROW_GAP)
-            };
+            layout[id] = { x: 40 + ci * (NODE_W + COL_GAP), y: 30 + y0 + ri * (NODE_H + ROW_GAP) };
           });
         });
         contentW += 80;
@@ -965,10 +1125,9 @@
       // ---------------- SVG render ----------------
       var svg = document.getElementById("graph");
       var SVGNS = "http://www.w3.org/2000/svg";
-      var vp;   // viewport <g>
-      var view = { x: 0, y: 0, s: 1 };
-      var dragMoved = false;   // set while a real pan/pinch is happening,
-                               // so a drag never counts as a node click
+      var vp, view = { x: 0, y: 0, s: 1 };
+      var dragMoved = false;
+      var nodeEls = {}, edgeEls = [];
 
       function el(name, attrs, parent) {
         var e = document.createElementNS(SVGNS, name);
@@ -989,38 +1148,54 @@
       }
 
       function applyView() {
-        vp.setAttribute("transform",
+        if (vp) vp.setAttribute("transform",
           "translate(" + view.x + "," + view.y + ") scale(" + view.s + ")");
       }
 
       function fitView() {
         var wrap = document.getElementById("graph-wrap");
+        if (!wrap.clientWidth || !contentW) return;
         var w = wrap.clientWidth, h = wrap.clientHeight;
         var s = Math.min(w / contentW, h / contentH, 1.1);
-        s = Math.max(s, 0.12);
-        view.s = s;
-        view.x = (w - contentW * s) / 2;
-        view.y = (h - contentH * s) / 2;
+        view.s = Math.max(s, 0.12);
+        view.x = (w - contentW * view.s) / 2;
+        view.y = (h - contentH * view.s) / 2;
         applyView();
       }
 
-      var nodeEls = {}, edgeEls = [];
-
       function renderGraph() {
-        computeLayout();
+        var wrap = document.getElementById("graph-wrap");
+        var old = wrap.querySelector(".cg-toobig");
+        if (old) old.remove();
         svg.innerHTML = "";
         nodeEls = {}; edgeEls = [];
+
+        if (!visible.length) {
+          wrap.insertAdjacentHTML("beforeend",
+            '<div class="cg-toobig">No concepts match these filters.<br>' +
+            '<b>Widen the level, grade or subject chips.</b></div>');
+          return;
+        }
+        // A 450-node DAG is a hairball, not a diagram. Say so plainly and
+        // send people to the view that actually answers their question.
+        if (visible.length > GRAPH_LIMIT) {
+          wrap.insertAdjacentHTML("beforeend",
+            '<div class="cg-toobig"><b>' + visible.length + ' concepts is too many to draw legibly.</b><br>' +
+            'The graph earns its keep on a focused slice — pick one subject, a grade band, ' +
+            'or a lower level cap, and it will appear.<br>' +
+            '<button class="btn-sm primary" id="toobig-table">&#9776; Browse the table instead</button></div>');
+          document.getElementById("toobig-table").addEventListener("click", function () { setView("table"); });
+          return;
+        }
+
+        computeLayout();
         vp = el("g", {}, svg);
 
-        var vset = {};
-        visibleIds.forEach(function (id) { vset[id] = true; });
-
-        // edges first (under nodes)
         var edgeLayer = el("g", {}, vp);
-        visibleIds.forEach(function (id) {
-          byId[id].prereqs.forEach(function (p) {
-            if (!vset[p]) return;
-            var a = layout[p], b = layout[id];
+        visible.forEach(function (c) {
+          c.prereqs.forEach(function (p) {
+            if (!visibleSet[p]) return;
+            var a = layout[p], b = layout[c.id];
             var x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2;
             var x2 = b.x, y2 = b.y + NODE_H / 2;
             var mx = (x1 + x2) / 2;
@@ -1028,62 +1203,58 @@
               d: "M" + x1 + "," + y1 + " C" + mx + "," + y1 + " " + mx + "," + y2 + " " + x2 + "," + y2,
               "class": "cedge"
             }, edgeLayer);
-            edgeEls.push({ from: p, to: id, el: path });
+            edgeEls.push({ from: p, to: c.id, el: path });
           });
         });
 
         var nodeLayer = el("g", {}, vp);
-        visibleIds.forEach(function (id) {
-          var c = byId[id], p = layout[id];
+        visible.forEach(function (c) {
+          var p = layout[c.id];
           var g = el("g", { "class": "cnode", transform: "translate(" + p.x + "," + p.y + ")" }, nodeLayer);
-          var color = DOMAINS[c.domain].color;
-          el("rect", { width: NODE_W, height: NODE_H, rx: 8, stroke: color }, g);
+          el("rect", { width: NODE_W, height: NODE_H, rx: 8, stroke: colorOf(c) }, g);
           var lines = splitName(c.name);
-          if (lines.length === 1) {
-            el("text", { x: 10, y: 26 }, g).textContent = lines[0];
-          } else {
+          if (lines.length === 1) el("text", { x: 10, y: 26 }, g).textContent = lines[0];
+          else {
             el("text", { x: 10, y: 18 }, g).textContent = lines[0];
             el("text", { x: 10, y: 33 }, g).textContent = lines[1];
           }
-          var lvl = el("text", { x: NODE_W - 8, y: 13, "text-anchor": "end", "class": "lvl" }, g);
-          lvl.textContent = "L" + c.level;
-          if (state.plan.indexOf(id) !== -1) {
+          el("text", { x: NODE_W - 8, y: 13, "text-anchor": "end", "class": "lvl" }, g)
+            .textContent = "L" + c.level;
+          if (state.plan.indexOf(c.id) !== -1) {
             el("text", { x: NODE_W - 8, y: NODE_H - 7, "text-anchor": "end", "class": "planmark" }, g)
               .textContent = "★";
           }
-          var t = el("title", {}, g);
-          t.textContent = c.name + " — " + c.desc;
+          el("title", {}, g).textContent = c.name + " — " + c.desc;
           g.addEventListener("click", function (ev) {
             ev.stopPropagation();
             if (dragMoved) return;
-            selectNode(id);
+            selectNode(c.id);
           });
-          nodeEls[id] = g;
+          nodeEls[c.id] = g;
         });
 
         fitView();
         updateHighlights();
-        updateStats();
       }
 
       function updateHighlights() {
+        if (state.view !== "graph") return;
         var sel = state.selected;
-        var anc = sel ? ancestorsOf(sel) : {};
-        var dec = sel ? descendantsOf(sel) : {};
-        var q = state.search.trim().toLowerCase();
+        var anc = sel ? DB.ancestorsOf(sel) : {};
+        var dec = sel ? DB.descendantsOf(sel) : {};
+        var q = DB.normText(state.search);
 
-        visibleIds.forEach(function (id) {
-          var g = nodeEls[id];
+        visible.forEach(function (c) {
+          var g = nodeEls[c.id];
           if (!g) return;
           var cls = "cnode";
           if (sel) {
-            if (id === sel) cls += " sel";
-            else if (anc[id]) cls += " anc";
-            else if (dec[id]) cls += " dec";
+            if (c.id === sel) cls += " sel";
+            else if (anc[c.id]) cls += " anc";
+            else if (dec[c.id]) cls += " dec";
             else cls += " dim";
           }
-          if (q && (byId[id].name.toLowerCase().indexOf(q) !== -1 ||
-            byId[id].desc.toLowerCase().indexOf(q) !== -1)) cls += " hit";
+          if (q && DB.normText(c.name + " " + c.aliases.join(" ")).indexOf(q) !== -1) cls += " hit";
           g.setAttribute("class", cls);
         });
 
@@ -1100,49 +1271,64 @@
         });
       }
 
+      // ---------------- Stats / summary ----------------
       function updateStats() {
-        var edges = edgeEls.length;
+        var edges = 0;
+        visible.forEach(function (c) {
+          c.prereqs.forEach(function (p) { if (visibleSet[p]) edges++; });
+        });
         document.getElementById("stats").innerHTML =
-          "<b>" + visibleIds.length + "</b> of " + CONCEPTS.length + " concepts &middot; " + edges + " links";
-        updateTopSummary();
-      }
+          "<b>" + visible.length + "</b> of " + DB.all.length + " concepts &middot; " + edges + " links";
 
-      // Compact filter summary shown in the sticky bar when collapsed.
-      function updateTopSummary() {
         var parts = [];
-        parts.push(state.track ? TRACKS[state.track].name : "All audiences");
+        var subs = onSubjects();
+        parts.push(subs.length === subjectKeys.length ? "All subjects"
+          : subs.length === 1 ? SUBJECTS[subs[0]].name : subs.length + " subjects");
+        var bands = bandKeys.concat("none").filter(function (b) { return state.bands[b]; });
+        if (bands.length < bandKeys.length + 1) parts.push(bands.length + " grade bands");
         parts.push("to L" + state.maxLevel);
-        var offDomains = domainKeys.filter(function (k) { return !state.domains[k]; }).length;
-        if (offDomains) parts.push((domainKeys.length - offDomains) + "/" + domainKeys.length + " domains");
-        parts.push(visibleIds.length + " concepts");
-        var el = document.getElementById("cg-top-summary");
-        if (el) el.textContent = parts.join("  ·  ");
+        parts.push(visible.length + " concepts");
+        document.getElementById("cg-top-summary").textContent = parts.join("  ·  ");
       }
 
-      // ---------------- Selection / detail panel ----------------
+      // ---------------- Selection / detail ----------------
       function selectNode(id) {
         state.selected = id;
-        updateHighlights();
+        if (state.view === "table") {
+          document.querySelectorAll(".crow.sel").forEach(function (r) { r.classList.remove("sel"); });
+          var row = document.querySelector('.crow[data-id="' + id + '"]');
+          if (row) row.classList.add("sel");
+        } else updateHighlights();
         renderDetail();
       }
 
       function clearSelection() {
         state.selected = null;
         document.getElementById("detail").classList.remove("open");
+        document.querySelectorAll(".crow.sel").forEach(function (r) { r.classList.remove("sel"); });
         updateHighlights();
       }
 
-      function esc(s) {
-        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      function relChips(ids, label) {
+        if (!ids.length) return "";
+        var h = "<h4>" + label + "</h4><div class='rel-chips'>";
+        ids.forEach(function (p) {
+          var c = DB.byId(p);
+          if (!c) return;
+          var outside = !visibleSet[p];
+          h += '<span class="rel-chip' + (outside ? " outside" : "") + '" data-id="' + p + '"' +
+            (outside ? ' title="outside current filter"' : "") + ">" + esc(c.name) + "</span>";
+        });
+        return h + "</div>";
       }
 
       function renderDetail() {
         var id = state.selected;
         if (!id) return;
-        var c = byId[id];
-        var color = DOMAINS[c.domain].color;
+        var c = DB.byId(id);
+        var color = colorOf(c);
         var inPlan = state.plan.indexOf(id) !== -1;
-        var missingPre = Object.keys(ancestorsOf(id)).filter(function (p) {
+        var missingPre = Object.keys(DB.ancestorsOf(id)).filter(function (p) {
           return state.plan.indexOf(p) === -1;
         }).length;
 
@@ -1151,40 +1337,25 @@
         html += '<span class="badge domain" style="color:' + color + ';border-color:' + color + '55">' +
           esc(DOMAINS[c.domain].name) + "</span>";
         html += '<span class="badge">L' + c.level + " · " + esc(LEVELS[c.level].name) + "</span>";
-        c.tracks.forEach(function (t) {
-          html += '<span class="badge">' + esc(TRACKS[t].name) + "</span>";
-        });
+        html += '<span class="badge">' + esc(gradeLabel(c)) + "</span>";
+        if (c.status !== "published") {
+          html += '<span class="badge warn">' + esc(STATUSES[c.status].name) + "</span>";
+        }
         html += "</div>";
         html += '<p class="desc">' + esc(c.desc) + "</p>";
 
-        if (c.prereqs.length) {
-          html += "<h4>Learn first</h4><div class='rel-chips'>";
-          c.prereqs.forEach(function (p) {
-            var outside = visibleIds.indexOf(p) === -1;
-            html += '<span class="rel-chip' + (outside ? " outside" : "") +
-              '" data-id="' + p + '"' +
-              (outside ? ' title="outside current filter"' : "") + ">" +
-              esc(byId[p].name) + "</span>";
-          });
-          html += "</div>";
-        } else {
-          html += "<h4>Learn first</h4><div class='rel-chips'><span class='badge'>Nothing — a starting point</span></div>";
+        html += c.prereqs.length ? relChips(c.prereqs, "Learn first")
+          : "<h4>Learn first</h4><div class='rel-chips'><span class='badge'>Nothing — a starting point</span></div>";
+        html += relChips(DB.dependentsOf(id), "Unlocks");
+        html += relChips(c.related, "Related");
+
+        if (c.misconceptions.length) {
+          html += "<h4>Common misconceptions</h4><ul class='misc-list'>";
+          c.misconceptions.forEach(function (m) { html += "<li>" + esc(m) + "</li>"; });
+          html += "</ul>";
         }
 
-        var deps = dependents[id];
-        if (deps.length) {
-          html += "<h4>Unlocks</h4><div class='rel-chips'>";
-          deps.forEach(function (q) {
-            var outside = visibleIds.indexOf(q) === -1;
-            html += '<span class="rel-chip' + (outside ? " outside" : "") +
-              '" data-id="' + q + '"' +
-              (outside ? ' title="outside current filter"' : "") + ">" +
-              esc(byId[q].name) + "</span>";
-          });
-          html += "</div>";
-        }
-
-        if (c.tools && c.tools.length) {
+        if (c.tools.length) {
           html += "<h4>Tools &amp; activities</h4><ul class='tool-list'>";
           c.tools.forEach(function (t) {
             var kind = KINDS[t.k];
@@ -1193,21 +1364,29 @@
             var labelHtml = "<b>" + esc(t.label) + "</b>";
             if (href) {
               var ext = /^https?:/i.test(href) ? ' target="_blank" rel="noopener"' : "";
-              html += '<li><a href="' + href + '"' + ext + ">" + kindSpan + labelHtml + "</a></li>";
-            } else {
-              html += "<li>" + kindSpan + labelHtml + "</li>";
-            }
+              html += '<li><a href="' + esc(href) + '"' + ext + ">" + kindSpan + labelHtml + "</a></li>";
+            } else html += "<li>" + kindSpan + labelHtml + "</li>";
           });
           html += "</ul>";
         }
 
-        html += '<div class="actions">';
-        if (inPlan) {
-          html += '<button class="btn-sm" id="plan-remove-btn">&#10005; Remove from curriculum</button>';
-        } else {
-          html += '<button class="btn-sm primary" id="plan-add-btn">&#9733; Add to curriculum' +
-            (missingPre ? " (+" + missingPre + " prereqs)" : "") + "</button>";
+        if (c.syllabusRefs.length || c.aliases.length || c.sources.length) {
+          html += "<h4>Reference</h4><div class='meta-line'>";
+          if (c.syllabusRefs.length) {
+            html += "<b>Syllabus:</b> " + c.syllabusRefs.map(function (r) {
+              return "<code>" + esc(r) + "</code>";
+            }).join(" ") + "<br>";
+          }
+          if (c.aliases.length) html += "<b>Also called:</b> " + esc(c.aliases.join(", ")) + "<br>";
+          if (c.sources.length) html += "<b>Mapped from:</b> " + esc(c.sources.join(", ")) + "<br>";
+          html += "<b>id:</b> <code>" + esc(c.id) + "</code></div>";
         }
+
+        html += '<div class="actions">';
+        html += inPlan
+          ? '<button class="btn-sm" id="plan-remove-btn">✕ Remove from curriculum</button>'
+          : '<button class="btn-sm primary" id="plan-add-btn">★ Add to curriculum' +
+            (missingPre ? " (+" + missingPre + " prereqs)" : "") + "</button>";
         html += "</div>";
 
         var body = document.getElementById("detail-body");
@@ -1218,26 +1397,26 @@
           chip.addEventListener("click", function () { selectNode(chip.getAttribute("data-id")); });
         });
         var addBtn = document.getElementById("plan-add-btn");
-        if (addBtn) addBtn.addEventListener("click", function () { planAdd(id); renderDetail(); });
+        if (addBtn) addBtn.addEventListener("click", function () { planAdd(id); });
         var rmBtn = document.getElementById("plan-remove-btn");
-        if (rmBtn) rmBtn.addEventListener("click", function () { planRemove(id); renderDetail(); });
+        if (rmBtn) rmBtn.addEventListener("click", function () { planRemove(id); });
       }
 
       // ---------------- Curriculum plan ----------------
       function planSave() {
-        localStorage.setItem("aryabhat-concept-plan", JSON.stringify(state.plan));
+        try { localStorage.setItem("aryabhat-concept-plan", JSON.stringify(state.plan)); } catch (e) {}
         renderPlan();
-        renderGraph(); // refresh ★ marks
+        if (state.view === "table") renderTable(); else renderGraph();
         if (state.selected) renderDetail();
       }
 
       function planAdd(id) {
-        var toAdd = Object.keys(ancestorsOf(id));
+        // Adding a concept silently adds everything it depends on —
+        // a plan with a hole in it is not a teachable sequence.
+        var toAdd = Object.keys(DB.ancestorsOf(id));
         toAdd.push(id);
-        toAdd.forEach(function (n) {
-          if (state.plan.indexOf(n) === -1) state.plan.push(n);
-        });
-        state.plan = teachingSort(state.plan);
+        toAdd.forEach(function (n) { if (state.plan.indexOf(n) === -1) state.plan.push(n); });
+        state.plan = DB.teachingSort(state.plan);
         planSave();
       }
 
@@ -1248,14 +1427,14 @@
 
       function renderPlan() {
         var list = document.getElementById("plan-list");
-        var ordered = teachingSort(state.plan);
+        var ordered = DB.teachingSort(state.plan);
         document.getElementById("plan-count").textContent = ordered.length + " concepts";
         document.getElementById("plan-empty").style.display = ordered.length ? "none" : "block";
         list.innerHTML = "";
         ordered.forEach(function (id) {
-          var c = byId[id];
+          var c = DB.byId(id);
           var li = document.createElement("li");
-          li.innerHTML = '<span class="dot" style="background:' + DOMAINS[c.domain].color + '"></span>' +
+          li.innerHTML = '<span class="dot" style="background:' + colorOf(c) + '"></span>' +
             '<span class="lvl-badge">L' + c.level + "</span>" +
             '<span class="nm">' + esc(c.name) + "</span>" +
             '<button class="rm" title="Remove">&times;</button>';
@@ -1266,16 +1445,18 @@
       }
 
       function planMarkdown() {
-        var ordered = teachingSort(state.plan);
-        var name = state.track ? TRACKS[state.track].name : "Astronomy";
+        var ordered = DB.teachingSort(state.plan);
+        var subs = onSubjects();
+        var name = subs.length === 1 ? SUBJECTS[subs[0]].name : "Science & Maths";
         var md = "# " + name + " — concept sequence\n";
         md += "_" + ordered.length + " concepts in teaching order (prerequisites always come first). " +
-          "Generated from the Astronomy Concept Graph — aryabhat.org/concepts.html_\n\n";
+          "Generated from the Aryabhat Concept Map — aryabhat.org/concepts/_\n\n";
         ordered.forEach(function (id, i) {
-          var c = byId[id];
-          md += (i + 1) + ". **" + c.name + "** · L" + c.level + " · " + DOMAINS[c.domain].name + "\n";
+          var c = DB.byId(id);
+          md += (i + 1) + ". **" + c.name + "** · L" + c.level + " · " +
+            DOMAINS[c.domain].name + (c.grades.length ? " · " + gradeLabel(c) : "") + "\n";
           md += "   " + c.desc + "\n";
-          if (c.tools && c.tools.length) {
+          if (c.tools.length) {
             md += "   *Try:* " + c.tools.map(function (t) {
               var s = KINDS[t.k].name + " — " + t.label;
               var href = t.url || KINDS[t.k].url;
@@ -1288,79 +1469,124 @@
         return md;
       }
 
-      // ---------------- Filter UI ----------------
-      function chipRow(containerId, items, isOn, onClick) {
+      // ---------------- Controls ----------------
+      function chipRow(containerId, items, onClick) {
         var box = document.getElementById(containerId);
         box.innerHTML = "";
         items.forEach(function (it) {
           var b = document.createElement("button");
-          b.className = "chip" + (isOn(it) ? " on" : "") + (it.cls ? " " + it.cls : "");
+          b.className = "chip" + (it.on ? " on" : "") + (it.cls ? " " + it.cls : "");
           b.innerHTML = it.html;
+          if (it.title) b.title = it.title;
           b.addEventListener("click", function () { onClick(it); });
           box.appendChild(b);
         });
       }
 
       function renderControls() {
-        var trackItems = [{ key: null, html: "All concepts" }].concat(
-          Object.keys(TRACKS).map(function (k) { return { key: k, html: TRACKS[k].name }; }));
-        chipRow("track-chips", trackItems,
-          function (it) { return state.track === it.key; },
-          function (it) {
-            state.track = it.key;
-            location.hash = it.key ? "track=" + it.key : "";
-            clearSelection();
-            renderControls();
-            renderGraph();
-          });
+        var subs = onSubjects();
 
-        var levelItems = [1, 2, 3, 4, 5].map(function (l) {
-          return { key: l, html: "L" + l + " " + LEVELS[l].name };
-        });
-        chipRow("level-chips", levelItems,
-          function (it) { return it.key <= state.maxLevel; },
-          function (it) {
-            state.maxLevel = it.key;
-            clearSelection();
-            renderControls();
-            renderGraph();
-          });
-
-        var domainItems = domainKeys.map(function (k) {
+        chipRow("subject-chips", subjectKeys.map(function (k) {
           return {
-            key: k, cls: "domain-chip" + (state.domains[k] ? "" : " off"),
-            html: '<span class="dot" style="background:' + DOMAINS[k].color + '"></span>' + DOMAINS[k].name
+            key: k,
+            cls: "subject-chip" + (state.subjects[k] ? "" : " off"),
+            html: '<span class="dot" style="background:' + SUBJECTS[k].color + '"></span>' + esc(SUBJECTS[k].name),
+            title: SUBJECTS[k].blurb || ""
           };
+        }), function (it) {
+          state.subjects[it.key] = !state.subjects[it.key];
+          if (!onSubjects().length) state.subjects[it.key] = true;   // never all-off
+          clearSelection();
+          rerender();
         });
-        chipRow("domain-chips", domainItems,
-          function () { return false; },
-          function (it) {
+
+        // Strand chips only make sense once you're inside one subject —
+        // 44 of them at once is noise, not a filter.
+        var domRow = document.getElementById("domain-row");
+        if (subs.length === 1) {
+          domRow.classList.remove("hidden");
+          var mine = domainKeys.filter(function (k) { return DOMAINS[k].subject === subs[0]; });
+          chipRow("domain-chips", mine.map(function (k) {
+            return {
+              key: k,
+              cls: "domain-chip" + (state.domains[k] ? "" : " off"),
+              html: '<span class="dot" style="background:' + DOMAINS[k].color + '"></span>' + esc(DOMAINS[k].name)
+            };
+          }), function (it) {
             state.domains[it.key] = !state.domains[it.key];
             clearSelection();
-            renderControls();
-            renderGraph();
+            rerender();
           });
+        } else domRow.classList.add("hidden");
+
+        chipRow("band-chips", bandKeys.map(function (k) {
+          return { key: k, on: state.bands[k], html: esc(BANDS[k].name) };
+        }).concat([{
+          key: "none", on: state.bands["none"], html: "Off-syllabus",
+          title: "Concepts with no NCERT grade — club, astrophotography and enrichment material"
+        }]), function (it) {
+          state.bands[it.key] = !state.bands[it.key];
+          clearSelection();
+          rerender();
+        });
+
+        chipRow("level-chips", [1, 2, 3, 4, 5].map(function (l) {
+          return { key: l, on: l <= state.maxLevel, html: "L" + l + " " + LEVELS[l].name, title: LEVELS[l].hint };
+        }), function (it) {
+          state.maxLevel = it.key;
+          clearSelection();
+          rerender();
+        });
+
+        chipRow("status-chips", [{
+          key: "drafts", on: state.showDrafts, html: "Show drafts",
+          title: "Include concepts still marked draft or in-review"
+        }], function () {
+          state.showDrafts = !state.showDrafts;
+          clearSelection();
+          rerender();
+        });
+      }
+
+      function setView(v) {
+        state.view = v;
+        document.getElementById("view-table").classList.toggle("on", v === "table");
+        document.getElementById("view-graph").classList.toggle("on", v === "graph");
+        document.getElementById("table-view").style.display = v === "table" ? "" : "none";
+        document.getElementById("graph-wrap").style.display = v === "graph" ? "" : "none";
+        document.getElementById("view-hint").textContent = v === "table"
+          ? "Grouped by subject & strand — click a row for detail"
+          : "Arrows point from a prerequisite to what it unlocks";
+        // The panel is fixed in table view and rides the canvas in graph view.
+        var d = document.getElementById("detail");
+        (v === "graph" ? document.getElementById("graph-wrap") : document.body).appendChild(d);
+        rerender();
+      }
+
+      function rerender() {
+        recomputeVisible();
+        renderControls();
+        if (state.view === "table") renderTable(); else renderGraph();
+        updateStats();
+        if (state.selected && visibleSet[state.selected]) renderDetail();
       }
 
       // ---------------- Pan & zoom ----------------
       (function initPanZoom() {
         var wrap = document.getElementById("graph-wrap");
-        var pointers = {};
-        var lastPinch = null;
-        var dragging = false;    // a real pan/pinch is under way (capture engaged)
-        var DRAG_TH = 5;         // px of movement before a press becomes a drag
+        var pointers = {}, lastPinch = null, dragging = false;
+        var DRAG_TH = 5;
 
         wrap.addEventListener("pointerdown", function (e) {
-          if (e.target.closest(".cg-detail") || e.target.closest(".cg-zoom")) return;
+          if (e.target.closest(".cg-detail") || e.target.closest(".cg-zoom") ||
+            e.target.closest(".cg-toobig")) return;
           pointers[e.pointerId] = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY };
           if (Object.keys(pointers).length === 2) {
-            // second finger down → definitely a pinch gesture, not a tap
             dragging = true; dragMoved = true;
             wrap.classList.add("dragging");
           }
-          // NOTE: no setPointerCapture here — capturing on a plain press
-          // would steal the click from the node. We capture only once a
-          // drag actually starts (see pointermove).
+          // No setPointerCapture on a plain press — that would steal the
+          // click from the node. We capture only once a drag really starts.
         });
 
         wrap.addEventListener("pointermove", function (e) {
@@ -1383,9 +1609,7 @@
             var a = pointers[ids[0]], b = pointers[ids[1]];
             var dist = Math.hypot(a.x - b.x, a.y - b.y);
             var cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
-            if (lastPinch) {
-              zoomAt(cx, cy, dist / lastPinch);
-            }
+            if (lastPinch) zoomAt(cx, cy, dist / lastPinch);
             lastPinch = dist;
           }
         });
@@ -1396,8 +1620,8 @@
           if (!Object.keys(pointers).length) {
             wrap.classList.remove("dragging");
             dragging = false;
-            // Clear the drag flag only after the click event that follows
-            // pointerup has been dispatched, so it can suppress that click.
+            // Clear the flag only after the click that follows pointerup
+            // has dispatched, so a drag never registers as a node click.
             setTimeout(function () { dragMoved = false; }, 0);
           }
         }
@@ -1406,8 +1630,7 @@
 
         wrap.addEventListener("wheel", function (e) {
           e.preventDefault();
-          var factor = Math.pow(1.0015, -e.deltaY);
-          zoomAt(e.clientX, e.clientY, factor);
+          zoomAt(e.clientX, e.clientY, Math.pow(1.0015, -e.deltaY));
         }, { passive: false });
 
         function zoomAt(cx, cy, factor) {
@@ -1430,12 +1653,12 @@
           zoomAt(r.left + r.width / 2, r.top + r.height / 2, 1 / 1.3);
         });
         document.getElementById("zoom-fit").addEventListener("click", fitView);
-
-        // click on empty svg clears selection (but not at the end of a drag)
-        svg.addEventListener("click", function () { if (dragMoved) return; clearSelection(); });
+        svg.addEventListener("click", function () { if (!dragMoved) clearSelection(); });
       })();
 
-      // ---------------- Wire the rest ----------------
+      // ---------------- Wiring ----------------
+      document.getElementById("view-table").addEventListener("click", function () { setView("table"); });
+      document.getElementById("view-graph").addEventListener("click", function () { setView("graph"); });
       document.getElementById("detail-close").addEventListener("click", clearSelection);
 
       var searchTimer = null;
@@ -1443,17 +1666,17 @@
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function () {
           state.search = e.target.value;
-          updateHighlights();
-          // pan to first hit
-          var q = state.search.trim().toLowerCase();
+          rerender();
+          if (state.view !== "graph") return;
+          var q = DB.normText(state.search);
           if (!q) return;
-          var hit = visibleIds.filter(function (id) {
-            return byId[id].name.toLowerCase().indexOf(q) !== -1;
+          var hit = visible.filter(function (c) {
+            return DB.normText(c.name).indexOf(q) !== -1;
           })[0];
-          if (hit && layout[hit]) {
+          if (hit && layout[hit.id]) {
             var wrap = document.getElementById("graph-wrap");
-            view.x = wrap.clientWidth / 2 - (layout[hit].x + NODE_W / 2) * view.s;
-            view.y = wrap.clientHeight / 2 - (layout[hit].y + NODE_H / 2) * view.s;
+            view.x = wrap.clientWidth / 2 - (layout[hit.id].x + NODE_W / 2) * view.s;
+            view.y = wrap.clientHeight / 2 - (layout[hit.id].y + NODE_H / 2) * view.s;
             applyView();
           }
         }, 200);
@@ -1467,9 +1690,8 @@
       });
 
       document.getElementById("plan-add-visible").addEventListener("click", function () {
-        visibleIds.forEach(function (id) {
-          if (state.plan.indexOf(id) === -1) state.plan.push(id);
-        });
+        visible.forEach(function (c) { if (state.plan.indexOf(c.id) === -1) state.plan.push(c.id); });
+        state.plan = DB.teachingSort(state.plan);
         planSave();
       });
 
@@ -1499,44 +1721,54 @@
       });
 
       document.getElementById("plan-json").addEventListener("click", function () {
-        var ordered = teachingSort(state.plan).map(function (id) { return byId[id]; });
+        var ordered = DB.teachingSort(state.plan).map(function (id) { return DB.byId(id); });
         var blob = new Blob([JSON.stringify(ordered, null, 2)], { type: "application/json" });
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "astronomy-curriculum.json";
+        a.download = "concept-curriculum.json";
         a.click();
         URL.revokeObjectURL(a.href);
       });
 
-      window.addEventListener("resize", function () { fitView(); });
+      window.addEventListener("resize", function () { if (state.view === "graph") fitView(); });
 
-      // ---------------- Collapse / expand the top panel ----------------
+      // ---------------- Collapse / expand top panel ----------------
       function setTopCollapsed(collapsed) {
         document.body.classList.toggle("top-collapsed", collapsed);
         document.getElementById("cg-top-toggle").innerHTML =
           collapsed ? "&#9660; Show filters" : "&#9650; Hide filters";
         try { localStorage.setItem("aryabhat-concept-topcollapsed", collapsed ? "1" : "0"); } catch (e) {}
-        // graph height changed via CSS transition — refit once it settles
-        setTimeout(fitView, 60);
-        setTimeout(fitView, 400);
+        if (state.view === "graph") { setTimeout(fitView, 60); setTimeout(fitView, 400); }
       }
       document.getElementById("cg-top-bar").addEventListener("click", function () {
         setTopCollapsed(!document.body.classList.contains("top-collapsed"));
       });
 
       // ---------------- Boot ----------------
-      renderControls();
-      renderGraph();
+      document.getElementById("levels-legend").innerHTML =
+        Object.keys(LEVELS).map(function (l) {
+          return "<span><b>L" + l + " " + esc(LEVELS[l].name) + "</b> " + esc(LEVELS[l].hint) + "</span>";
+        }).join("");
+
+      setView(state.view);
       renderPlan();
       var startCollapsed = false;
       try { startCollapsed = localStorage.getItem("aryabhat-concept-topcollapsed") === "1"; } catch (e) {}
       setTopCollapsed(startCollapsed);
-      if (state.selected) { selectNode(state.selected); }
+      if (state.selected) selectNode(state.selected);
+
+      // Surface data problems in the console rather than failing mutely —
+      // the CLI (`node concepts/cli.js validate`) is the real gate.
+      var v = DB.validate();
+      if (!v.ok) {
+        console.error("Concept DB has " + v.errors.length + " error(s):");
+        v.errors.slice(0, 20).forEach(function (e) { console.error("  " + e.id + ": " + e.msg); });
+      }
     })();
   </script>
 
   <!-- Background starfield — inlined (formerly js/cosmos-bg.js) so this
-       page has no external script dependency besides js/concepts-data.js.
+       page has no external script dependency besides the concept data.
        Calm twinkle + slow dust + occasional shooting star; respects
        prefers-reduced-motion. -->
   <script>
