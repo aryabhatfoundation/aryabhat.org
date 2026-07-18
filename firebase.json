@@ -267,6 +267,12 @@
         "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1069s",
         "type": 302
       }
+    ],
+    "rewrites": [
+      {
+        "source": "/study",
+        "destination": "/study-material.html"
+      }
     ]
   }
 }

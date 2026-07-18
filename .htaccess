@@ -4,6 +4,9 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_USER_AGENT} !(Windows\ NT\ 5.1|Windows\ NT\ 5.2) [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
 
+# Shorthand for the unlisted study-material page (keeps the /study URL clean)
+RewriteRule ^study/?$ study-material.html [L]
+
 Redirect 301 /study1 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study1.pdf
 Redirect 301 /study2 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study2.pdf
 Redirect 301 /study3 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study3.pdf
