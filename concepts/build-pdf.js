@@ -2,19 +2,26 @@
 // ============================================================
 // Render every course to a single print-ready HTML document.
 //
-//   node concepts/courses/build-pdf.js > courses.html
+//   node concepts/build-pdf.js            > handbook.html   (all courses)
+//   node concepts/build-pdf.js <courseId> > leaflet.html    (just one)
 //   (then Chrome --headless --print-to-pdf)
 //
 // Reads the live CourseDB, so the booklet can never disagree with
 // what `course-validate` passes — the running orders, moon windows
 // and kit lists are computed, not transcribed.
+//
+// This lives in concepts/, NOT in courses/. The data directories hold
+// data only: their loaders require() every .js they find, so a script
+// dropped in one gets EXECUTED on every CLI call. That is not
+// hypothetical — this file used to sit in courses/ and silently killed
+// `courses`, `course-validate` and everything downstream of them.
 // ============================================================
 
 "use strict";
 
 var fs = require("fs");
 var path = require("path");
-var ROOT = path.resolve(__dirname, "..");
+var ROOT = path.resolve(__dirname);
 
 global.window = global;
 require(path.join(ROOT, "data", "_schema.js"));
@@ -24,11 +31,12 @@ fs.readdirSync(path.join(ROOT, "data"))
 require(path.join(ROOT, "db.js"));
 var CDB = global.ConceptDB.build(global.CONCEPTS);
 
-require(path.join(__dirname, "_schema.js"));
-fs.readdirSync(__dirname)
-    .filter(function (f) { return f.endsWith(".js") && f !== "_schema.js" && f !== "build-pdf.js"; })
+var COURSES_DIR = path.join(ROOT, "courses");
+require(path.join(COURSES_DIR, "_schema.js"));
+fs.readdirSync(COURSES_DIR)
+    .filter(function (f) { return f.endsWith(".js") && f !== "_schema.js"; })
     .sort()
-    .forEach(function (f) { require(path.join(__dirname, f)); });
+    .forEach(function (f) { require(path.join(COURSES_DIR, f)); });
 require(path.join(ROOT, "coursedb.js"));
 global.CourseDB.build(global.COURSES, global.ConceptDB);
 var CO = global.CourseDB;

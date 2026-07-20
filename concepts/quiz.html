@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google Analytics 4 (centralized in /js/analytics.js) -->
+  <script src="/js/analytics.js"></script>
+
+  <meta charset="utf-8">
+  <title>Quizzes — Aryabhat Curriculum Lab</title>
+  <meta name="description"
+    content="Take the Aryabhat astronomy quizzes online. Auto-marked multiple choice, self-marked short answers, and a diagnosis of the misconceptions each wrong answer reveals.">
+  <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Self-contained, like concepts/index.html. Reads the SAME data files
+       the CLI and the PDF builders read — quizzes/*.js — so a paper on
+       screen can never disagree with the paper on paper.
+       Format spec: QUIZ-FORMAT.md -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================
+       concepts/quiz.html — take a quiz, get diagnosed.
+
+       Three question kinds, three honest treatments:
+         mcq       — machine-marked. This is the score.
+         short     — shown the model answer, marked by the learner.
+                     Kept in a SEPARATE tally; self-marking is not
+                     the same evidence as machine-marking and the
+                     page never pretends otherwise.
+         practical — cannot be done at a screen. Listed, not scored.
+
+       The results page leads with what `diagnoses` reveals, not with
+       the percentage. A score says how much went wrong; the diagnosis
+       says WHAT is wrong, which is the only part you can act on.
+       ========================================================== */
+
+    * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; }
+
+    :root {
+      --gold: #ffcc33;
+      --gold-deep: #ffa41b;
+      --gold-soft: #ffe58a;
+      --ink: #e6eef7;
+      --ink-dim: #9fb3c8;
+      --panel: #16223388;
+      --panel-solid: #1a2636;
+      --border: #2a3d55;
+      --accent-cyan: #1EAEDB;
+      --good: #4ade80;
+      --good-deep: #16a34a;
+      --bad: #f87171;
+      --warn: #fbbf24;
+      --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', Menlo, Consolas, monospace;
+      --brand-shape: 10px;
+      --brand-shape-tight: 8px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font-body);
+      background: radial-gradient(ellipse at 50% 120%, #1a2a40 0%, #0a1018 55%, #04060a 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 940px; margin: 0 auto; padding: 0 12px; }
+    .main { padding: 18px 20px; background-color: #111d; border-radius: var(--brand-shape); }
+
+    a { color: var(--gold); }
+
+    /* ---------------- header ---------------- */
+
+    .qz-head { padding: 26px 0 6px; }
+    .qz-kicker {
+      font-family: var(--font-display);
+      font-size: 11px; letter-spacing: 2.4px; text-transform: uppercase;
+      color: var(--gold-deep); font-weight: 700;
+    }
+    .qz-head h1 {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 4.4vw, 38px);
+      margin: 6px 0 8px; letter-spacing: -.5px; line-height: 1.12;
+    }
+    .qz-lede { color: var(--ink-dim); font-size: 15px; line-height: 1.6; margin: 0; max-width: 68ch; }
+    .qz-lede b { color: var(--ink); font-weight: 600; }
+
+    /* ---------------- quiz picker ---------------- */
+
+    .qz-group-title {
+      font-family: var(--font-display); font-size: 12px; letter-spacing: 1.6px;
+      text-transform: uppercase; color: var(--ink-dim); font-weight: 600;
+      margin: 26px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .qz-list { display: grid; gap: 10px; }
+    .qz-card {
+      display: block; width: 100%; text-align: left; cursor: pointer;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--brand-shape); padding: 14px 16px;
+      color: var(--ink); font-family: var(--font-body); font-size: 15px;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .qz-card:hover { border-color: var(--gold-deep); background: #1c2a3e88; transform: translateY(-1px); }
+    .qz-card .t { font-family: var(--font-display); font-weight: 600; font-size: 16px; display: block; }
+    .qz-card .b { color: var(--ink-dim); font-size: 13.5px; line-height: 1.5; margin-top: 4px; display: block; }
+    .qz-card .m {
+      margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 14px;
+      font-size: 12px; color: var(--ink-dim); font-family: var(--font-mono);
+    }
+    .qz-card .m b { color: var(--gold-soft); font-weight: 600; }
+
+    .pill {
+      display: inline-block; font-size: 10.5px; font-family: var(--font-display);
+      letter-spacing: 1px; text-transform: uppercase; font-weight: 700;
+      padding: 2px 8px; border-radius: 999px; vertical-align: 2px; margin-left: 8px;
+    }
+    .pill.entry { background: #3b2f0d; color: var(--gold); }
+    .pill.session { background: #0d2b38; color: var(--accent-cyan); }
+    .pill.exit { background: #2b1030; color: #e879f9; }
+    .pill.draft { background: #2a2f3a; color: var(--ink-dim); }
+
+    /* ---------------- taking ---------------- */
+
+    .qz-bar {
+      position: sticky; top: 0; z-index: 30;
+      background: #0b1119ee; backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+    }
+    .qz-bar-in {
+      max-width: 940px; margin: 0 auto; padding: 0 12px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .qz-bar .name {
+      font-family: var(--font-display); font-weight: 600; font-size: 14.5px;
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qz-prog { flex: 0 0 130px; height: 6px; background: #22304399; border-radius: 999px; overflow: hidden; }
+    .qz-prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); width: 0; transition: width .25s; }
+    .qz-count { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); flex: 0 0 auto; }
+
+    .q {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--brand-shape); padding: 18px 18px 16px; margin: 14px 0;
+    }
+    .q-top { display: flex; gap: 12px; align-items: flex-start; }
+    .q-num {
+      flex: 0 0 auto; width: 26px; height: 26px; line-height: 26px; text-align: center;
+      border-radius: 50%; background: #22304a; color: var(--gold-soft);
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 700;
+    }
+    .q-stem { font-size: 16px; line-height: 1.55; }
+    .q-kindtag {
+      display: inline-block; margin-left: 8px; font-size: 10px; font-family: var(--font-display);
+      letter-spacing: 1px; text-transform: uppercase; color: var(--ink-dim);
+      border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; vertical-align: 3px;
+    }
+
+    .opts { list-style: none; margin: 14px 0 0 38px; padding: 0; display: grid; gap: 8px; }
+    .opt {
+      display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: baseline;
+      background: #14203099; border: 1px solid #22334a; border-radius: var(--brand-shape-tight);
+      padding: 10px 12px; cursor: pointer; font-size: 15px; line-height: 1.5;
+      transition: border-color .12s, background .12s;
+    }
+    .opt:hover { border-color: #3f5c80; background: #1a283c; }
+    .opt .ltr { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-dim); font-weight: 700; }
+    .opt.picked { border-color: var(--gold-deep); background: #2a220e; }
+    .opt.picked .ltr { color: var(--gold); }
+
+    /* marked state */
+    .opt.right { border-color: var(--good-deep); background: #0f2a1a; }
+    .opt.right .ltr { color: var(--good); }
+    .opt.wrong { border-color: #7f1d1d; background: #2a1010; }
+    .opt.wrong .ltr { color: var(--bad); }
+    .opt.locked { cursor: default; }
+    .opt.locked:hover { border-color: inherit; }
+    .opt .mark { font-weight: 700; margin-left: 6px; }
+    .opt.right .mark { color: var(--good); }
+    .opt.wrong .mark { color: var(--bad); }
+
+    .diag {
+      grid-column: 2; margin-top: 6px; font-size: 13px; line-height: 1.45;
+      color: var(--warn); border-left: 2px solid #6b4a10; padding-left: 9px;
+    }
+    .diag b {
+      font-family: var(--font-display); font-size: 9.5px; letter-spacing: 1.2px;
+      text-transform: uppercase; margin-right: 7px; color: var(--gold-deep);
+    }
+
+    .ansbox { margin: 12px 0 0 38px; }
+    .ansbox textarea {
+      width: 100%; min-height: 72px; resize: vertical;
+      background: #101a26; border: 1px solid #22334a; border-radius: var(--brand-shape-tight);
+      color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+      padding: 10px 12px;
+    }
+    .ansbox textarea:focus { outline: none; border-color: var(--gold-deep); }
+    .ansbox textarea:disabled { opacity: .75; }
+
+    .model {
+      margin: 10px 0 0; background: #0f2a1a; border: 1px solid #1c4a2e;
+      border-radius: var(--brand-shape-tight); padding: 11px 13px; font-size: 14.5px; line-height: 1.5;
+    }
+    .model b {
+      display: block; font-family: var(--font-display); font-size: 10px; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--good); margin-bottom: 5px;
+    }
+
+    .selfmark { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .selfmark .lbl { font-size: 13px; color: var(--ink-dim); margin-right: 4px; }
+    .smb {
+      cursor: pointer; font-family: var(--font-body); font-size: 13.5px;
+      background: #14203099; border: 1px solid #22334a; color: var(--ink);
+      border-radius: 999px; padding: 5px 14px; transition: .12s;
+    }
+    .smb:hover { border-color: #3f5c80; }
+    .smb.on-yes { background: #0f2a1a; border-color: var(--good-deep); color: var(--good); }
+    .smb.on-no { background: #2a1010; border-color: #7f1d1d; color: var(--bad); }
+
+    .prac {
+      margin: 12px 0 0 38px; background: #241d0b; border: 1px solid #4a3c10;
+      border-radius: var(--brand-shape-tight); padding: 11px 13px;
+      font-size: 14px; line-height: 1.5; color: var(--gold-soft);
+    }
+    .prac b {
+      display: block; font-family: var(--font-display); font-size: 10px; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--gold-deep); margin-bottom: 5px;
+    }
+
+    .expl {
+      margin: 12px 0 0 38px; font-size: 14px; line-height: 1.55; color: var(--ink-dim);
+      border-left: 2px solid var(--border); padding-left: 11px;
+    }
+    .concepttag {
+      margin: 10px 0 0 38px; font-family: var(--font-mono); font-size: 11.5px; color: #6b7f96;
+    }
+    .concepttag a { color: #8fa8c2; text-decoration: none; border-bottom: 1px dotted #4a5f78; }
+    .concepttag a:hover { color: var(--gold); }
+
+    /* ---------------- buttons ---------------- */
+
+    .btn {
+      cursor: pointer; font-family: var(--font-display); font-weight: 600;
+      border-radius: var(--brand-shape-tight); padding: 11px 22px; font-size: 15px;
+      border: 1px solid var(--border); background: var(--panel-solid); color: var(--ink);
+      transition: .15s;
+    }
+    .btn:hover { border-color: var(--gold-deep); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--gold-deep), var(--gold));
+      color: #14202e; border-color: transparent;
+    }
+    .btn.primary:hover { filter: brightness(1.08); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn:disabled:hover { border-color: var(--border); filter: none; }
+    .btn.sm { padding: 7px 14px; font-size: 13.5px; }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 22px 0 40px; }
+    .actions .note { color: var(--ink-dim); font-size: 13px; }
+
+    /* ---------------- results ---------------- */
+
+    .score-card {
+      background: linear-gradient(160deg, #1b2942, #121b28);
+      border: 1px solid var(--border); border-radius: var(--brand-shape);
+      padding: 26px 24px; margin: 18px 0;
+    }
+    .score-main { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    .score-num {
+      font-family: var(--font-display); font-weight: 700; letter-spacing: -2px;
+      font-size: 56px; line-height: 1; color: var(--gold);
+    }
+    .score-of { font-size: 17px; color: var(--ink-dim); }
+    .score-pct {
+      font-family: var(--font-mono); font-size: 15px; padding: 4px 12px;
+      border-radius: 999px; background: #22304a; color: var(--gold-soft);
+    }
+    .score-sub { margin-top: 14px; color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; }
+    .score-sub b { color: var(--ink); }
+
+    .tallies { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .tally {
+      background: #101a26; border: 1px solid var(--border); border-radius: var(--brand-shape-tight);
+      padding: 10px 14px; min-width: 140px;
+    }
+    .tally .k {
+      font-family: var(--font-display); font-size: 10px; letter-spacing: 1.3px;
+      text-transform: uppercase; color: var(--ink-dim);
+    }
+    .tally .v { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-top: 3px; }
+
+    .diagnosis {
+      background: #241d0b; border: 1px solid #4a3c10; border-radius: var(--brand-shape);
+      padding: 20px 22px; margin: 18px 0;
+    }
+    .diagnosis h2 {
+      font-family: var(--font-display); font-size: 19px; margin: 0 0 6px; color: var(--gold);
+    }
+    .diagnosis p.sub { color: var(--gold-soft); font-size: 14px; margin: 0 0 14px; line-height: 1.55; opacity: .85; }
+    .diagnosis ol { margin: 0; padding-left: 20px; }
+    .diagnosis li { margin-bottom: 11px; font-size: 15px; line-height: 1.5; }
+    .diagnosis li .w { color: var(--ink-dim); font-size: 13px; display: block; margin-top: 2px; font-family: var(--font-mono); }
+
+    .allgood {
+      background: #0f2a1a; border: 1px solid #1c4a2e; border-radius: var(--brand-shape);
+      padding: 18px 22px; margin: 18px 0; font-size: 15px; line-height: 1.55;
+    }
+    .allgood b { color: var(--good); }
+
+    .review-title {
+      font-family: var(--font-display); font-size: 12px; letter-spacing: 1.6px;
+      text-transform: uppercase; color: var(--ink-dim); font-weight: 600;
+      margin: 30px 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+
+    .hidden { display: none !important; }
+
+    .footer-line {
+      color: #6b7f96; font-size: 13px; line-height: 1.6; margin: 30px 0 40px;
+      border-top: 1px solid var(--border); padding-top: 16px;
+    }
+
+    .loading { color: var(--ink-dim); padding: 40px 0; text-align: center; font-size: 15px; }
+
+    @media (max-width: 620px) {
+      .opts, .ansbox, .prac, .expl, .concepttag { margin-left: 0; }
+      .qz-prog { flex-basis: 60px; }
+      .score-num { font-size: 44px; }
+    }
+
+    @media print {
+      .qz-bar, .actions, .btn { display: none !important; }
+      body { background: #fff; color: #000; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ---------------- sticky bar (taking / results only) ---------------- -->
+  <div class="qz-bar hidden" id="bar">
+    <div class="qz-bar-in">
+      <button class="btn sm" id="bar-back">&larr; All quizzes</button>
+      <span class="name" id="bar-name"></span>
+      <span class="qz-prog"><i id="bar-prog"></i></span>
+      <span class="qz-count" id="bar-count"></span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="main">
+
+      <!-- ---------------- picker ---------------- -->
+      <div id="view-picker">
+        <header class="qz-head">
+          <div class="qz-kicker">Curriculum Lab &middot; Quizzes</div>
+          <h1>Take a quiz</h1>
+          <p class="qz-lede">
+            The same questions as the printed papers &mdash; they are read from the same
+            data files, so the two can never drift apart. Multiple choice is
+            <b>marked for you</b>. Short answers show you the model answer and you
+            <b>mark yourself</b>. Practical tasks need a telescope and an assessor, so they
+            are listed here but not scored.
+            <br><br>
+            The score is the least interesting part. What matters is the
+            <b>diagnosis</b> at the end: every wrong option here is a wrong idea somebody
+            actually holds, and the results page names the ones you picked.
+          </p>
+        </header>
+        <div id="picker-body"><p class="loading">Loading quizzes&hellip;</p></div>
+      </div>
+
+      <!-- ---------------- taking ---------------- -->
+      <div id="view-take" class="hidden">
+        <header class="qz-head">
+          <div class="qz-kicker" id="take-kicker"></div>
+          <h1 id="take-title"></h1>
+          <p class="qz-lede" id="take-blurb"></p>
+        </header>
+        <div id="take-body"></div>
+        <div class="actions">
+          <button class="btn primary" id="submit">Finish &amp; see results</button>
+          <span class="note" id="submit-note"></span>
+        </div>
+      </div>
+
+      <!-- ---------------- results ---------------- -->
+      <div id="view-results" class="hidden">
+        <header class="qz-head">
+          <div class="qz-kicker">Results</div>
+          <h1 id="res-title"></h1>
+        </header>
+        <div id="res-body"></div>
+        <div class="actions">
+          <button class="btn primary" id="retake">Try again</button>
+          <button class="btn" id="res-back">All quizzes</button>
+          <button class="btn" id="res-print">Print this page</button>
+        </div>
+      </div>
+
+      <p class="footer-line">
+        Questions, courses and concepts all live in one graph &mdash;
+        <a href="index.html">the concept map</a> is the same data seen from below.
+        The record format is specified in <a href="QUIZ-FORMAT.md">QUIZ-FORMAT.md</a>.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ---------------- data ----------------
+       Order matters: each _schema.js creates the array its siblings
+       push() into, and each layer references ids in the layer below. -->
+  <script src="data/_schema.js"></script>
+  <script src="data/astronomy.js"></script>
+  <script src="data/maths.js"></script>
+  <script src="data/physics.js"></script>
+  <script src="data/chemistry.js"></script>
+  <script src="data/biology.js"></script>
+  <script src="data/earth.js"></script>
+  <script src="data/skills.js"></script>
+  <script src="db.js"></script>
+
+  <script src="courses/_schema.js"></script>
+  <script src="courses/teacher-training.js"></script>
+  <script src="courses/quiz-prelim.js"></script>
+  <script src="courses/quiz-practical.js"></script>
+  <script src="courses/astrophoto-workshop.js"></script>
+  <script src="courses/school-6.js"></script>
+  <script src="courses/school-7.js"></script>
+  <script src="courses/school-8.js"></script>
+  <script src="courses/school-9.js"></script>
+  <script src="coursedb.js"></script>
+
+  <script src="quizzes/_schema.js"></script>
+  <script src="quizzes/entry-practical.js"></script>
+  <script src="quizzes/topics-practical-a.js"></script>
+  <script src="quizzes/topics-practical-b.js"></script>
+  <script src="quizdb.js"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    ConceptDB.build(window.CONCEPTS);
+    CourseDB.build(window.COURSES, ConceptDB);
+    QuizDB.build(window.QUESTIONS, window.QUIZZES, ConceptDB, CourseDB);
+
+    var LETTERS = "abcdefgh";
+    var $ = function (id) { return document.getElementById(id); };
+
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ------------------------------------------------------------
+    // state — one attempt at a time
+    // ------------------------------------------------------------
+    var A = null; // { quiz, rows, picks:{qid:optIndex}, texts:{qid:string},
+                  //   self:{qid:true|false}, marked:bool }
+
+    // ------------------------------------------------------------
+    // picker
+    // ------------------------------------------------------------
+
+    function renderPicker() {
+      var quizzes = QuizDB.allQuizzes();
+      var groups = { entry: [], session: [], exit: [] };
+      quizzes.forEach(function (z) { (groups[z.purpose] || groups.exit).push(z); });
+
+      var html = "";
+      [["entry", "Entry checks", "What a learner should already know on day one."],
+       ["session", "Session checks", "Did that session land?"],
+       ["exit", "Exit papers", "The whole course, at the end."]
+      ].forEach(function (g) {
+        var list = groups[g[0]];
+        if (!list.length) return;
+        html += '<div class="qz-group-title">' + esc(g[1]) + '</div>';
+        html += '<div class="qz-list">';
+        list.forEach(function (z) {
+          var st = QuizDB.stats(z);
+          var course = z.course && CourseDB.byId(z.course);
+          html += '<button class="qz-card" data-quiz="' + esc(z.id) + '">';
+          html += '<span class="t">' + esc(z.name) +
+                  '<span class="pill ' + esc(z.purpose) + '">' + esc(g[1].replace(/e?s$/, "")) + '</span>' +
+                  (z.status !== "published" ? '<span class="pill draft">' + esc(z.status) + '</span>' : '') +
+                  '</span>';
+          if (z.blurb) html += '<span class="b">' + esc(z.blurb) + '</span>';
+          html += '<span class="m">' +
+            '<span><b>' + st.questions + '</b> questions</span>' +
+            (z.duration ? '<span><b>' + z.duration + '</b> min</span>' : '') +
+            '<span><b>' + st.concepts + '</b> concepts</span>' +
+            '<span><b>' + st.diagnostic + '</b> diagnostic</span>' +
+            (course ? '<span>' + esc(course.name) + '</span>' : '') +
+            '</span>';
+          html += '</button>';
+        });
+        html += '</div>';
+      });
+
+      $("picker-body").innerHTML = html || '<p class="loading">No quizzes found.</p>';
+      Array.prototype.forEach.call(document.querySelectorAll("[data-quiz]"), function (el) {
+        el.addEventListener("click", function () { start(el.getAttribute("data-quiz")); });
+      });
+    }
+
+    // ------------------------------------------------------------
+    // taking
+    // ------------------------------------------------------------
+
+    function start(quizId) {
+      var z = QuizDB.quizById(quizId);
+      if (!z) return;
+      A = { quiz: z, rows: QuizDB.paper(z), picks: {}, texts: {}, self: {}, marked: false };
+      show("take");
+      $("bar").classList.remove("hidden");
+      $("bar-name").textContent = z.name;
+      $("take-kicker").textContent = (QUIZ_PURPOSES[z.purpose] || {}).name || "";
+      $("take-title").textContent = z.name;
+      $("take-blurb").textContent = z.blurb || "";
+      renderQuestions();
+      progress();
+      window.scrollTo(0, 0);
+    }
+
+    // How many questions this page can actually mark. Practicals are
+    // excluded everywhere — counting them would inflate the denominator
+    // with work nobody did.
+    function answerable() {
+      return A.rows.filter(function (r) { return r.q.kind !== "practical"; });
+    }
+
+    function renderQuestions() {
+      var html = "";
+      A.rows.forEach(function (row, i) { html += questionHTML(row, i); });
+      $("take-body").innerHTML = html;
+      wireQuestions();
+    }
+
+    function questionHTML(row, i) {
+      var q = row.q;
+      var marked = A.marked;
+      var picked = A.picks[q.id];
+
+      var h = '<div class="q" id="q-' + esc(q.id) + '">';
+      h += '<div class="q-top"><span class="q-num">' + (i + 1) + '</span>';
+      h += '<span class="q-stem">' + esc(q.stem);
+      if (q.kind === "practical") h += '<span class="q-kindtag">practical</span>';
+      else if (q.kind === "short") h += '<span class="q-kindtag">short answer</span>';
+      h += '</span></div>';
+
+      if (q.kind === "mcq") {
+        h += '<ol class="opts">';
+        q.options.forEach(function (o, oi) {
+          var cls = "opt";
+          if (marked) {
+            cls += " locked";
+            if (o.correct) cls += " right";
+            else if (picked === oi) cls += " wrong";
+          } else if (picked === oi) {
+            cls += " picked";
+          }
+          h += '<li class="' + cls + '" data-q="' + esc(q.id) + '" data-opt="' + oi + '">';
+          h += '<span class="ltr">' + LETTERS.charAt(oi) + '</span>';
+          h += '<span class="otext">' + esc(o.text);
+          if (marked && o.correct) h += '<span class="mark">&#10003;</span>';
+          else if (marked && picked === oi) h += '<span class="mark">&times;</span>';
+          h += '</span>';
+          // The diagnosis is shown only for the wrong option the learner
+          // actually chose. Printing every misconception in the bank would
+          // teach the wrong ideas to everyone who did not hold them.
+          if (marked && picked === oi && !o.correct && o.diagnoses) {
+            h += '<span class="diag"><b>this reveals</b>' + esc(o.diagnoses) + '</span>';
+          }
+          h += '</li>';
+        });
+        h += '</ol>';
+
+      } else if (q.kind === "short") {
+        h += '<div class="ansbox"><textarea data-text="' + esc(q.id) + '" ' +
+             (marked ? "disabled" : "") + ' placeholder="Your answer&hellip;">' +
+             esc(A.texts[q.id] || "") + '</textarea>';
+        if (marked) {
+          h += '<div class="model"><b>What a correct answer needs</b>' + esc(q.answer) + '</div>';
+          var sm = A.self[q.id];
+          h += '<div class="selfmark"><span class="lbl">Mark yourself:</span>' +
+               '<button class="smb' + (sm === true ? " on-yes" : "") + '" data-self="' + esc(q.id) + '" data-val="1">I had this</button>' +
+               '<button class="smb' + (sm === false ? " on-no" : "") + '" data-self="' + esc(q.id) + '" data-val="0">I missed it</button>' +
+               '</div>';
+        }
+        h += '</div>';
+
+      } else {
+        h += '<div class="prac"><b>Practical task &mdash; not scored here</b>' +
+             'This is done, not written. Your assessor watches you do it.' +
+             (marked ? '<br><br><i>' + esc(q.answer) + '</i>' : '') +
+             '</div>';
+      }
+
+      if (marked) {
+        if (q.explain) h += '<div class="expl">' + esc(q.explain) + '</div>';
+        if (row.concept) {
+          h += '<div class="concepttag">concept: <a href="index.html#' + esc(q.concept) +
+               '" target="_blank">' + esc(row.concept.name) + '</a>' +
+               ' &middot; ' + esc((QUESTION_DIFFICULTY[q.difficulty] || {}).name || "") + '</div>';
+        }
+      }
+      h += '</div>';
+      return h;
+    }
+
+    function wireQuestions() {
+      Array.prototype.forEach.call(document.querySelectorAll(".opt:not(.locked)"), function (el) {
+        el.addEventListener("click", function () {
+          if (A.marked) return;
+          var qid = el.getAttribute("data-q");
+          A.picks[qid] = parseInt(el.getAttribute("data-opt"), 10);
+          Array.prototype.forEach.call(
+            document.querySelectorAll('.opt[data-q="' + qid + '"]'),
+            function (o) { o.classList.remove("picked"); });
+          el.classList.add("picked");
+          progress();
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll("[data-text]"), function (el) {
+        el.addEventListener("input", function () {
+          A.texts[el.getAttribute("data-text")] = el.value;
+          progress();
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll("[data-self]"), function (el) {
+        el.addEventListener("click", function () {
+          var qid = el.getAttribute("data-self");
+          A.self[qid] = el.getAttribute("data-val") === "1";
+          renderResults();       // the tally moves, so redraw it
+        });
+      });
+    }
+
+    function progress() {
+      var need = answerable();
+      var done = need.filter(function (r) {
+        return r.q.kind === "mcq"
+          ? A.picks[r.q.id] !== undefined
+          : (A.texts[r.q.id] || "").trim().length > 0;
+      }).length;
+      $("bar-prog").style.width = (need.length ? (done / need.length) * 100 : 0) + "%";
+      $("bar-count").textContent = done + " / " + need.length;
+      $("submit-note").textContent = done < need.length
+        ? (need.length - done) + " unanswered — you can finish anyway"
+        : "";
+    }
+
+    // ------------------------------------------------------------
+    // marking
+    // ------------------------------------------------------------
+
+    function mark() {
+      var mcq = A.rows.filter(function (r) { return r.q.kind === "mcq"; });
+      var right = 0, wrong = [], skipped = 0;
+
+      mcq.forEach(function (r) {
+        var pick = A.picks[r.q.id];
+        if (pick === undefined) { skipped++; return; }
+        var o = r.q.options[pick];
+        if (o && o.correct) right++;
+        else wrong.push({ row: r, option: o });
+      });
+
+      var shorts = A.rows.filter(function (r) { return r.q.kind === "short"; });
+      var selfRight = shorts.filter(function (r) { return A.self[r.q.id] === true; }).length;
+      var selfDone = shorts.filter(function (r) { return A.self[r.q.id] !== undefined; }).length;
+
+      return {
+        mcqTotal: mcq.length, right: right, skipped: skipped, wrong: wrong,
+        shortTotal: shorts.length, selfRight: selfRight, selfDone: selfDone,
+        practicals: A.rows.filter(function (r) { return r.q.kind === "practical"; }).length
+      };
+    }
+
+    function renderResults() {
+      var m = mark();
+      var z = A.quiz;
+      $("res-title").textContent = z.name;
+
+      var pct = m.mcqTotal ? Math.round((m.right / m.mcqTotal) * 100) : 0;
+
+      var h = '<div class="score-card">';
+      h += '<div class="score-main">' +
+           '<span class="score-num">' + m.right + '</span>' +
+           '<span class="score-of">of ' + m.mcqTotal + ' multiple-choice</span>' +
+           '<span class="score-pct">' + pct + '%</span>' +
+           '</div>';
+
+      // Say exactly what the number covers. A percentage that quietly
+      // omits a third of the paper is a lie of omission.
+      var caveats = [];
+      if (m.skipped) caveats.push('<b>' + m.skipped + '</b> left blank (counted wrong)');
+      if (m.shortTotal) caveats.push('<b>' + m.shortTotal + '</b> short answer' +
+        (m.shortTotal > 1 ? 's are' : ' is') + ' marked by you, below, and not in this number');
+      if (m.practicals) caveats.push('<b>' + m.practicals + '</b> practical task' +
+        (m.practicals > 1 ? 's need' : ' needs') + ' a telescope and an assessor');
+      h += '<div class="score-sub">This score is the multiple-choice only' +
+           (caveats.length ? ' — ' + caveats.join('; ') : '') + '.</div>';
+
+      if (m.shortTotal || m.practicals) {
+        h += '<div class="tallies">';
+        if (m.shortTotal) {
+          h += '<div class="tally"><div class="k">Self-marked</div><div class="v">' +
+               m.selfRight + ' / ' + m.shortTotal +
+               (m.selfDone < m.shortTotal ? ' <span style="font-size:12px;color:var(--ink-dim)">(' +
+                 (m.shortTotal - m.selfDone) + ' unmarked)</span>' : '') +
+               '</div></div>';
+        }
+        if (m.practicals) {
+          h += '<div class="tally"><div class="k">Practical</div><div class="v">' +
+               m.practicals + ' with assessor</div></div>';
+        }
+        h += '</div>';
+      }
+      h += '</div>';
+
+      // ---- the part that matters ----
+      var revealed = m.wrong.filter(function (w) { return w.option && w.option.diagnoses; });
+      if (revealed.length) {
+        h += '<div class="diagnosis">';
+        h += '<h2>What your wrong answers reveal</h2>';
+        h += '<p class="sub">Each of these is a specific wrong idea, not a slip. ' +
+             'They are worth more of your attention than the score above.</p>';
+        h += '<ol>';
+        revealed.forEach(function (w) {
+          h += '<li>' + esc(w.option.diagnoses) +
+               '<span class="w">Q' + (A.rows.indexOf(w.row) + 1) + ' &middot; ' + esc(w.row.q.concept) + '</span></li>';
+        });
+        h += '</ol></div>';
+      } else if (m.wrong.length) {
+        h += '<div class="diagnosis"><h2>' + m.wrong.length + ' wrong, no diagnosis attached</h2>' +
+             '<p class="sub">Those distractors carry no <code>diagnoses</code> field, so there is ' +
+             'nothing specific to report. Read the explanations below.</p></div>';
+      } else if (m.mcqTotal) {
+        h += '<div class="allgood"><b>Every multiple-choice answer correct.</b> ' +
+             'Nothing to diagnose. Read the explanations below anyway — several give the ' +
+             'reasoning behind an answer you may have reached by elimination.</div>';
+      }
+
+      h += '<div class="review-title">Every question, with the answers</div>';
+      $("res-body").innerHTML = h;
+
+      var qh = "";
+      A.rows.forEach(function (row, i) { qh += questionHTML(row, i); });
+      $("res-body").insertAdjacentHTML("beforeend", '<div id="review">' + qh + '</div>');
+      wireQuestions();
+    }
+
+    // ------------------------------------------------------------
+    // views
+    // ------------------------------------------------------------
+
+    function show(which) {
+      $("view-picker").classList.toggle("hidden", which !== "picker");
+      $("view-take").classList.toggle("hidden", which !== "take");
+      $("view-results").classList.toggle("hidden", which !== "results");
+      $("bar").classList.toggle("hidden", which === "picker");
+    }
+
+    function toPicker() {
+      A = null;
+      show("picker");
+      window.scrollTo(0, 0);
+    }
+
+    $("submit").addEventListener("click", function () {
+      A.marked = true;
+      show("results");
+      renderResults();
+      $("bar-count").textContent = "marked";
+      $("bar-prog").style.width = "100%";
+      window.scrollTo(0, 0);
+    });
+
+    $("retake").addEventListener("click", function () { start(A.quiz.id); });
+    $("res-back").addEventListener("click", toPicker);
+    $("bar-back").addEventListener("click", toPicker);
+    $("res-print").addEventListener("click", function () { window.print(); });
+
+    renderPicker();
+  })();
+  </script>
+
+</body>
+
+</html>

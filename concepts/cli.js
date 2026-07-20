@@ -30,6 +30,7 @@ var path = require("path");
 var ROOT = path.resolve(__dirname);
 var CONCEPTS_DIR = path.join(ROOT, "data");
 var COURSES_DIR = path.join(ROOT, "courses");
+var QUIZZES_DIR = path.join(ROOT, "quizzes");
 
 // ---------------- load ----------------
 
@@ -39,7 +40,7 @@ global.window = global;
 
 function load() {
     if (!fs.existsSync(CONCEPTS_DIR)) die("no data/ directory at " + CONCEPTS_DIR);
-    var files = fs.readdirSync(CONCEPTS_DIR).filter(function (f) { return f.endsWith(".js"); });
+    var files = dataFiles(CONCEPTS_DIR);
     if (files.indexOf("_schema.js") === -1) die("data/_schema.js is missing — it must load first");
     // _schema.js declares the taxonomy and creates window.CONCEPTS; every
     // other file push()es into it, so their order among themselves is free.
@@ -49,11 +50,24 @@ function load() {
     return { db: global.ConceptDB, files: ordered };
 }
 
+// Quizzes load on demand, and need the course layer for the scope check.
+function loadQuizzes(db) {
+    var CD = loadCourses(db);
+    if (!fs.existsSync(QUIZZES_DIR)) die("no quizzes/ directory at " + QUIZZES_DIR);
+    var files = dataFiles(QUIZZES_DIR);
+    if (files.indexOf("_schema.js") === -1) die("quizzes/_schema.js is missing — it must load first");
+    var ordered = ["_schema.js"].concat(files.filter(function (f) { return f !== "_schema.js"; }).sort());
+    ordered.forEach(function (f) { require(path.join(QUIZZES_DIR, f)); });
+    require(path.join(ROOT, "quizdb.js"));
+    global.QuizDB.build(global.QUESTIONS, global.QUIZZES, db, CD);
+    return global.QuizDB;
+}
+
 // Courses load on demand — the concept commands must keep working even
 // if the course layer is absent or broken.
 function loadCourses(db) {
     if (!fs.existsSync(COURSES_DIR)) die("no courses/ directory at " + COURSES_DIR);
-    var files = fs.readdirSync(COURSES_DIR).filter(function (f) { return f.endsWith(".js"); });
+    var files = dataFiles(COURSES_DIR);
     if (files.indexOf("_schema.js") === -1) die("courses/_schema.js is missing — it must load first");
     var ordered = ["_schema.js"].concat(files.filter(function (f) { return f !== "_schema.js"; }).sort());
     ordered.forEach(function (f) { require(path.join(COURSES_DIR, f)); });
@@ -78,6 +92,23 @@ function moonGlyph(age) {
 function die(msg) {
     process.stderr.write("error: " + msg + "\n");
     process.exit(2);
+}
+
+// The data directories are require()d wholesale, so anything dropped in
+// one is EXECUTED on every CLI call. A tool put in courses/ once killed
+// every course command silently. Executable scripts declare themselves
+// with a shebang; data files never do. Refuse the former, loudly.
+function dataFiles(dir) {
+    return fs.readdirSync(dir).filter(function (f) {
+        if (!f.endsWith(".js")) return false;
+        var head = fs.readFileSync(path.join(dir, f), "utf8").slice(0, 2);
+        if (head === "#!") {
+            process.stderr.write("warning: skipping " + f + " in " + path.basename(dir) +
+                "/ — it is a script, not data. Tools belong in concepts/.\n");
+            return false;
+        }
+        return true;
+    });
 }
 
 // ---------------- arg parsing ----------------
@@ -376,6 +407,127 @@ var COMMANDS = {
         process.stdout.write("\n" + n + " misconceptions across " + list.length + " concepts\n");
     },
 
+    // ---------------- quiz layer ----------------
+
+    quizzes: function (db) {
+        var QD = loadQuizzes(db);
+        var list = QD.allQuizzes();
+        if (flags["json"]) return jsonOut(list);
+        list.forEach(function (z) {
+            var s = QD.stats(z);
+            process.stdout.write("\n" + C.bold + z.name + C.off + C.dim + "  " + z.id + C.off + "\n");
+            process.stdout.write("  " + C.dim + (global.QUIZ_PURPOSES[z.purpose] || {}).name +
+                (z.course ? " · " + z.course : "") +
+                (z.session ? " · session " + z.session : "") +
+                (z.status !== "published" ? " · [" + z.status + "]" : "") + C.off + "\n");
+            process.stdout.write("  " + s.questions + " questions · " + s.concepts + " concepts · " +
+                s.diagnostic + " diagnostic" +
+                (z.duration ? " · " + z.duration + " min" : "") + "\n");
+        });
+        process.stdout.write("\n" + list.length + " quizzes · " + QD.allQuestions().length + " questions in the bank\n");
+    },
+
+    // The student's paper. --key adds answers, explanations and what each
+    // distractor reveals.
+    quiz: function (db) {
+        var QD = loadQuizzes(db);
+        var z = QD.quizById(positional[0]);
+        if (!z) die("no quiz with id '" + positional[0] + "' — try `quizzes`");
+        if (flags["json"]) return jsonOut({ quiz: z, paper: QD.paper(z), stats: QD.stats(z) });
+        var key = !!flags["key"];
+
+        process.stdout.write(C.bold + z.name + C.off + "\n");
+        if (z.blurb) process.stdout.write(z.blurb + "\n");
+        var s = QD.stats(z);
+        process.stdout.write(C.dim + "  " + s.questions + " questions" +
+            (z.duration ? " · " + z.duration + " minutes" : "") +
+            (key ? " · MARKER'S COPY" : "") + C.off + "\n");
+
+        QD.paper(z).forEach(function (row, i) {
+            var q = row.q;
+            process.stdout.write("\n" + C.bold + (i + 1) + ". " + C.off + q.stem + "\n");
+            if (key) {
+                process.stdout.write(C.dim + "   [" + q.concept + " · " +
+                    (global.QUESTION_DIFFICULTY[q.difficulty] || {}).name + " · " + q.kind + "]" + C.off + "\n");
+            }
+            if (q.options.length) {
+                q.options.forEach(function (o, oi) {
+                    var letter = "abcdefgh".charAt(oi);
+                    if (!key) {
+                        process.stdout.write("   " + letter + ") " + o.text + "\n");
+                    } else if (o.correct) {
+                        process.stdout.write("   " + C.green + letter + ") " + o.text + "  ✓" + C.off + "\n");
+                    } else {
+                        process.stdout.write("   " + letter + ") " + o.text +
+                            (o.diagnoses ? C.yellow + "   → reveals: " + o.diagnoses + C.off : "") + "\n");
+                    }
+                });
+            } else if (key) {
+                process.stdout.write("   " + C.green + "answer: " + q.answer + C.off + "\n");
+            } else {
+                process.stdout.write("   " + C.dim + "________________________________________" + C.off + "\n");
+            }
+            if (key && q.explain) process.stdout.write("   " + C.dim + q.explain + C.off + "\n");
+        });
+        process.stdout.write("\n");
+    },
+
+    "quiz-validate": function (db) {
+        var QD = loadQuizzes(db);
+        var r = QD.validate();
+        r.errors.forEach(function (e) {
+            process.stdout.write(C.red + "ERROR  " + C.off + pad(e.id, 26) + " " + e.msg + "\n");
+        });
+        if (!flags["quiet"]) {
+            r.warnings.forEach(function (w) {
+                process.stdout.write(C.yellow + "warn   " + C.off + pad(w.id, 26) + " " + w.msg + "\n");
+            });
+        }
+        process.stdout.write("\n" + (r.ok ? C.green + "OK" + C.off : C.red + "FAILED" + C.off) +
+            " — " + QD.allQuizzes().length + " quizzes, " + QD.allQuestions().length + " questions, " +
+            r.errors.length + " errors, " + r.warnings.length + " warnings\n");
+        process.exit(r.ok ? 0 : 1);
+    },
+
+    // What a course teaches but never checks.
+    "quiz-coverage": function (db) {
+        var QD = loadQuizzes(db);
+        var cov = QD.coverage(positional[0]);
+        if (!cov) die("no course with id '" + positional[0] + "'");
+        if (flags["json"]) return jsonOut(cov);
+        process.stdout.write(C.bold + positional[0] + C.off + " — question coverage\n\n");
+        process.stdout.write("  taught concepts   " + cov.tested + " / " + cov.taught + " have questions\n");
+        process.stdout.write("  assumed concepts  " + cov.assumedTested + " / " + cov.assumed + " have questions\n");
+        if (cov.untested.length) {
+            process.stdout.write("\n" + C.bold + "Taught but never tested" + C.off + " (" + cov.untested.length + ")\n");
+            db.teachingSort(cov.untested).forEach(function (id) {
+                process.stdout.write("  " + pad(id, 26) + C.dim + db.byId(id).name + C.off + "\n");
+            });
+        }
+    },
+
+    // Which documented misconceptions a paper actually probes.
+    "quiz-diagnostics": function (db) {
+        var QD = loadQuizzes(db);
+        var z = QD.quizById(positional[0]);
+        if (!z) die("no quiz with id '" + positional[0] + "'");
+        var d = QD.diagnostics(z);
+        if (flags["json"]) return jsonOut(d);
+        process.stdout.write(C.bold + z.name + C.off + " — what this paper diagnoses\n");
+        d.probes.forEach(function (p) {
+            process.stdout.write("\n" + C.bold + p.concept + C.off + C.dim + "  " + p.q + C.off + "\n");
+            p.diagnoses.forEach(function (x) { process.stdout.write("  → " + x + "\n"); });
+        });
+        if (d.blind.length) {
+            process.stdout.write("\n" + C.yellow + "Scoring but not diagnosing" + C.off +
+                " — these test a concept with documented misconceptions, but no distractor uses them:\n");
+            d.blind.forEach(function (b) {
+                process.stdout.write("  " + pad(b.q, 24) + C.dim + b.concept + " (" + b.available + " available)" + C.off + "\n");
+            });
+        }
+        process.stdout.write("\n" + d.probes.length + " diagnostic · " + d.blind.length + " merely scoring\n");
+    },
+
     // The packing list.
     "course-kit": function (db) {
         var CD = loadCourses(db);
@@ -414,6 +566,14 @@ if (!cmd || cmd === "help" || cmd === "--help" || cmd === "-h" || !COMMANDS[cmd]
         "  course-gaps <id>         what a course stands on but never teaches",
         "  course-misconceptions <id>   every wrong idea it must confront, in order",
         "  course-kit <id>          packing list, by session",
+        "",
+        C.bold + "Quizzes" + C.off + " — questions tagged with concept ids",
+        "",
+        "  quizzes                  list quizzes and the bank size",
+        "  quiz <id>                the paper   --key for answers + what each distractor reveals",
+        "  quiz-validate            scope check + one-correct-answer (exit 1 on error)",
+        "  quiz-coverage <course>   what a course teaches but never tests",
+        "  quiz-diagnostics <id>    which documented misconceptions the paper probes",
         "",
         "  Shared flags: --json  --subject a,b  --grade 8,9  --search text",
         "",

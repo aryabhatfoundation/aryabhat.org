@@ -22,10 +22,15 @@ Everything lives under `concepts/` and depends on nothing outside it.
 ```
 concepts/
   index.html      the explorer page
+  quiz.html       take a quiz in the browser, scored + diagnosed
   README.md       this file — schema + authoring contract
+  QUIZ-FORMAT.md  the quiz record specification (normative, v1.0)
   db.js           ConceptDB: normalize, filter, validate, traverse
   coursedb.js     CourseDB: coverage + moon feasibility        ← the course layer
-  cli.js          Node CLI over both
+  quizdb.js       QuizDB: scope check + misconception probes   ← the quiz layer
+  cli.js          Node CLI over all three
+  build-pdf.js       course booklet/leaflet generator (a TOOL — see below)
+  build-quiz-pdf.js  quiz paper + marker's key generator (a TOOL)
   data/
     _schema.js    taxonomy tables + window.CONCEPTS = []   ← loads FIRST
     astronomy.js  253 concepts   (the original corpus, plus the quiz mapping)
@@ -38,9 +43,18 @@ concepts/
   courses/
     _schema.js    course taxonomy + window.COURSES = []   ← loads FIRST
     *.js          one file per course
+  quizzes/
+    _schema.js    quiz taxonomy + window.QUESTIONS/QUIZZES = []   ← loads FIRST
+    *.js          question banks + the quizzes that use them
   coverage/
     *.md          which concepts a source document covers
 ```
+
+**`data/`, `courses/` and `quizzes/` hold data only.** Their loaders `require()` every `.js`
+they find, so a script dropped in one gets *executed* on every CLI call. That is not
+hypothetical: `build-pdf.js` once lived in `courses/` and silently killed every course
+command. Tools live in `concepts/`, and the loaders now refuse any file starting with a
+shebang.
 
 There is **no build step**. Subject files are plain `window.CONCEPTS.push(...)` calls;
 the page loads them with `<script>` tags and the CLI fakes a `window` and `require`s
@@ -414,6 +428,84 @@ typos.
    honest answer was to cut the star-tracker night, not to weaken the prereqs. The graph
    was right: you cannot teach polar alignment to someone who has never met a mount.
 5. `status: "draft"` until a human has read it end to end.
+
+---
+
+## The quiz layer
+
+> **The full specification is [QUIZ-FORMAT.md](QUIZ-FORMAT.md)** — normative, versioned,
+> and the place to look before writing a bank. What follows is the orientation.
+
+A concept says what an idea is. A course says when it is taught. A quiz asks whether it
+landed. Every question names the **one concept** it tests — that single tag is what makes
+the rest work.
+
+Two things about the format are easy to trip over and are specified there in full:
+
+- **Option order is derived, not authored.** Write the correct option first; `QuizDB.build()`
+  permutes them from the question id before anyone sees them. So a question id is a
+  permalink — renaming one moves its answer letters.
+- **`diagnoses` is the point.** It names the wrong model a distractor reveals, not the
+  correction. It is also why this is not QTI; QUIZ-FORMAT.md §1 explains that choice.
+
+```js
+{
+  id: "q-moon-phases-01", concept: "moon-phases", kind: "mcq", difficulty: 2,
+  stem: "Why does the Moon show phases?",
+  options: [
+    { text: "We see different fractions of its lit half as it orbits", correct: true },
+    { text: "The Earth's shadow falls across it",
+      diagnoses: "Phases as Earth's shadow — that is an eclipse" }
+  ],
+  explain: "..."
+}
+```
+
+```
+node concepts/cli.js quizzes                    list, with bank size
+node concepts/cli.js quiz <id>                  the student's paper
+node concepts/cli.js quiz <id> --key            answers + what each distractor reveals
+node concepts/cli.js quiz-validate              scope + one-correct-answer (exits 1)
+node concepts/cli.js quiz-coverage <course>     what a course teaches but never tests
+node concepts/cli.js quiz-diagnostics <id>      which misconceptions the paper probes
+```
+
+### `diagnoses` — the reason the layer exists
+
+Distractors are not filler to be guessed between. Each wrong option should be a wrong model
+somebody actually holds, and `diagnoses` names it. Then a marked paper says *"nine students
+hold the shadow model of phases"* rather than *"nine students scored 60%"*. One tells you
+what to reteach on Day 2; the other tells you nothing.
+
+The concept records already carry the documented wrong ideas in `misconceptions` — **draw
+distractors from there**. QuizDB warns when a question tests a concept with documented
+misconceptions but diagnoses none of them: a missed diagnostic opportunity, not a crime.
+Where a concept has none documented, writing the distractor *is* documenting the
+misconception for the first time — those `diagnoses` strings are candidates to fold back
+into the concept record.
+
+### The scope check
+
+Attach a quiz to a course and QuizDB enforces the thing that is impossible to eyeball
+across ninety questions:
+
+- **entry** — every question must test a concept the course **assumes**, and must **not**
+  test one it teaches. An entry check that examines the syllabus is not measuring
+  readiness, it is measuring clairvoyance.
+- **session** — no asking on Day 1 about Day 3's material. Concepts must be taught by that
+  session or assumed.
+- **exit** — must test something the course actually teaches or assumes.
+
+Same spirit as the course layer's prereq coverage: the graph knows what was taught and
+when, so the machine can check the paper.
+
+### Question kinds
+
+`mcq` needs `options` with exactly one `correct: true`. `short` and `practical` need
+`answer` instead — what the marker looks for, or what the assessor watches the student
+**do**. Reach for `practical` when a student could recite the rule and still get it wrong
+in the field: *"Fit the solar filter and hand the scope to the instructor for check"* is a
+better test than any paragraph about filters.
 
 ---
 
