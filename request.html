@@ -6,7 +6,7 @@
     <script src="/js/analytics.js"></script>
 
     <meta charset="utf-8">
-    <title>Request for conducting an Astronomical Event - Aryabhat Foundation</title>
+    <title>Request an Astronomical Event - Aryabhat Foundation</title>
     <meta name="description" content="Request for conducting an Astronomical Event with Aryabhat Foundation">
     <meta name="author" content="Aryabhat Foundation">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,101 +30,123 @@
             color: #ffcc33;
         }
 
+        .form-section .step-hint {
+            color: #9cf;
+            margin: -5px 0 18px;
+            text-indent: 0;
+        }
+
         .hidden {
-            display: none;
+            display: none !important;
         }
 
-        .declaration-box {
-            background-color: #1a2430;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #445;
+        .intro-card {
+            padding: 14px 16px;
             margin-bottom: 20px;
         }
 
-        .declaration-box label {
-            margin-bottom: 0;
+        /* ---- Progress indicator ---- */
+        .steps {
             display: flex;
-            align-items: flex-start;
+            margin: 10px 0 22px;
+            padding: 0;
+            list-style: none;
         }
 
-        .declaration-box input[type="checkbox"] {
-            margin-top: 5px;
-            margin-right: 15px;
-        }
-
-        /* Wizard Tabs */
-        .wizard-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 4px;
-        }
-
-        .wizard-tab {
+        .steps li {
             flex: 1;
             text-align: center;
-            padding: 12px 20px 12px 30px;
-            background-color: #334;
-            color: #9cf;
+            position: relative;
+            cursor: default;
+        }
+
+        .steps li.done {
             cursor: pointer;
+        }
+
+        .step-dot {
+            width: 34px;
+            height: 34px;
+            line-height: 32px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: #223;
+            border: 2px solid #445;
+            color: #9cf;
             font-weight: bold;
             position: relative;
-            clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%);
-            transition: background-color 0.3s, color 0.3s;
+            z-index: 1;
         }
 
-        .wizard-tab:first-child {
-            padding-left: 20px;
-            clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%);
-        }
-
-        .wizard-tab:last-child {
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%);
-        }
-
-        .wizard-tab.active {
+        .steps li.active .step-dot {
             background-color: #146a9a;
+            border-color: #1d88c2;
             color: #fff;
         }
 
-        .wizard-tab:hover:not(.active) {
+        .steps li.done .step-dot {
+            background-color: #1a3a2a;
+            border-color: #3a7;
+            color: #6fc;
+        }
+
+        .step-name {
+            display: block;
+            font-size: 0.8em;
+            margin-top: 6px;
+            color: #9cf;
+            letter-spacing: .03em;
+        }
+
+        .steps li.active .step-name {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* connector line between dots */
+        .steps li+li::before {
+            content: '';
+            position: absolute;
+            top: 17px;
+            left: -50%;
+            width: 100%;
+            height: 2px;
             background-color: #445;
-            color: #fff;
         }
 
-        /* Responsive wizard tabs */
-        @media(max-width: 550px) {
-            .wizard-tabs {
-                flex-direction: column;
-                gap: 2px;
-            }
-
-            .wizard-tab {
-                clip-path: none !important;
-                padding: 12px !important;
-                border-radius: 4px;
-            }
+        .steps li.done+li::before,
+        .steps li.done+li.active::before {
+            background-color: #3a7;
         }
 
-        /* Radio Card Styles */
+        /* ---- Selection cards (event type & org status) ---- */
         .radio-card-group {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 549px) {
+            .radio-card-group {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
         }
 
         .radio-card {
             background-color: #1a2430;
             border: 2px solid #445;
-            border-radius: 8px;
-            padding: 12px 16px;
+            border-radius: 10px;
+            padding: 14px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            transition: all 0.2s ease;
+            gap: 12px;
+            transition: all 0.15s ease;
             margin-bottom: 0;
-            /* Override skeleton form margin */
+            min-height: 52px;
+            box-sizing: border-box;
         }
 
         .radio-card:hover {
@@ -132,36 +154,52 @@
             border-color: #667;
         }
 
-        /* Highlight when selected */
+        .radio-card input[type="radio"] {
+            margin: 0 !important;
+            flex-shrink: 0;
+        }
+
         .radio-card:has(input[type="radio"]:checked) {
             border-color: #ffcc33;
             background-color: #2b3a4a;
         }
 
-        .radio-card input[type="radio"] {
-            margin: 0 12px 0 0 !important;
-            /* Reset margin and space from text */
+        .radio-card .card-icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
         }
 
         .radio-card .label-body {
             font-weight: normal;
-            line-height: 1.3;
+            line-height: 1.35;
         }
 
-        /* Date Picker Cards */
+        .radio-card .label-body small {
+            display: block;
+            color: #9cf;
+            font-size: 0.82em;
+        }
+
+        /* ---- Date cards ---- */
+        .date-cards-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 549px) {
+            .date-cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .date-card {
             background-color: #1a2430;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 12px;
             border: 2px solid #445;
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
-
-        .date-card:hover {
-            transform: translateY(-2px);
-            border-color: #667;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .date-card:focus-within {
@@ -170,10 +208,10 @@
 
         .date-card .choice-label {
             color: #9cf;
-            font-size: 0.85em;
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             display: block;
             font-weight: bold;
         }
@@ -185,27 +223,152 @@
             border-radius: 6px;
             padding: 8px 12px;
             cursor: pointer;
-            margin-bottom: 0px;
+            margin-bottom: 0;
             text-align: center;
+            width: 100%;
+            min-height: 44px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
-        input[type="date"].date-picker:focus,
-        input[type="date"].date-picker:active {
+        input[type="date"].date-picker:focus {
             border-color: #ffcc33;
             background-color: rgba(255, 255, 255, 0.1);
+            outline: 0;
         }
 
-        /* Icon invert for dark theme */
         ::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
         }
 
-        .date-cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+        /* ---- Inputs: comfortable touch size on mobile ---- */
+        #eventRequestForm input[type="text"],
+        #eventRequestForm input[type="tel"],
+        #eventRequestForm input[type="number"],
+        #eventRequestForm textarea {
+            min-height: 44px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #fff;
+        }
+
+        #eventRequestForm label {
+            font-weight: bold;
+        }
+
+        #eventRequestForm label .optional {
+            color: #9cf;
+            font-weight: normal;
+            font-size: 0.85em;
+        }
+
+        /* ---- Validation ---- */
+        .invalid,
+        #eventRequestForm .invalid {
+            border-color: #ff6b6b !important;
+        }
+
+        .field-error {
+            display: none;
+            color: #ff9b9b;
+            font-size: 0.85em;
+            margin: 4px 0 12px;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        /* ---- Declaration ---- */
+        .declaration-box {
+            background-color: #1a2430;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 2px solid #445;
+            margin: 18px 0 6px;
+        }
+
+        .declaration-box.invalid {
+            border-color: #ff6b6b;
+        }
+
+        .declaration-box label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: flex-start;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .declaration-box input[type="checkbox"] {
+            margin: 4px 14px 0 0;
+            transform: scale(1.3);
+            flex-shrink: 0;
+        }
+
+        /* ---- Step navigation buttons ---- */
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 0 40px;
+        }
+
+        .step-nav .button,
+        .step-nav .button-primary {
+            height: 48px;
+            font-size: 1.05em;
+            padding: 0 28px;
+        }
+
+        @media (max-width: 549px) {
+            .step-nav {
+                flex-direction: column-reverse;
+            }
+
+            .step-nav .button,
+            .step-nav .button-primary {
+                width: 100%;
+            }
+        }
+
+        /* ---- Submit failure banner & success panel ---- */
+        .error-banner {
+            background-color: #3a1f24;
+            border: 1px solid #a55;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #ffb3b3;
+        }
+
+        .success-panel {
+            background-color: #1a3a2a;
+            border: 2px solid #3a7;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .success-panel h3 {
+            color: #6fc;
+            margin-top: 0;
+        }
+
+        .success-summary {
+            text-align: left;
+            display: inline-block;
+            margin: 10px auto 0;
+            color: #cfe;
+            line-height: 1.8;
+        }
+
+        .success-summary b {
+            color: #ffcc33;
         }
     </style>
 </head>
@@ -221,299 +384,439 @@
 
         <div class="main row">
             <div class="twelve columns">
-                <br><br>
-                <h2 align="center">Request for conducting an Astronomical Event</h2>
-                <p class="card">This form should be used by Schools, Colleges and other organisations that want to
-                    organise an
-                    Astronomical Event in coordination with Aryabhat Foundation.
-                    The prerequisites for standard events have been mentioned in our online <a
-                        href="https://aryabhat.org/files/Offered%20Activities.pdf">Offered Activities document</a>.
-                    We do not charge any fee for such events. However, the host organisation shall arrange for transport
-                    of equipment & team, and due hospitality for the team members. </p>
+                <br>
+                <h2 align="center">Request an Astronomical Event</h2>
+                <p class="card intro-card" id="intro-card">Schools, colleges and other organisations can invite
+                    Aryabhat Foundation to conduct an astronomy event — see the
+                    <a href="https://aryabhat.org/files/Offered_Activities.pdf">Offered Activities document</a>.
+                    We charge no fee; the host arranges transport of the equipment &amp; team, and due hospitality.</p>
 
-                <div class="wizard-tabs">
-                    <div class="wizard-tab active" id="tab-step-1" onclick="showStep(1)">1. About Event</div>
-                    <div class="wizard-tab" id="tab-step-2" onclick="showStep(2)">2. About your organization</div>
-                </div>
+                <ol class="steps" id="progress-steps">
+                    <li id="step-ind-1" class="active" onclick="stepClicked(1)"><span class="step-dot">1</span><span
+                            class="step-name">Event</span></li>
+                    <li id="step-ind-2" onclick="stepClicked(2)"><span class="step-dot">2</span><span
+                            class="step-name">Details</span></li>
+                    <li id="step-ind-3" onclick="stepClicked(3)"><span class="step-dot">3</span><span
+                            class="step-name">Organisation</span></li>
+                </ol>
 
-                <form action="#" method="POST" id="eventRequestForm" onsubmit="return submitToGoogleForm(event)">
+                <form id="eventRequestForm" novalidate>
 
-                    <!-- Section 1: About Event -->
+                    <!-- Step 1: What do you want to do? -->
                     <div class="form-section" id="section-1">
+                        <h3>What would you like to organise?</h3>
+                        <div class="radio-card-group" id="event-type-group">
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Sky View with Telescopes">
+                                <span class="card-icon">🔭</span>
+                                <span class="label-body">Sky View with Telescopes
+                                    <small>Evening sky-gazing session</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Solar Astronomy Workshop">
+                                <span class="card-icon">☀️</span>
+                                <span class="label-body">Solar Astronomy Workshop
+                                    <small>Daytime Sun observation</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Lecture and Interaction">
+                                <span class="card-icon">🎤</span>
+                                <span class="label-body">Lecture and Interaction
+                                    <small>Talk with Q&amp;A session</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Movie show and Interaction">
+                                <span class="card-icon">🎬</span>
+                                <span class="label-body">Movie show and Interaction
+                                    <small>Astronomy film &amp; discussion</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Workshop for School Teachers">
+                                <span class="card-icon">🧑‍🏫</span>
+                                <span class="label-body">Workshop for School Teachers
+                                    <small>Training for educators</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Composite Program with multiple activities">
+                                <span class="card-icon">🌌</span>
+                                <span class="label-body">Composite Program
+                                    <small>Combine multiple activities</small></span></label>
+                            <label class="radio-card"><input type="radio" name="event_type"
+                                    value="Other activity (Please specify in message)">
+                                <span class="card-icon">✨</span>
+                                <span class="label-body">Other activity
+                                    <small>Tell us your idea</small></span></label>
+                        </div>
+                        <small class="field-error" id="err-event_type">Please choose an event type.</small>
+                    </div>
+
+                    <!-- Step 2: Details -->
+                    <div class="form-section hidden" id="section-2">
+                        <h3>Event details</h3>
+
+                        <label for="beneficiaries">Expected number of participants</label>
+                        <input type="number" id="beneficiaries" name="beneficiaries" min="1" inputmode="numeric"
+                            placeholder="e.g. 50">
+                        <small class="field-error" id="err-beneficiaries">Please enter the expected number of
+                            participants.</small>
+
+                        <label style="margin-top: 10px;">Preferred dates</label>
+                        <p class="step-hint">Give us three possible dates, in order of preference. We will confirm one
+                            with you.</p>
+                        <div class="date-cards-container">
+                            <div class="date-card">
+                                <span class="choice-label">1st choice</span>
+                                <input type="date" id="date1" name="date1" class="date-picker">
+                            </div>
+                            <div class="date-card">
+                                <span class="choice-label">2nd choice</span>
+                                <input type="date" id="date2" name="date2" class="date-picker">
+                            </div>
+                            <div class="date-card">
+                                <span class="choice-label">3rd choice</span>
+                                <input type="date" id="date3" name="date3" class="date-picker">
+                            </div>
+                        </div>
+                        <small class="field-error" id="err-dates">Please pick all three dates (future dates
+                            only).</small>
+
+                        <label for="message" id="message-label" style="margin-top: 10px;">Anything else we should know?
+                            <span class="optional">(optional)</span></label>
+                        <textarea id="message" name="message" rows="3"
+                            placeholder="Any additional details..."></textarea>
+                        <small class="field-error" id="err-message">Please describe the activity you have in
+                            mind.</small>
+                    </div>
+
+                    <!-- Step 3: Organisation -->
+                    <div class="form-section hidden" id="section-3">
+                        <h3>About your organisation</h3>
+
+                        <label style="margin-bottom: 12px;">Type of organisation</label>
+                        <div class="radio-card-group" id="org-status-group">
+                            <label class="radio-card"><input type="radio" name="org_status"
+                                    value="School in Madhya Pradesh" onchange="handleStatusChange()">
+                                <span class="card-icon">🏫</span>
+                                <span class="label-body">School in Madhya Pradesh</span></label>
+                            <label class="radio-card"><input type="radio" name="org_status"
+                                    value="College / Other organisation situated in Bhopal"
+                                    onchange="handleStatusChange()">
+                                <span class="card-icon">🏛️</span>
+                                <span class="label-body">College / other organisation in Bhopal</span></label>
+                            <label class="radio-card"><input type="radio" name="org_status"
+                                    value="Organisation situated outside Bhopal" onchange="handleStatusChange()">
+                                <span class="card-icon">🚗</span>
+                                <span class="label-body">Organisation outside Bhopal</span></label>
+                        </div>
+                        <small class="field-error" id="err-org_status">Please select your organisation type.</small>
+
+                        <div class="hidden" id="quiz_participation_row">
+                            <label for="quiz_students">How many students from your school participated in the last
+                                Aryabhat Astronomy Quiz?</label>
+                            <input type="number" id="quiz_students" name="quiz_students" min="0" inputmode="numeric"
+                                placeholder="e.g. 120 (enter 0 if none)">
+                            <small class="field-error" id="err-quiz_students">Please enter a number (0 if none
+                                participated).</small>
+                        </div>
+
+                        <label for="org_name">Name and address of the organisation</label>
+                        <textarea id="org_name" name="org_name" rows="2"
+                            placeholder="e.g. Govt. Higher Secondary School, Berasia Road, Bhopal"></textarea>
+                        <small class="field-error" id="err-org_name">Please enter your organisation's name and
+                            address.</small>
 
                         <div class="row">
-                            <label style="margin-bottom: 15px;">What kind of event do you wish to organise?</label>
-                            <div class="radio-card-group">
-                                <label class="radio-card"><input type="radio" name="event_type"
-                                        value="Sky View with Telescopes" required>
-                                    <span class="label-body">Sky View with Telescopes</span></label>
-                                <label class="radio-card"><input type="radio" name="event_type"
-                                        value="Solar Astronomy Workshop"> <span class="label-body">Solar Astronomy
-                                        Workshop</span></label>
-                                <label class="radio-card"><input type="radio" name="event_type"
-                                        value="Lecture and Interaction"> <span class="label-body">Lecture and
-                                        Interaction</span></label>
-                                <label class="radio-card"><input type="radio" name="event_type"
-                                        value="Movie show and Interaction"> <span class="label-body">Movie show and
-                                        Interaction</span></label>
-                                <label class="radio-card"><input type="radio" name="event_type"
-                                        value="Workshop for School Teachers"> <span class="label-body">Workshop for
-                                        School Teachers</span></label>
-                                <label class="radio-card"><input type="radio" name="event_type" value="Other activity">
-                                    <span class="label-body">Other activity (specify in message)</span></label>
+                            <div class="six columns">
+                                <label for="contact_name">Contact person's name and designation</label>
+                                <input type="text" id="contact_name" name="contact_name"
+                                    placeholder="e.g. Sunita Sharma, Principal">
+                                <small class="field-error" id="err-contact_name">Please enter the contact person's name
+                                    and designation.</small>
+                            </div>
+                            <div class="six columns">
+                                <label for="contact_mobile">Contact person's mobile number</label>
+                                <input type="tel" id="contact_mobile" name="contact_mobile" inputmode="tel"
+                                    placeholder="10-digit mobile number">
+                                <small class="field-error" id="err-contact_mobile">Please enter a valid mobile
+                                    number.</small>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <label style="margin-bottom: 15px;">Preferred Dates</label>
-                            <div class="date-cards-container">
-                                <div class="date-card">
-                                    <span class="choice-label">Choice 1 (Required)</span>
-                                    <input type="date" id="date1" name="date1" class="u-full-width date-picker"
-                                        required>
-                                </div>
-                                <div class="date-card">
-                                    <span class="choice-label">Choice 2 (Required)</span>
-                                    <input type="date" id="date2" name="date2" class="u-full-width date-picker"
-                                        required>
-                                </div>
-                                <div class="date-card">
-                                    <span class="choice-label">Choice 3 (Required)</span>
-                                    <input type="date" id="date3" name="date3" class="u-full-width date-picker"
-                                        required>
-                                </div>
-                            </div>
+                        <div class="declaration-box" id="declaration-box">
+                            <label>
+                                <input type="checkbox" name="declaration" id="declaration">
+                                <span class="label-body justify">We have read the terms and conditions of Aryabhat and
+                                    we agree to abide by them. We also agree to provide the Transport arrangement and
+                                    due hospitality for the Equipment and the team.</span>
+                            </label>
                         </div>
-
-                        <div class="row">
-                            <label for="beneficiaries">Expected number of beneficiaries</label>
-                            <input type="number" id="beneficiaries" name="beneficiaries" class="u-full-width" min="1"
-                                placeholder="e.g. 50" required>
-                        </div>
-
-                        <div class="row">
-                            <label for="message">Message (Specify other activity or additional details)</label>
-                            <textarea id="message" name="message" class="u-full-width"
-                                placeholder="Any additional details..." required></textarea>
-                        </div>
+                        <small class="field-error" id="err-declaration">Please accept the declaration to submit your
+                            request.</small>
                     </div>
 
-                    <div class="row" style="text-align: right; margin-top: 20px;">
-                        <button class="button-primary" type="button" onclick="showStep(2)">Next Step ➔</button>
+                    <div class="error-banner hidden" id="submit-error">Submission failed. Please check your internet
+                        connection and press Submit again.</div>
+
+                    <div class="step-nav">
+                        <button class="button hidden" type="button" id="back-btn" onclick="goBack()">⬅ Back</button>
+                        <button class="button-primary" type="submit" id="next-btn">Continue ➔</button>
                     </div>
-            </div>
+                </form>
 
-            <!-- Section 2: About your organization -->
-            <div class="form-section hidden" id="section-2">
-
-                <div class="row">
-                    <label for="org_name">🏫 Name and Address of the host organisation</label>
-                    <textarea id="org_name" name="org_name" class="u-full-width" required></textarea>
-                </div>
-
-                <div class="row">
-                    <div class="six columns">
-                        <label for="contact_name">👤 Contact person's name and designation</label>
-                        <input type="text" id="contact_name" name="contact_name" class="u-full-width" required>
-                    </div>
-                    <div class="six columns">
-                        <label for="contact_mobile">📞 Contact person's Mobile number</label>
-                        <input type="tel" id="contact_mobile" name="contact_mobile" class="u-full-width" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <label style="margin-bottom: 15px;">Status of the host organisation</label>
-                    <div class="radio-card-group" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
-                        <label class="radio-card"><input type="radio" name="org_status" value="School in Madhya Pradesh"
-                                required onchange="handleStatusChange()"> <span class="label-body">School in Madhya
-                                Pradesh</span></label>
-                        <label class="radio-card"><input type="radio" name="org_status"
-                                value="College / Other organisation situated in Bhopal" onchange="handleStatusChange()">
-                            <span class="label-body">College / Other organisation
-                                situated in Bhopal</span></label>
-                        <label class="radio-card"><input type="radio" name="org_status"
-                                value="Organisation situated outside Bhopal" onchange="handleStatusChange()"> <span
-                                class="label-body">Organisation situated outside
-                                Bhopal</span></label>
-                    </div>
-                </div>
-
-                <div class="row hidden" id="quiz_participation_row">
-                    <label for="quiz_students">How many students from your school participated in the last
-                        Aryabhat Astronomy Quiz?</label>
-                    <input type="number" id="quiz_students" name="quiz_students" class="u-full-width" min="0">
-                </div>
-                <div class="row" style="margin-top: 20px; display: flex; justify-content: space-between;">
-                    <button class="button" type="button" onclick="showStep(1)">⬅ Previous Step</button>
+                <div class="success-panel hidden" id="success-panel">
+                    <h3>✅ Request received — thank you!</h3>
+                    <p style="color:#cfe; text-indent:0;">Our team will contact you to confirm the date and the
+                        arrangements.</p>
+                    <div class="success-summary" id="success-summary"></div>
                 </div>
             </div>
+        </div>
 
-            <div class="row declaration-box hidden" id="declaration-section">
-                <label>
-                    <input type="checkbox" name="declaration" required>
-                    <span class="label-body justify">We have read the terms and conditions of Aryabhat and we
-                        agree to abide by them. We also agree to provide the Transport arrangement and due
-                        hospitality for the Equipment and the team.</span>
-                </label>
-            </div>
-
-            <div class="row hidden" id="submit-section" style="text-align: center; margin-bottom: 40px;">
-                <button class="button-primary" type="submit">Submit Request</button>
-            </div>
-
-            </form>
+        <div class="row">
+            <p> &copy; Aryabhat Foundation &middot;</p>
         </div>
     </div>
 
-    <div class="row">
-        <p> &copy; Aryabhat Foundation &middot;</p>
-    </div>
-    </div>
-
-    <script src="js/background-stars.js"></script>
+    <script src="js/cosmos-bg.js"></script>
     <script src="js/layout.js"></script>
     <script>
+        // ---- Submission wiring --------------------------------------------------
+        // Submissions go through a Google Apps Script relay bound to the Google
+        // Form (see tools/form-relay.gs in the repo). The form's invisible
+        // reCAPTCHA blocks direct cross-origin posts to formResponse, so the
+        // relay files the response server-side as the form owner and reports
+        // real success or failure back to this page. The relay also maps the
+        // chosen event onto each branch's own event question.
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzU4BIg3AAHuS5eaBC0KdytEbzXzMu8pSWIbANlbrjTO8JPp8lxpMoSkBPo12zZoLOh1w/exec';
+        const OTHER_CHOICE = 'Other activity (Please specify in message)';
+
+        // ---- Wizard navigation --------------------------------------------------
+        let currentStep = 1;
+        const TOTAL_STEPS = 3;
+
         function showStep(step) {
-            const section1 = document.getElementById('section-1');
-            const section2 = document.getElementById('section-2');
-            const tab1 = document.getElementById('tab-step-1');
-            const tab2 = document.getElementById('tab-step-2');
-            const declaration = document.getElementById('declaration-section');
-            const submitBtn = document.getElementById('submit-section');
+            currentStep = step;
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                document.getElementById('section-' + i).classList.toggle('hidden', i !== step);
+                const ind = document.getElementById('step-ind-' + i);
+                ind.classList.toggle('active', i === step);
+                ind.classList.toggle('done', i < step);
+            }
+            document.getElementById('back-btn').classList.toggle('hidden', step === 1);
+            document.getElementById('next-btn').textContent = (step === TOTAL_STEPS) ? 'Submit Request' : 'Continue ➔';
+            document.getElementById('progress-steps').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function stepClicked(step) {
+            if (step < currentStep) showStep(step); // free to go back; forward goes through validation
+        }
+
+        function goBack() {
+            if (currentStep > 1) showStep(currentStep - 1);
+        }
+
+        // ---- Validation ---------------------------------------------------------
+        function setFieldError(id, hasError, invalidEl) {
+            document.getElementById('err-' + id).classList.toggle('show', hasError);
+            if (invalidEl) invalidEl.classList.toggle('invalid', hasError);
+        }
+
+        function validateStep(step) {
+            const form = document.getElementById('eventRequestForm');
+            const bad = [];
 
             if (step === 1) {
-                section1.classList.remove('hidden');
-                section2.classList.add('hidden');
-                tab1.classList.add('active');
-                tab2.classList.remove('active');
-                declaration.classList.add('hidden');
-                submitBtn.classList.add('hidden');
-            } else if (step === 2) {
-                // Optionally validate section 1 fields here before proceeding
-                const eventType = document.querySelector('input[name="event_type"]:checked');
-                const date1 = document.getElementById('date1').value;
-                const date2 = document.getElementById('date2').value;
-                const date3 = document.getElementById('date3').value;
-                const beneficiaries = document.getElementById('beneficiaries').value;
-                const message = document.getElementById('message').value.trim();
+                const ok = !!form.event_type.value;
+                setFieldError('event_type', !ok);
+                if (!ok) bad.push(document.getElementById('event-type-group'));
+            }
 
-                if (!eventType || !date1 || !date2 || !date3 || !beneficiaries || !message) {
-                    alert('Please fill out all required fields in Step 1 (Event Type, all three date choices, Expected Beneficiaries, and Message) before proceeding.');
-                    return;
+            if (step === 2) {
+                const ben = document.getElementById('beneficiaries');
+                const benOk = parseInt(ben.value, 10) >= 1;
+                setFieldError('beneficiaries', !benOk, ben);
+                if (!benOk) bad.push(ben);
+
+                const dateEls = ['date1', 'date2', 'date3'].map(id => document.getElementById(id));
+                let datesOk = true;
+                let dateMsg = 'Please pick all three dates (future dates only).';
+                dateEls.forEach(el => {
+                    const ok = !!el.value && el.value >= el.min;
+                    el.classList.toggle('invalid', !ok);
+                    if (!ok) datesOk = false;
+                });
+                if (datesOk) {
+                    // All three are present and valid — now require them to be distinct.
+                    const counts = {};
+                    dateEls.forEach(el => { counts[el.value] = (counts[el.value] || 0) + 1; });
+                    if (Object.values(counts).some(c => c > 1)) {
+                        datesOk = false;
+                        dateMsg = 'Please choose three different dates.';
+                        dateEls.forEach(el => { if (counts[el.value] > 1) el.classList.add('invalid'); });
+                    }
+                }
+                document.getElementById('err-dates').textContent = dateMsg;
+                setFieldError('dates', !datesOk);
+                if (!datesOk) bad.push(document.querySelector('.date-cards-container'));
+
+                const msg = document.getElementById('message');
+                const msgOk = form.event_type.value !== OTHER_CHOICE || msg.value.trim() !== '';
+                setFieldError('message', !msgOk, msg);
+                if (!msgOk) bad.push(msg);
+            }
+
+            if (step === 3) {
+                const statusOk = !!form.org_status.value;
+                setFieldError('org_status', !statusOk);
+                if (!statusOk) bad.push(document.getElementById('org-status-group'));
+
+                if (form.org_status.value === 'School in Madhya Pradesh') {
+                    const quiz = document.getElementById('quiz_students');
+                    const quizOk = quiz.value !== '' && parseInt(quiz.value, 10) >= 0;
+                    setFieldError('quiz_students', !quizOk, quiz);
+                    if (!quizOk) bad.push(quiz);
                 }
 
-                section1.classList.add('hidden');
-                section2.classList.remove('hidden');
-                tab1.classList.remove('active');
-                tab2.classList.add('active');
-                declaration.classList.remove('hidden');
-                submitBtn.classList.remove('hidden');
+                const org = document.getElementById('org_name');
+                const orgOk = org.value.trim() !== '';
+                setFieldError('org_name', !orgOk, org);
+                if (!orgOk) bad.push(org);
+
+                const cname = document.getElementById('contact_name');
+                const cnameOk = cname.value.trim() !== '';
+                setFieldError('contact_name', !cnameOk, cname);
+                if (!cnameOk) bad.push(cname);
+
+                const mob = document.getElementById('contact_mobile');
+                const mobOk = /^[0-9+\-()\s]{10,15}$/.test(mob.value.trim());
+                setFieldError('contact_mobile', !mobOk, mob);
+                if (!mobOk) bad.push(mob);
+
+                const dec = document.getElementById('declaration');
+                setFieldError('declaration', !dec.checked, document.getElementById('declaration-box'));
+                if (!dec.checked) bad.push(document.getElementById('declaration-box'));
             }
+
+            if (bad.length) {
+                bad[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+            return true;
         }
+
+        // ---- Conditional fields -------------------------------------------------
         function handleStatusChange() {
-            const statusRadio = document.querySelector('input[name="org_status"]:checked');
-            const quizRow = document.getElementById('quiz_participation_row');
-            const quizInput = document.getElementById('quiz_students');
-
-            if (statusRadio && statusRadio.value === 'School in Madhya Pradesh') {
-                quizRow.classList.remove('hidden');
-                quizInput.setAttribute('required', 'required');
-            } else {
-                quizRow.classList.add('hidden');
-                quizInput.removeAttribute('required');
-                quizInput.value = '';
+            const form = document.getElementById('eventRequestForm');
+            const isMP = form.org_status.value === 'School in Madhya Pradesh';
+            document.getElementById('quiz_participation_row').classList.toggle('hidden', !isMP);
+            if (!isMP) {
+                document.getElementById('quiz_students').value = '';
+                setFieldError('quiz_students', false, document.getElementById('quiz_students'));
             }
         }
 
-        function submitToGoogleForm(e) {
+        function updateMessageLabel() {
+            const form = document.getElementById('eventRequestForm');
+            const label = document.getElementById('message-label');
+            if (form.event_type.value === OTHER_CHOICE) {
+                label.innerHTML = 'Describe the activity you have in mind';
+            } else {
+                label.innerHTML = 'Anything else we should know? <span class="optional">(optional)</span>';
+            }
+        }
+
+        // ---- Submission ---------------------------------------------------------
+        function buildSubmissionData(form) {
+            return {
+                org: form.org_name.value.trim(),
+                contact: form.contact_name.value.trim(),
+                mobile: form.contact_mobile.value.trim(),
+                status: form.org_status.value,
+                event: form.event_type.value,
+                quiz: form.quiz_students.value,
+                date1: form.date1.value,
+                date2: form.date2.value,
+                date3: form.date3.value,
+                participants: form.beneficiaries.value,
+                message: form.message.value.trim()
+            };
+        }
+
+        function showSuccess(form) {
+            const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN',
+                { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('success-summary').innerHTML =
+                '<b>Event:</b> ' + form.event_type.value.replace(' (Please specify in message)', '') + '<br>' +
+                '<b>Participants:</b> ' + form.beneficiaries.value + '<br>' +
+                '<b>Preferred dates:</b> ' + fmt(form.date1.value) + ' / ' + fmt(form.date2.value) + ' / ' + fmt(form.date3.value) + '<br>' +
+                '<b>Contact:</b> ' + form.contact_name.value + ', ' + form.contact_mobile.value;
+            form.classList.add('hidden');
+            document.getElementById('progress-steps').classList.add('hidden');
+            document.getElementById('intro-card').classList.add('hidden');
+            const panel = document.getElementById('success-panel');
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof gtag === 'function') {
+                gtag('event', 'event_request_submitted', { event_label: form.event_type.value });
+            }
+        }
+
+        document.getElementById('eventRequestForm').addEventListener('submit', function (e) {
             e.preventDefault();
+            if (!validateStep(currentStep)) return;
+            if (currentStep < TOTAL_STEPS) {
+                showStep(currentStep + 1);
+                return;
+            }
+
             const form = e.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalLabel = submitBtn.textContent;
+            const submitBtn = document.getElementById('next-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+            document.getElementById('submit-error').classList.add('hidden');
 
-            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfxU6bReItNXDLkE0ZSNcR-K1lkVrwrFd_ZcHeIoy5vDajABg/formResponse';
-            const DECLARATION_TEXT = 'We have read the terms and conditions of Aryabhat and we agree to abide by them. We also agree to provide the Transport arrangement and due hospitality for the Equipment and the team.';
-
-            const data = new FormData();
-            data.append('entry.2004549463', form.org_name.value);
-            data.append('entry.177831093', form.contact_name.value);
-            data.append('entry.1311425902', form.contact_mobile.value);
-
-            const orgStatus = (form.org_status.value || '').trim();
-            data.append('entry.887324177', orgStatus);
-
-            const eventType = (form.event_type.value || '').trim();
-            let pageHistory;
-            if (orgStatus === 'School in Madhya Pradesh') {
-                data.append('entry.1502852254', eventType);
-                if (form.quiz_students && form.quiz_students.value !== '') {
-                    data.append('entry.410486298', form.quiz_students.value);
-                }
-                pageHistory = '0,1';
-            } else if (orgStatus === 'College / Other organisation situated in Bhopal') {
-                data.append('entry.707527323', eventType);
-                pageHistory = '0,2,4';
-            } else if (orgStatus === 'Organisation situated outside Bhopal') {
-                data.append('entry.1341374603', eventType);
-                pageHistory = '0,3,4';
-            }
-
-            // Dates, beneficiaries, message, declaration are only reached on non-MP paths.
-            if (orgStatus !== 'School in Madhya Pradesh') {
-                const dateMap = {
-                    date1: 'entry.1800191993',
-                    date2: 'entry.1039685010',
-                    date3: 'entry.1389898607'
-                };
-                Object.keys(dateMap).forEach(key => {
-                    const val = form[key].value;
-                    if (val) {
-                        const [y, m, d] = val.split('-');
-                        data.append(dateMap[key] + '_year', y);
-                        data.append(dateMap[key] + '_month', m);
-                        data.append(dateMap[key] + '_day', d);
-                    }
-                });
-                data.append('entry.413558893', form.beneficiaries.value);
-                data.append('entry.1433939273', form.message.value);
-                data.append('entry.2117185552', DECLARATION_TEXT);
-            }
-
-            data.append('fvv', '1');
-            data.append('pageHistory', pageHistory);
-
-            fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: data })
-                .then(() => {
-                    alert('Thank you! Your request has been submitted. We will contact you soon.');
-                    form.reset();
-                    showStep(1);
-                    handleStatusChange();
+            // Plain-string body keeps this a "simple" request (no CORS preflight,
+            // which Apps Script does not answer). The relay's reply is readable,
+            // so success here means the response really was recorded.
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(buildSubmissionData(form)) })
+                .then(r => r.json())
+                .then(result => {
+                    if (!result.ok) throw new Error(result.error || 'Submission rejected');
+                    showSuccess(form);
                 })
                 .catch(() => {
-                    alert('Submission failed. Please check your connection and try again.');
-                })
-                .finally(() => {
+                    const banner = document.getElementById('submit-error');
+                    banner.classList.remove('hidden');
+                    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     submitBtn.disabled = false;
-                    submitBtn.textContent = originalLabel;
+                    submitBtn.textContent = 'Submit Request';
                 });
+        });
 
-            return false;
-        }
-
-        // Set min date for date pickers to tomorrow
-        window.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            // Only future dates means min is at least tomorrow
-            today.setDate(today.getDate() + 1);
-            const tomorrowStr = today.toISOString().split('T')[0];
-
-            document.querySelectorAll('.date-picker').forEach(picker => {
-                picker.setAttribute('min', tomorrowStr);
+        // Tapping an event card answers the only question of step 1 — move on.
+        document.querySelectorAll('input[name="event_type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                setFieldError('event_type', false);
+                updateMessageLabel();
+                if (currentStep === 1) setTimeout(() => showStep(2), 250);
             });
         });
+
+        // Clear field errors as soon as the user fixes them.
+        ['beneficiaries', 'org_name', 'contact_name', 'contact_mobile', 'quiz_students', 'message'].forEach(id => {
+            document.getElementById(id).addEventListener('input', e => setFieldError(id, false, e.target));
+        });
+        ['date1', 'date2', 'date3'].forEach(id => {
+            document.getElementById(id).addEventListener('change', e => {
+                e.target.classList.remove('invalid');
+                setFieldError('dates', false);
+            });
+        });
+        document.querySelectorAll('input[name="org_status"]').forEach(r =>
+            r.addEventListener('change', () => setFieldError('org_status', false)));
+        document.getElementById('declaration').addEventListener('change', () =>
+            setFieldError('declaration', false, document.getElementById('declaration-box')));
+
+        // Only future dates can be requested.
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        document.querySelectorAll('.date-picker').forEach(p => p.setAttribute('min', minDate));
     </script>
 </body>
 
