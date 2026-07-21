@@ -44,7 +44,7 @@
       },
       {
         "source": "/requestevent",
-        "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfxU6bReItNXDLkE0ZSNcR-K1lkVrwrFd_ZcHeIoy5vDajABg/viewform",
+        "destination": "/request.html",
         "type": 302
       },
       {
