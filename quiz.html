@@ -786,8 +786,9 @@
 
       <!-- ============================================================
            QUIZ PORTAL BANNER — top-level card linking to the live
-           quiz portal (Astro Quiz 2026-27 registration is open).
-           ============================================================ -->
+           quiz portal. Individual registration for 2026-27 is closed;
+           card commented out below for reuse next year.
+           ============================================================
       <section class="quiz-portal">
         <span class="quiz-portal-kicker">👤 Individual Registration &middot; Astro Quiz 2026&ndash;27</span>
         <div class="quiz-portal-line">
@@ -799,14 +800,19 @@
           </div>
         </div>
       </section>
+      -->
 
-      <!-- Second banner — school registration, promoted from the sidebar -->
-      <section class="quiz-portal quiz-portal-schools">
+      <!-- Second banner — school registration, promoted from the sidebar.
+           id="institutional" lives on the section (was on the last-date
+           span) so quiz.html#institutional links keep working. -->
+      <section class="quiz-portal quiz-portal-schools" id="institutional">
         <span class="quiz-portal-kicker">🏫 Registration for Schools</span>
         <div class="quiz-portal-line">
+          <!-- Last date hidden — registration window over
           <div class="quiz-portal-title-box">
-            <span class="quiz-portal-title quiz-portal-title-sm" id="institutional">Last date 25 July 2026</span>
+            <span class="quiz-portal-title quiz-portal-title-sm">Last date 25 July 2026</span>
           </div>
+          -->
           <div class="quiz-portal-action">
             <a class="button button-primary" href="astroquiz-guide.html">📖 Guide for Schools</a>
             <a class="button button-primary" target="_blank" href="files/2026/Flow.pdf">Flow Chart</a>
@@ -855,6 +861,7 @@
             </div>
           </details>
 
+          <!-- Individual registration closed for 2026-27 — reuse next year.
           <details class="card-container">
             <summary>
               <h5>👤 Individual Registration</h5>
@@ -864,6 +871,7 @@
               <a class="button button-primary" target="_blank" href="https://quiz.aryabhat.org">Take me there &rarr;</a>
             </div>
           </details>
+          -->
 
           <details class="card-container">
             <summary>
