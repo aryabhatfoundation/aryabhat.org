@@ -558,6 +558,48 @@
             touch-action: manipulation;
         }
 
+        /* Swipe feedback: the incoming chart enters from the side the finger
+           came from, so the gesture reads as moving along a row of charts. */
+        @keyframes cs-slide-from-right {
+            from {
+                opacity: 0;
+                transform: translateX(7%);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes cs-slide-from-left {
+            from {
+                opacity: 0;
+                transform: translateX(-7%);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .chart-shell.from-right {
+            animation: cs-slide-from-right .28s ease-out;
+        }
+
+        .chart-shell.from-left {
+            animation: cs-slide-from-left .28s ease-out;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .chart-shell.from-right,
+            .chart-shell.from-left {
+                animation: none;
+            }
+        }
+
         .chart-hint {
             text-align: center;
             color: var(--ink-dim);
@@ -628,6 +670,20 @@
             color: var(--ink-dim);
             font-size: .9rem;
             margin-top: 6px;
+        }
+
+        .star-page-link {
+            display: inline-block;
+            white-space: nowrap;
+            font-family: var(--font-display);
+            font-size: .8rem;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .star-page-link:hover {
+            color: var(--gold-soft);
+            text-decoration: underline;
         }
 
         .star-stats {
@@ -947,7 +1003,7 @@
             <!-- ================= DETAIL ================= -->
             <section id="detail-view" class="hidden" aria-live="polite">
                 <div class="detail-nav">
-                    <a class="link-btn" href="#" id="back-link">← All constellations</a>
+                    <a class="link-btn" href="constellations.html" id="back-link">← All constellations</a>
                     <span>
                         <a class="link-btn" id="prev-link" href="#">← Prev</a>
                         <a class="link-btn" id="next-link" href="#">Next →</a>
@@ -974,6 +1030,7 @@
 
                 <div class="cta-row">
                     <button class="button" type="button" id="copy-link">🔗 Copy link to this chart</button>
+                    <a class="button" href="stars.html">⭐ Bright stars →</a>
                     <a class="button" href="sky.html">🌌 Tonight's sky map →</a>
                 </div>
             </section>
@@ -996,6 +1053,7 @@
     <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
 
     <script src="js/constellation-data.js"></script>
+    <script src="js/sky-charts.js"></script>
     <script>
         (function () {
             'use strict';
@@ -1003,27 +1061,21 @@
             var DATA = window.CONSTELLATION_DATA;
             var CONS = DATA.constellations;
 
-            // Central India (Bhopal) — the same observer sky.html uses.
-            var LAT = 23.2599;
-
-            // Spectral class -> [core, glow]. Same table the chart generator
-            // uses, so the page and the source SVGs agree.
-            var SPECTRAL = {
-                O: ['#cad7ff', '#7c9dff'],
-                B: ['#dbe4ff', '#93b4ff'],
-                A: ['#ffffff', '#c9d8ff'],
-                F: ['#fff6ec', '#ffe2b8'],
-                G: ['#fff2d0', '#ffd98a'],
-                K: ['#ffe0b8', '#ffb765'],
-                M: ['#ffc9b0', '#ff8f6b']
-            };
-            var DEFAULT_COLOR = ['#ffffff', '#c9d8ff'];
+            // Colours, radii, sky arithmetic and the chart renderer itself are
+            // shared with stars.html so the two pages never drift apart.
+            var SC = window.SkyCharts;
+            var MONTHS = SC.MONTHS;
+            var starColors = SC.starColors;
+            var starLabel = SC.starLabel;
+            var bestMonth = SC.bestMonth;
+            var visibilityNote = SC.visibilityNote;
+            var formatRA = SC.formatRA;
+            var formatDec = SC.formatDec;
+            var brightnessNote = SC.brightnessNote;
+            var normalise = SC.normalise;
 
             var ZODIAC = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra',
                 'scorpius', 'sagittarius', 'capricornus', 'aquarius', 'pisces'];
-
-            var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-                'August', 'September', 'October', 'November', 'December'];
 
             var CATEGORY_LABEL = {
                 'nakshatra': 'Nakshatra junction star',
@@ -1032,62 +1084,9 @@
                 'vedic-asterism': 'Vedic asterism'
             };
 
-            var SVGNS = 'http://www.w3.org/2000/svg';
-
             // ---------------------------------------------------------
             // Derived fields
             // ---------------------------------------------------------
-
-            function starColors(spectral) {
-                if (spectral) {
-                    var head = spectral.replace(/^[dgsDGS]+/, '');
-                    for (var i = 0; i < 2 && i < head.length; i++) {
-                        var c = head.charAt(i).toUpperCase();
-                        if (SPECTRAL[c]) return SPECTRAL[c];
-                    }
-                }
-                return DEFAULT_COLOR;
-            }
-
-            function starRadius(mag) {
-                return Math.max(3.2, Math.min(26.0, 13.0 * Math.exp(-0.22 * mag)));
-            }
-
-            // The month a constellation stands highest at around 9pm: it crosses
-            // the meridian then when the Sun sits 9h of right ascension behind it,
-            // and the Sun's RA is 0h at the March equinox and gains 24h a year.
-            function bestMonth(raDeg) {
-                var raHours = raDeg / 15;
-                var dayOfYear = 80 + ((raHours - 9 + 24) % 24) * (365.25 / 24);
-                var d = new Date(2001, 0, 1);
-                d.setDate(1 + Math.round(dayOfYear) % 365);
-                return d.getMonth();
-            }
-
-            // Highest the figure's centre ever gets above the Central-India horizon.
-            function culmination(decDeg) {
-                return 90 - Math.abs(LAT - decDeg);
-            }
-
-            function visibilityNote(decDeg) {
-                var alt = culmination(decDeg);
-                if (alt <= 0) return { text: 'Never rises here', sub: 'too far south for Central India' };
-                if (decDeg > 90 - LAT) return { text: 'Circumpolar', sub: 'up every night of the year' };
-                if (alt < 20) return {
-                    text: 'Low — ' + Math.round(alt) + '° up',
-                    sub: 'needs a clear southern horizon'
-                };
-                return { text: Math.round(alt) + '° above the horizon', sub: 'at its highest, from Central India' };
-            }
-
-            // Fold to a comparable key: drop IAST diacritics and punctuation so a
-            // search for "krttika" hits K\u1e5bttik\u0101, while Devanagari passes through
-            // untouched so \u092e\u0947\u0937 still matches too.
-            function normalise(text) {
-                return (text || '').toLowerCase()
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9\u0900-\u097f]/g, '');
-            }
 
             // Precompute the fields the atlas searches and filters on.
             CONS.forEach(function (c, i) {
@@ -1120,10 +1119,6 @@
             // Formatting
             // ---------------------------------------------------------
 
-            function starLabel(s) {
-                return s.name || s.desig || ('HIP ' + s.hip);
-            }
-
             // For most constellations the source database's transliteration is
             // just the Latin name again — only show it when it says something.
             function sanskritLabel(con) {
@@ -1133,96 +1128,11 @@
                 return con.devanagari + (iast ? ' · ' + iast : '');
             }
 
-            function formatRA(deg) {
-                var hours = deg / 15;
-                var h = Math.floor(hours);
-                var m = Math.floor((hours - h) * 60);
-                return h + 'h ' + (m < 10 ? '0' : '') + m + 'm';
-            }
-
-            function formatDec(deg) {
-                var sign = deg < 0 ? '−' : '+';
-                var a = Math.abs(deg);
-                var d = Math.floor(a);
-                var m = Math.round((a - d) * 60);
-                if (m === 60) { d += 1; m = 0; }
-                return sign + d + '° ' + (m < 10 ? '0' : '') + m + '′';
-            }
-
-            function brightnessNote(mag) {
-                if (mag < 1.5) return 'one of the brightest stars in the sky';
-                if (mag < 3) return 'easy to see from a town';
-                if (mag < 4.5) return 'needs a reasonably dark sky';
-                return 'faint — dark skies only';
-            }
-
             function el(tag, className, text) {
                 var node = document.createElement(tag);
                 if (className) node.className = className;
                 if (text !== undefined) node.textContent = text;
                 return node;
-            }
-
-            function svgEl(tag, attrs) {
-                var node = document.createElementNS(SVGNS, tag);
-                for (var k in attrs) {
-                    if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-                        node.setAttribute(k, attrs[k]);
-                    }
-                }
-                return node;
-            }
-
-            // ---------------------------------------------------------
-            // Thumbnails
-            // ---------------------------------------------------------
-
-            // A card shows the figure alone — lines and the stars they join —
-            // cropped to its own bounding box so small figures aren't lost in
-            // the frame.
-            function buildThumb(con) {
-                var stars = con.figureStars.length ? con.figureStars : con.stars;
-                var xs = stars.map(function (s) { return s.x; });
-                var ys = stars.map(function (s) { return s.y; });
-                var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
-                var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
-                var pad = 70;
-                var w = Math.max(maxX - minX, 1) + pad * 2;
-                var h = Math.max(maxY - minY, 1) + pad * 2;
-                // Letterbox into a fixed 4:3 card so the grid stays even.
-                var target = 4 / 3;
-                if (w / h < target) { var nw = h * target; minX -= (nw - w) / 2; w = nw; }
-                else { var nh = w / target; minY -= (nh - h) / 2; h = nh; }
-
-                var svg = svgEl('svg', {
-                    'class': 'thumb',
-                    viewBox: (minX - pad) + ' ' + (minY - pad) + ' ' + w + ' ' + h,
-                    'aria-hidden': 'true', focusable: 'false'
-                });
-
-                var byHip = {};
-                con.stars.forEach(function (s) { byHip[s.hip] = s; });
-
-                var lines = svgEl('g', {
-                    fill: 'none', stroke: '#9dbcff', 'stroke-opacity': '0.75',
-                    'stroke-width': '5', 'stroke-linecap': 'round'
-                });
-                con.segments.forEach(function (seg) {
-                    var pts = seg.filter(function (hip) { return byHip[hip]; })
-                        .map(function (hip) { return byHip[hip].x + ',' + byHip[hip].y; }).join(' ');
-                    if (pts) lines.appendChild(svgEl('polyline', { points: pts }));
-                });
-                svg.appendChild(lines);
-
-                stars.forEach(function (s) {
-                    var colors = starColors(s.sp);
-                    var r = Math.max(6, starRadius(s.mag) * 0.85);
-                    svg.appendChild(svgEl('circle', {
-                        cx: s.x, cy: s.y, r: r * 2.6, fill: colors[1], 'fill-opacity': '0.20'
-                    }));
-                    svg.appendChild(svgEl('circle', { cx: s.x, cy: s.y, r: r, fill: colors[0] }));
-                });
-                return svg;
             }
 
             // ---------------------------------------------------------
@@ -1260,7 +1170,7 @@
                 shown.forEach(function (con) {
                     var card = el('a', 'con-card');
                     card.href = '#' + con.id;
-                    card.appendChild(buildThumb(con));
+                    card.appendChild(SC.buildThumb(con));
                     var body = el('div', 'card-body');
                     body.appendChild(el('div', 'card-latin', con.latin));
                     if (con.devanagari) {
@@ -1303,6 +1213,14 @@
             var current = null;
             var selectedHip = null;
             var fieldButton = null;
+            var enterFrom = 0;
+            var atlasScroll = 0;
+
+            // The page moves between two views inside one document, so it owns
+            // scrolling outright rather than letting the browser guess.
+            if ('scrollRestoration' in window.history) {
+                window.history.scrollRestoration = 'manual';
+            }
 
             // Charts run from 0.55 to 1.5 times as tall as they are wide. Cap the
             // shell's width so even the tallest fits the screen in one go.
@@ -1310,106 +1228,6 @@
                 if (!current) return;
                 var maxHeight = Math.max(320, window.innerHeight * 0.78);
                 chartShell.style.maxWidth = Math.round(maxHeight * (current.w / current.h)) + 'px';
-            }
-
-            function buildChart(con) {
-                var svg = svgEl('svg', {
-                    viewBox: '0 0 ' + con.w + ' ' + con.h,
-                    role: 'img',
-                    'aria-label': con.latin + ' star figure'
-                });
-
-                var defs = svgEl('defs', {});
-                var sky = svgEl('radialGradient', { id: 'cs-sky', cx: '50%', cy: '45%', r: '75%' });
-                sky.appendChild(svgEl('stop', { offset: '0%', 'stop-color': '#151e3f' }));
-                sky.appendChild(svgEl('stop', { offset: '100%', 'stop-color': '#070a16' }));
-                defs.appendChild(sky);
-
-                var glowIds = {};
-                con.stars.forEach(function (s) {
-                    var glow = starColors(s.sp)[1];
-                    if (glowIds[glow]) return;
-                    var id = 'cs-g' + Object.keys(glowIds).length;
-                    glowIds[glow] = id;
-                    var grad = svgEl('radialGradient', { id: id });
-                    grad.appendChild(svgEl('stop', { offset: '0%', 'stop-color': glow, 'stop-opacity': '0.85' }));
-                    grad.appendChild(svgEl('stop', { offset: '45%', 'stop-color': glow, 'stop-opacity': '0.25' }));
-                    grad.appendChild(svgEl('stop', { offset: '100%', 'stop-color': glow, 'stop-opacity': '0' }));
-                    defs.appendChild(grad);
-                });
-                svg.appendChild(defs);
-                svg.appendChild(svgEl('rect', { width: con.w, height: con.h, fill: 'url(#cs-sky)' }));
-
-                var byHip = {};
-                con.stars.forEach(function (s) { byHip[s.hip] = s; });
-
-                // Dotted figure lines: a zero-length dash with a round cap.
-                var lines = svgEl('g', {
-                    fill: 'none', stroke: '#9dbcff', 'stroke-opacity': '0.7', 'stroke-width': '4',
-                    'stroke-linecap': 'round', 'stroke-dasharray': '0.1 15'
-                });
-                con.segments.forEach(function (seg) {
-                    var pts = seg.filter(function (hip) { return byHip[hip]; })
-                        .map(function (hip) { return byHip[hip].x + ',' + byHip[hip].y; }).join(' ');
-                    if (pts) lines.appendChild(svgEl('polyline', { points: pts }));
-                });
-                svg.appendChild(lines);
-
-                // Field stars first so the figure's own stars sit on top.
-                [false, true].forEach(function (isFigure) {
-                    var members = con.stars.filter(function (s) { return !!s.fig === isFigure; });
-                    if (!members.length) return;
-                    var group = svgEl('g', isFigure ? {} : { opacity: '0.72' });
-                    members.forEach(function (s) {
-                        group.appendChild(buildStarNode(con, s, glowIds));
-                    });
-                    svg.appendChild(group);
-                });
-
-                // Bayer letters, on the figure's brighter stars only.
-                var labels = svgEl('g', {
-                    'font-family': 'Georgia, serif', 'font-size': '20',
-                    fill: '#c8d6ff', 'fill-opacity': '0.62', 'pointer-events': 'none'
-                });
-                con.stars.forEach(function (s) {
-                    if (!s.fig || !s.bayer || s.mag > 4.0) return;
-                    var r = starRadius(s.mag);
-                    var text = svgEl('text', { x: s.x + r + 7, y: s.y - r - 4 });
-                    text.textContent = s.bayer;
-                    labels.appendChild(text);
-                });
-                svg.appendChild(labels);
-
-                return svg;
-            }
-
-            function buildStarNode(con, star, glowIds) {
-                var colors = starColors(star.sp);
-                var r = starRadius(star.mag);
-                var node = svgEl('g', {
-                    'class': 'cs-star',
-                    'data-hip': star.hip,
-                    tabindex: '0',
-                    role: 'button',
-                    'aria-label': starLabel(star) + ', magnitude ' + star.mag
-                });
-
-                node.appendChild(svgEl('circle', {
-                    cx: star.x, cy: star.y, r: (r * 3.4).toFixed(2),
-                    fill: 'url(#' + glowIds[colors[1]] + ')', 'pointer-events': 'none'
-                }));
-                node.appendChild(svgEl('circle', {
-                    cx: star.x, cy: star.y, r: r.toFixed(2), fill: colors[0], 'pointer-events': 'none'
-                }));
-                node.appendChild(svgEl('circle', {
-                    'class': 'cs-ring', cx: star.x, cy: star.y, r: (r + 12).toFixed(2),
-                    fill: 'none', stroke: 'transparent', 'stroke-width': '4', 'pointer-events': 'none'
-                }));
-                // A generous transparent disc so the star is tappable on a phone.
-                node.appendChild(svgEl('circle', {
-                    cx: star.x, cy: star.y, r: Math.max(r * 3, 32).toFixed(2), fill: 'transparent'
-                }));
-                return node;
             }
 
             function renderStarPanel(star) {
@@ -1432,9 +1250,18 @@
                 if (star.name && star.desig) desig.push(star.desig);
                 desig.push('HIP ' + star.hip);
                 desig.push(star.fig ? 'on the figure' : 'field star');
-                starPanel.appendChild(el('div', 'star-desig', desig.join(' · ')));
+                var desigLine = el('div', 'star-desig', desig.join(' · ') + ' ');
+                starPanel.appendChild(desigLine);
 
                 var names = DATA.sanskritStars[star.hip] || [];
+
+                // Bright stars and every star the texts name have a page of their
+                // own; the faint field stars do not, so they get no dead link.
+                if (star.mag <= SC.STAR_PAGE_MAG_LIMIT || names.length) {
+                    var more = el('a', 'star-page-link', '⭐ Its own page →');
+                    more.href = 'stars.html#hip' + star.hip;
+                    desigLine.appendChild(more);
+                }
                 names.forEach(function (n) {
                     var block = el('div', 'sanskrit-block');
                     var line = el('div', 'sanskrit-name');
@@ -1567,6 +1394,9 @@
             }
 
             function openConstellation(con, hip) {
+                // Remember where the reader was in the grid so coming back
+                // doesn't dump them at the top of 89 cards.
+                if (!atlasView.classList.contains('hidden')) atlasScroll = window.scrollY;
                 current = con;
                 atlasView.classList.add('hidden');
                 detailView.classList.remove('hidden');
@@ -1580,10 +1410,21 @@
                 document.getElementById('detail-sub').textContent = sub;
 
                 chartShell.textContent = '';
-                chartShell.appendChild(buildChart(con));
+                chartShell.appendChild(SC.buildChart(con, {
+                    interactive: true, labels: true, idPrefix: 'cs'
+                }));
                 fitChart();
                 renderFacts(con);
                 renderStarList(con);
+
+                // Replay the entry animation only when a swipe or an arrow link
+                // asked for a neighbour; a fresh deep link just appears.
+                chartShell.classList.remove('from-left', 'from-right');
+                if (enterFrom) {
+                    void chartShell.offsetWidth;
+                    chartShell.classList.add(enterFrom > 0 ? 'from-right' : 'from-left');
+                    enterFrom = 0;
+                }
 
                 var prev = CONS[(con.index - 1 + CONS.length) % CONS.length];
                 var next = CONS[(con.index + 1) % CONS.length];
@@ -1618,6 +1459,7 @@
                 detailView.classList.add('hidden');
                 atlasView.classList.remove('hidden');
                 document.title = 'Constellation Atlas: Aryabhat';
+                window.scrollTo(0, atlasScroll);
             }
 
             // ---------------------------------------------------------
@@ -1644,6 +1486,72 @@
                 }
             }
 
+            // ---------------------------------------------------------
+            // Swipe between neighbours (touch)
+            // ---------------------------------------------------------
+
+            // step: +1 for the next constellation, -1 for the previous one.
+            function goToNeighbour(step) {
+                if (!current) return;
+                var target = CONS[(current.index + step + CONS.length) % CONS.length];
+                enterFrom = step;
+                window.location.hash = '#' + target.id;
+            }
+
+            var SWIPE_MIN = 60;      // px of travel before it counts as a swipe
+            var SWIPE_RATIO = 1.8;   // how much more horizontal than vertical
+            var SWIPE_EDGE = 28;     // screen edge reserved for the browser
+            var swipeX = 0, swipeY = 0, swiping = false;
+
+            detailView.addEventListener('touchstart', function (e) {
+                swiping = e.touches.length === 1;
+                if (!swiping) return;
+                swipeX = e.touches[0].clientX;
+                swipeY = e.touches[0].clientY;
+                // Swipes that begin at the very edge belong to the browser's own
+                // back/forward gesture — taking them too would move two steps.
+                if (swipeX < SWIPE_EDGE || swipeX > window.innerWidth - SWIPE_EDGE) {
+                    swiping = false;
+                }
+            }, { passive: true });
+
+            // A second finger means a pinch, not a swipe.
+            detailView.addEventListener('touchmove', function (e) {
+                if (e.touches.length !== 1) swiping = false;
+            }, { passive: true });
+
+            detailView.addEventListener('touchcancel', function () {
+                swiping = false;
+            }, { passive: true });
+
+            detailView.addEventListener('touchend', function (e) {
+                if (!swiping) return;
+                swiping = false;
+                var touch = e.changedTouches[0];
+                var dx = touch.clientX - swipeX;
+                var dy = touch.clientY - swipeY;
+                // Short travel is a tap on a star; a steeper angle is the page
+                // being scrolled. Neither should change the constellation.
+                if (Math.abs(dx) < SWIPE_MIN) return;
+                if (Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return;
+                goToNeighbour(dx < 0 ? 1 : -1);
+            }, { passive: true });
+
+            // Touch devices get the swipe told to them; mice and trackpads don't.
+            if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+                document.querySelector('.chart-hint').textContent =
+                    'Tap a star for its details, or swipe sideways for the next constellation. ' +
+                    'Larger dots are brighter stars.';
+            }
+
+            // The arrow links move the same way, so they animate the same way.
+            document.getElementById('prev-link').addEventListener('click', function () {
+                enterFrom = -1;
+            });
+            document.getElementById('next-link').addEventListener('click', function () {
+                enterFrom = 1;
+            });
+
             chartShell.addEventListener('click', onChartActivate);
             chartShell.addEventListener('keydown', onChartKey);
             window.addEventListener('hashchange', route);
@@ -1656,8 +1564,16 @@
 
             document.getElementById('back-link').addEventListener('click', function (e) {
                 e.preventDefault();
-                if (window.history.length > 1) window.history.back();
-                else window.location.hash = '';
+                // Always land on the list. history.back() only steps to whatever
+                // came before, which is the previous constellation as soon as the
+                // reader has swiped or used the arrows.
+                if (window.history.pushState) {
+                    window.history.pushState(null, '',
+                        window.location.pathname + window.location.search);
+                    showAtlas();
+                } else {
+                    window.location.hash = '';
+                }
             });
 
             document.getElementById('copy-link').addEventListener('click', function () {

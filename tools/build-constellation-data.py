@@ -141,6 +141,39 @@ def build_sanskrit_index(constellations, star_names):
 
 
 # ---------------------------------------------------------------------------
+# Which constellations really carry an Indian name
+# ---------------------------------------------------------------------------
+
+# The source database gives a Devanagari name to 41 constellations, but most of
+# those are only the Latin name spelled in Devanagari — एक्विला for Aquila,
+# बूटेस for Bootes — which is a spelling, not a name. A few others move a star's
+# name onto its whole constellation (ब्रह्महृदय is Capella and ब्रहलुब्धक is
+# Sirius, both stars, in the Sūrya Siddhānta), and a few are twentieth-century
+# mappings of Puranic characters onto the Greek figures (देवयानी, शर्मिष्ठा,
+# ययाति for Andromeda, Cassiopeia and Perseus).
+#
+# Classical Indian astronomy names the twelve rashis and the asterisms — not the
+# constellations. So only these pass through: the twelve rashis, and the two
+# figures the star-name database actually attests from the Vedic corpus.
+RASHI = {
+    "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+    "libra", "scorpius", "sagittarius", "capricornus", "aquarius", "pisces",
+}
+TRADITIONAL = {
+    "orion",       # मृग, the celestial deer (Prajāpati) — Vedic corpus
+    "ursa_major",  # सप्तर्षि, the Seven Sages — Vedic corpus and Purāṇas
+}
+
+
+def indian_name_kind(cid):
+    if cid in RASHI:
+        return "rashi"
+    if cid in TRADITIONAL:
+        return "traditional"
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Payload
 # ---------------------------------------------------------------------------
 
@@ -176,10 +209,12 @@ def trim_constellation(con):
         "segments": con["segments"],
         "stars": stars,
     }
-    if con.get("name_devanagari"):
+    kind = indian_name_kind(con["id"])
+    if kind and con.get("name_devanagari"):
         out["devanagari"] = con["name_devanagari"]
-    if con.get("name_iast"):
-        out["iast"] = con["name_iast"]
+        out["nameKind"] = kind
+        if con.get("name_iast"):
+            out["iast"] = con["name_iast"]
     return out
 
 
@@ -223,7 +258,12 @@ def main():
         fh.write(";\n")
 
     named = sum(len(v) for v in sanskrit.values())
+    kept = [c["name_latin"] for c in constellations if indian_name_kind(c["id"])]
+    dropped = [c["name_latin"] for c in constellations
+               if c.get("name_devanagari") and not indian_name_kind(c["id"])]
     print("constellations: %d" % len(constellations))
+    print("  Indian constellation names kept: %d (%s)" % (len(kept), ", ".join(kept)))
+    print("  transliterations/misattributions dropped: %d" % len(dropped))
     print("stars: %d" % sum(len(c["stars"]) for c in constellations))
     print("Sanskrit names attached: %d entries over %d stars"
           % (named, len(sanskrit)))
