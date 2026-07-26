@@ -1,0 +1,802 @@
+/* ==========================================================================
+   sky.css — the shared stylesheet for the Sky Atlas section
+   (sky.html, constellations.html, stars.html)
+
+   Everything here used to be pasted into each of those pages' own <style>
+   block, four copies drifting apart a declaration at a time. It is in one
+   file now so the section cannot look like four different sites.
+
+   Load it AFTER css/style.css: several rules here exist to undo the
+   site-wide <button> treatment, and they need to win on source order.
+
+   Part 1 is the design-system overlay from design.md — tokens, navbar,
+   buttons, footer. It is not sky-specific, and is a candidate for lifting
+   site-wide the next time the other pages are touched.
+   Part 2 is the section's own furniture: sub-nav, page head, toolbar,
+   detail chrome, charts, facts.
+
+   Page-specific components stay in their page's <style> block: the atlas
+   grid and star panel in constellations.html, the star cards in
+   stars.html, the map / calendar / visibility panel in sky.html.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   PART 1 — DESIGN SYSTEM (design.md)
+   ========================================================================== */
+
+:root {
+    --gold: #ffcc33;
+    --gold-deep: #ffa41b;
+    --gold-soft: #ffe58a;
+    --ink: #e6eef7;
+    --ink-dim: #9fb3c8;
+    --panel: #16223388;
+    --panel-solid: #1a2636;
+    --border: #2a3d55;
+    --accent-cyan: #1EAEDB;
+    --font-brand: 'renfrewregular', 'Space Grotesk', Arial, sans-serif;
+    --font-display: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+    --font-body: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --brand-shape: 10px;
+    --brand-shape-tight: 8px;
+}
+
+html,
+body {
+    overflow-x: hidden;
+    font-family: var(--font-body);
+}
+
+.main h1,
+.main h2,
+.main h3,
+.main h4,
+.main h5,
+.main h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   NAVBAR
+   -------------------------------------------------------------------------- */
+.navbar {
+    position: relative;
+    height: auto;
+    min-height: 4.4rem;
+    background: linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    border-bottom: 1px solid rgba(255, 204, 51, 0.18);
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.navbar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.navbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 204, 51, 0.18) 15%,
+            rgba(255, 204, 51, 0.7) 50%,
+            rgba(255, 204, 51, 0.18) 85%,
+            transparent 100%);
+    pointer-events: none;
+}
+
+.navbar > .container {
+    width: max-content;
+    min-width: 100%;
+    min-height: 4.4rem;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-list {
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.navbar-item {
+    float: none !important;
+    flex: 0 0 auto;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.navbar-item.current {
+    background: transparent;
+    border-radius: 0;
+}
+
+.navbar-link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-transform: none;
+    line-height: 1.3;
+    color: var(--ink);
+    margin: 0;
+    padding: 11px 20px;
+    border-radius: 999px;
+    position: relative;
+    transition: color .2s ease, background .2s ease, box-shadow .25s ease;
+}
+
+.navbar-link:hover,
+.navbar-link:focus {
+    color: var(--gold-soft);
+    background: rgba(255, 204, 51, 0.10);
+    outline: 0;
+}
+
+.navbar-link.active {
+    color: var(--gold);
+    background: rgba(255, 204, 51, 0.12);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: none;
+    border-radius: var(--brand-shape-tight);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
+        0 0 16px rgba(255, 204, 51, 0.12);
+}
+
+.navbar-link.active:hover,
+.navbar-link.active:focus {
+    color: var(--gold-soft);
+    background: rgba(255, 204, 51, 0.18);
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar,
+    .navbar > .container {
+        min-height: 3.5rem;
+    }
+
+    .navbar > .container {
+        padding: 0 6px;
+    }
+
+    .navbar-list {
+        gap: 4px;
+    }
+
+    .navbar-link {
+        font-size: .88rem;
+        padding: 8px 14px;
+        letter-spacing: .04em;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS
+   Scoped to .button: chips, star rows, view tabs and star cards are all
+   <button>s or <a>s too, and must not inherit the gold CTA treatment.
+   -------------------------------------------------------------------------- */
+.main .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: .9rem;
+    font-weight: 500;
+    letter-spacing: .03em;
+    text-transform: none;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: var(--brand-shape);
+    border: 1px solid rgba(255, 204, 51, 0.5);
+    background: transparent;
+    background-image: none;
+    color: var(--gold);
+    text-decoration: none;
+    text-shadow: none;
+    box-shadow: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .25s ease, color .25s ease, border-color .25s ease, box-shadow .3s ease, transform .15s ease;
+}
+
+.main .button:hover,
+.main .button:focus {
+    background: rgba(255, 204, 51, 0.08);
+    color: var(--gold-soft);
+    border-color: var(--gold);
+    box-shadow: 0 0 24px rgba(255, 204, 51, 0.18);
+    transform: translateY(-1px);
+    outline: 0;
+}
+
+.main .button:active {
+    transform: translateY(0);
+    background: rgba(255, 204, 51, 0.14);
+    box-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+}
+
+.main .button.button-primary {
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: .03em;
+    background: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+    background-image: linear-gradient(180deg, #1a2638 0%, #0d1722 100%);
+    border: 1.5px solid var(--gold);
+    box-shadow:
+        0 0 22px rgba(255, 204, 51, 0.18),
+        inset 0 1px 0 rgba(255, 204, 51, 0.12);
+    text-shadow: none;
+}
+
+.main .button.button-primary:hover {
+    color: var(--gold-soft);
+    background: linear-gradient(180deg, #243348 0%, #11202f 100%);
+    background-image: linear-gradient(180deg, #243348 0%, #11202f 100%);
+    border-color: var(--gold-soft);
+    box-shadow:
+        0 0 32px rgba(255, 204, 51, 0.32),
+        inset 0 1px 0 rgba(255, 204, 51, 0.20);
+    transform: translateY(-2px);
+}
+
+/* css/style.css gives every bare <button> an extruded 3D treatment with a
+   fixed height. Every button-shaped component in this section opts out. */
+.main .chip,
+.main .star-row,
+.main .star-card,
+.main .subnav-link {
+    height: auto;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER
+   -------------------------------------------------------------------------- */
+.footer-line {
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 2.5rem 0 3rem;
+    padding-bottom: 1.5rem;
+}
+
+
+/* ==========================================================================
+   PART 2 — SKY ATLAS SECTION
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   SUB-NAV — the section's own row of destinations, injected by js/sky-nav.js.
+   This replaces the ad-hoc "see also" button rows each page used to end
+   with, which listed the other pages in a different order every time.
+   -------------------------------------------------------------------------- */
+.sky-subnav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 2px 0;
+    margin-bottom: 2px;
+}
+
+.sky-subnav::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.main .subnav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    padding: 8px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(10, 19, 28, 0.6);
+    color: var(--ink-dim);
+    font-family: var(--font-display);
+    font-size: .85rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.main .subnav-link:hover {
+    color: var(--gold-soft);
+    border-color: rgba(255, 204, 51, 0.45);
+}
+
+.main .subnav-link.active {
+    color: var(--gold);
+    background: rgba(255, 204, 51, 0.12);
+    border-color: rgba(255, 204, 51, 0.5);
+}
+
+.subnav-link .subnav-icon {
+    font-size: .95rem;
+    line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   PAGE HEAD
+   -------------------------------------------------------------------------- */
+.atlas-head {
+    text-align: center;
+    padding: 1.6rem 0 0.4rem;
+}
+
+.kicker {
+    display: block;
+    font-family: var(--font-display);
+    font-size: .75rem;
+    letter-spacing: .4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .6rem;
+}
+
+.atlas-head h1 {
+    font-family: var(--font-brand);
+    font-size: clamp(1.9rem, 6vw, 3rem);
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0 0 .6rem;
+}
+
+.atlas-head h1 em {
+    font-style: normal;
+    color: var(--gold);
+}
+
+.atlas-lede {
+    max-width: 660px;
+    margin: 0 auto 1.4rem;
+    color: var(--ink-dim);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   TOOLBAR — search + filter chips
+   -------------------------------------------------------------------------- */
+.atlas-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.atlas-search {
+    width: 100%;
+    max-width: 460px;
+    height: 46px;
+    padding: 0 16px;
+    border-radius: var(--brand-shape);
+    border: 1px solid var(--border);
+    background: rgba(10, 19, 28, 0.72);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.atlas-search::placeholder {
+    color: #6d829a;
+}
+
+.atlas-search:focus {
+    outline: 0;
+    border-color: rgba(255, 204, 51, 0.55);
+    box-shadow: 0 0 16px rgba(255, 204, 51, 0.12);
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.main .chip {
+    font-family: var(--font-display);
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    padding: 7px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(10, 19, 28, 0.6);
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.main .chip:hover {
+    color: var(--gold-soft);
+    background: rgba(10, 19, 28, 0.6);
+    border-color: rgba(255, 204, 51, 0.45);
+    transform: none;
+    box-shadow: none;
+}
+
+.main .chip.active {
+    color: var(--gold);
+    background: rgba(255, 204, 51, 0.12);
+    border-color: rgba(255, 204, 51, 0.5);
+}
+
+.result-count {
+    color: var(--ink-dim);
+    font-size: .82rem;
+    letter-spacing: .04em;
+}
+
+.empty-note {
+    text-align: center;
+    color: var(--ink-dim);
+    padding: 2rem 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   DETAIL CHROME — the frame around one constellation or one star
+   -------------------------------------------------------------------------- */
+.detail-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 1.2rem 0 1rem;
+}
+
+.link-btn {
+    background: none;
+    border: 0;
+    padding: 6px 2px;
+    color: var(--ink-dim);
+    font-family: var(--font-display);
+    font-size: .85rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.link-btn:hover {
+    color: var(--gold-soft);
+}
+
+.link-btn[disabled] {
+    opacity: .3;
+    cursor: default;
+}
+
+.detail-title {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.detail-title h2 {
+    font-family: var(--font-brand);
+    font-size: clamp(1.8rem, 5.5vw, 2.6rem);
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0;
+}
+
+.detail-title .deva {
+    color: var(--gold);
+    font-size: clamp(1.1rem, 3.6vw, 1.5rem);
+    margin-top: .2rem;
+}
+
+.detail-title .sub {
+    color: var(--ink-dim);
+    font-size: .92rem;
+    margin-top: .35rem;
+}
+
+/* --------------------------------------------------------------------------
+   VIEW TOGGLE — a second way of looking at the same object.
+
+   Deliberately quiet. This was a two-tab segmented control, which gave the
+   advanced view equal billing with the chart everyone actually came for.
+   It is a single muted line now: findable if you are looking, not competing
+   with the thing above it.
+   -------------------------------------------------------------------------- */
+.view-toggle {
+    text-align: center;
+    margin: -2px 0 16px;
+}
+
+.view-toggle .link-btn {
+    display: inline-block;
+    padding: 2px 0;
+    border-bottom: 1px dotted rgba(159, 179, 200, 0.45);
+}
+
+.view-toggle .link-btn:hover {
+    border-bottom-color: var(--gold-soft);
+}
+
+/* --------------------------------------------------------------------------
+   CHART — the framed SVG, shared by the atlas chart, the finder chart and
+   the depth stage
+   -------------------------------------------------------------------------- */
+.chart-shell {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    background: #070a16;
+    position: relative;
+    /* Width is capped in JS to the figure's own aspect ratio so a tall
+       chart still fits on screen without scrolling. */
+    margin: 0 auto;
+}
+
+.chart-shell svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: manipulation;
+}
+
+/* Swipe feedback: the incoming chart enters from the side the finger came
+   from, so the gesture reads as moving along a row of charts. */
+@keyframes sky-slide-from-right {
+    from {
+        opacity: 0;
+        transform: translateX(7%);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes sky-slide-from-left {
+    from {
+        opacity: 0;
+        transform: translateX(-7%);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.chart-shell.from-right {
+    animation: sky-slide-from-right .28s ease-out;
+}
+
+.chart-shell.from-left {
+    animation: sky-slide-from-left .28s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .chart-shell.from-right,
+    .chart-shell.from-left {
+        animation: none;
+    }
+}
+
+.chart-hint {
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: .8rem;
+    margin: 8px 0 12px;
+}
+
+.chart-hint a {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.chart-hint a:hover {
+    color: var(--gold-soft);
+    text-decoration: underline;
+}
+
+/* Interactive stars on a chart drawn by js/sky-charts.js. */
+.cs-star {
+    cursor: pointer;
+}
+
+.cs-star:focus {
+    outline: 0;
+}
+
+.cs-star:focus-visible .cs-ring,
+.cs-star:hover .cs-ring {
+    stroke: var(--gold-soft);
+    stroke-opacity: .75;
+}
+
+.cs-star.selected .cs-ring {
+    stroke: var(--gold);
+    stroke-opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   FACTS
+   -------------------------------------------------------------------------- */
+.facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.fact {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(10, 19, 28, 0.55);
+    padding: 10px 13px;
+}
+
+.fact .label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+}
+
+.fact .value {
+    display: block;
+    color: var(--ink);
+    font-size: .98rem;
+    margin-top: 3px;
+    line-height: 1.35;
+}
+
+.fact .value .sm {
+    color: var(--ink-dim);
+    font-size: .82rem;
+}
+
+.fact a {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.fact a:hover {
+    color: var(--gold-soft);
+    text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   SANSKRIT — the attested name, and how firm the identification is
+   -------------------------------------------------------------------------- */
+.sanskrit-name {
+    color: var(--gold-soft);
+    font-size: 1.15rem;
+    line-height: 1.35;
+}
+
+.sanskrit-name .iast {
+    color: var(--ink);
+    font-size: .95rem;
+}
+
+.sanskrit-meta {
+    color: var(--ink-dim);
+    font-size: .8rem;
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+.tag {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: .68rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--ink-dim);
+}
+
+.tag.certain {
+    color: #8fd6a0;
+    border-color: rgba(143, 214, 160, 0.45);
+}
+
+.tag.likely {
+    color: #ffd98a;
+    border-color: rgba(255, 217, 138, 0.45);
+}
+
+.tag.disputed {
+    color: #ff9f8f;
+    border-color: rgba(255, 159, 143, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   SECTION HEADINGS, CTAs, SOURCES
+   -------------------------------------------------------------------------- */
+.list-head {
+    font-family: var(--font-display);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 1.5rem 0 .65rem;
+}
+
+.cta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 1.4rem 0 1rem;
+}
+
+.sources {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1.5rem;
+    color: var(--ink-dim);
+    font-size: .78rem;
+    line-height: 1.65;
+}
+
+.sources a {
+    color: var(--ink-dim);
+    text-decoration: underline;
+}
+
+.sources a:hover {
+    color: var(--gold-soft);
+}

@@ -21,11 +21,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 2. Inject Navbar
+    //
+    // "Sky" is one item covering a whole section — the sky map, the evening
+    // show, the constellation atlas and the star list. Those four used to be
+    // reachable two different ways with no visible relationship between
+    // them; they now share a sub-nav of their own (js/sky-nav.js), and the
+    // top bar just says which section you are in.
     var navLinks = [
         { href: "index.html", text: "Home" },
         { href: "quiz.html", text: "Astronomy Quiz" },
-        { href: "sky.html", text: "Sky Map" },
-        { href: "whatsup.html", text: "What's Up" },
+        {
+            href: "sky.html", text: "Sky",
+            section: ["sky.html", "whatsup.html", "constellations.html",
+                "stars.html", "constellation-depth.html"]
+        },
         { href: "download.html", text: "Download" },
         { href: "photos.html", text: "Photos" },
         { href: "contact.html", text: "Contact Us" }
@@ -36,7 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var navListHTML = '<div class="container"><ul class="navbar-list">';
 
     navLinks.forEach(function (link) {
-        var isCurrent = currentFile === link.href;
+        var isCurrent = link.section
+            ? link.section.indexOf(currentFile) !== -1
+            : currentFile === link.href;
         var activeClass = isCurrent ? 'navbar-item current' : 'navbar-item';
         // Note: previously text color class logic might have been different, but 'current' class handles styling now.
         // There was a specific active class or style in CSS? 

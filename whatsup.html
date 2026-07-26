@@ -43,6 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <!-- Content catalogues + city list (data only) -->
     <script src="js/whatsup-data.js"></script>
+    <script src="js/whatsup-figures.js"></script>
     <!-- satellite.js (vendored, MIT) — SGP4 pass prediction, no runtime API -->
     <script src="js/satellite.min.js"></script>
     <script src="js/satellites-tle.js"></script>
@@ -765,8 +766,11 @@
     (function () {
         'use strict';
 
-        // Cities + astronomy catalogues live in js/whatsup-data.js
+        // Cities + astronomy catalogues live in js/whatsup-data.js; the star
+        // patterns are generated from the same figure database the
+        // constellation atlas draws from, and keyed by the same id.
         var CITIES = WHATSUP_DATA.CITIES;
+        var FIGURES = window.WHATSUP_FIGURES || {};
         function findCity(name) {
             if (!name) return null;
             name = String(name).trim().toLowerCase();
@@ -1347,7 +1351,9 @@
             // ── 4. CONSTELLATIONS ──
             visConst.forEach(function (c) {
                 var vis = constVis[c.id];
-                var visual = c.fig ? asterSVG(c.fig) : '<div class="visual"><span class="glyph">' + (c.glyph || '✦') + '</span></div>';
+                var fig = FIGURES[c.id];
+                var visual = fig ? asterSVG(fig)
+                    : '<div class="visual"><span class="glyph">' + (c.glyph || '✦') + '</span></div>';
                 var sub = (c.dev ? '<p class="devnag">' + esc(c.dev) + ' · ' + esc(c.translit) + '</p>'
                     : '<p class="translit">' + esc(c.translit) + '</p>');
                 sConst.push({

@@ -34,6 +34,8 @@ import os
 import re
 import sys
 
+import _bright_stars
+
 # Local checkout holding docs/constellation-lines, docs/star-names and
 # tools/src/main/resources/data. Override by passing a path as the first argument.
 DEFAULT_SOURCE_ROOT = os.environ.get("CONSTELLATION_SOURCE", "~/dev/bhagol")
@@ -50,11 +52,6 @@ BRIGHT_TXT = os.path.join(SOURCE_ROOT, "tools/src/main/resources/data/stardata_n
 
 # Every star this bright gets a page; fainter ones only if a text names them.
 MAG_LIMIT = 2.5
-
-# Distance match: a bright star is alone within a few arcminutes, and the
-# magnitudes have to agree too, so a hit is unambiguous.
-MATCH_DEG = 0.12
-MATCH_MAG = 0.35
 
 GREEK_WORD = {
     "α": "alpha", "β": "beta", "γ": "gamma", "δ": "delta", "ε": "epsilon",
@@ -107,62 +104,6 @@ def constellation_of(ra_deg, dec_deg, boundaries):
         if dec < dec_lo or ra_h < ra_lo or ra_h >= ra_hi:
             continue
         return abbr
-    return None
-
-
-# ---------------------------------------------------------------------------
-# Distance and alternate names
-# ---------------------------------------------------------------------------
-
-def load_bright_list():
-    """Rows of {names, mag, ra, dec, pc} from the Hipparcos-derived bright list."""
-    rows = []
-    with io.open(BRIGHT_TXT, encoding="utf-8") as fh:
-        for line in fh:
-            parts = line.strip().split(",")
-            if len(parts) < 7:
-                continue
-            try:
-                mag, dec, ra = float(parts[1]), float(parts[2]), float(parts[3])
-                x, y, z = float(parts[4]), float(parts[5]), float(parts[6])
-            except ValueError:
-                continue
-            rows.append({
-                "names": [n.strip() for n in parts[0].split("|") if n.strip()],
-                "mag": mag, "ra": ra, "dec": dec,
-                # Rectangular coordinates are in units of 0.001 parsec.
-                "pc": math.sqrt(x * x + y * y + z * z) / 1000.0,
-            })
-    return rows
-
-
-def separation_deg(ra1, dec1, ra2, dec2):
-    r1, d1, r2, d2 = map(math.radians, (ra1, dec1, ra2, dec2))
-    dot = (math.sin(d1) * math.sin(d2)
-           + math.cos(d1) * math.cos(d2) * math.cos(r1 - r2))
-    return math.degrees(math.acos(max(-1.0, min(1.0, dot))))
-
-
-def match_bright_row(star, bright):
-    close = [r for r in bright
-             if abs(r["dec"] - star["dec_deg"]) <= MATCH_DEG
-             and separation_deg(r["ra"], r["dec"], star["ra_deg"], star["dec_deg"]) <= MATCH_DEG]
-    if not close:
-        return None
-    close.sort(key=lambda r: separation_deg(r["ra"], r["dec"],
-                                            star["ra_deg"], star["dec_deg"]))
-
-    agreeing = [r for r in close if abs(r["mag"] - star["mag"]) <= MATCH_MAG]
-    if agreeing:
-        return agreeing[0]
-
-    # No magnitude agrees: this is a close double the bright list splits into
-    # components while the figure database carries the combined magnitude. The
-    # components sit at one distance, so that distance is still safe to use —
-    # but only if they actually agree, otherwise these are unrelated stars.
-    spread = max(r["pc"] for r in close) - min(r["pc"] for r in close)
-    if spread <= 0.01 * max(r["pc"] for r in close):
-        return close[0]
     return None
 
 
@@ -295,7 +236,7 @@ def main():
         by_abbr.setdefault(con["abbr"], con)
 
     boundaries = load_boundaries()
-    bright = load_bright_list()
+    bright = _bright_stars.load(BRIGHT_TXT)
     sanskrit, unmatched_names = build_sanskrit_index(constellations, names_db["stars"])
 
     # Candidates: bright enough on their own, or named in the texts.
@@ -341,13 +282,14 @@ def main():
         if star.get("spectral"):
             record["sp"] = star["spectral"]
 
-        row = match_bright_row(star, bright)
+        row = _bright_stars.match(bright, star["ra_deg"], star["dec_deg"], star["mag"])
         if row:
-            record["pc"] = round(row["pc"], 2)
             alt = [n for n in row["names"]
                    if n.lower() != (star.get("proper_name") or "").lower()]
             if alt:
                 record["alt"] = alt
+        if _bright_stars.usable_distance(row):
+            record["pc"] = round(row["pc"], 2)
         else:
             no_distance.append(star.get("proper_name") or designation or ("HIP %d" % hip))
 

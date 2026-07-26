@@ -185,119 +185,109 @@ window.WHATSUP_DATA = (function () {
         ];
 
         // Constellations. `ra`/`dec` = a bright anchor star, for visibility.
-        // `aster` = normalised star pattern (0–100 wide viewbox), else `glyph`.
+        // The star pattern each one draws is not here: positions would be a
+        // second copy of the ones in js/constellation-data.js, and the two
+        // could drift. js/whatsup-figures.js is generated from that database
+        // and keyed by the same `id`. Entries with no figure there fall back
+        // to their `glyph`.
         var CONSTELLATIONS = [
             {
                 id: 'orion', name: 'Orion', dev: 'मृग · कालपुरुष', translit: 'Mriga / Kalapurusha',
                 ra: 5.60, dec: 0.0, minAlt: 12,
                 body_text: 'The easiest pattern in the whole sky to find: three bright stars in a short, straight row — Orion\'s Belt. Above hangs red Betelgeuse (his shoulder), below sits blue-white Rigel (his foot). In India the same stars are seen as मृग, the deer.',
                 find: 'Look for the three-in-a-row belt. From the belt, a fainter line of stars hangs down — that is his sword, and the middle "star" is the glowing Orion Nebula.',
-                facts: ['<b>Betelgeuse</b> — a red giant near the end of its life', '<b>Rigel</b> — a blue supergiant, far brighter than the Sun', 'The belt points to <b>Sirius</b>, the brightest star'],
-                fig: { s: [[5.919, 7.407], [5.418, 6.350], [5.679, -1.943], [5.604, -1.202], [5.533, -0.299], [5.796, -9.670], [5.242, -8.202]], b: [0, 6], l: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6], [5, 6]] }
+                facts: ['<b>Betelgeuse</b> — a red giant near the end of its life', '<b>Rigel</b> — a blue supergiant, far brighter than the Sun', 'The belt points to <b>Sirius</b>, the brightest star']
             },
             {
                 id: 'ursa', name: 'The Big Dipper', dev: 'सप्तर्षि', translit: 'Saptarshi',
                 ra: 13.398, dec: 54.926, minAlt: 12,
                 body_text: 'Seven bright stars shaped like a ladle or a question-mark. To Indian eyes these are the सप्तर्षि — the seven great sages. They wheel around the Pole Star through the night and never fully set from our latitude in the right season.',
                 find: 'The two stars at the front of the bowl are the "Pointers" — draw a line through them and it lands on Polaris, the North Star. The middle star of the handle, Mizar, has a faint companion Alcor — in tradition, Vashishtha and his wife Arundhati.',
-                facts: ['The <b>Pointers</b> find the North Star', '<b>Mizar &amp; Alcor</b> — the classic eyesight test', 'Part of the Great Bear, <b>Ursa Major</b>'],
-                fig: { s: [[11.062, 61.751], [11.031, 56.383], [11.897, 53.695], [12.257, 57.033], [12.900, 55.960], [13.399, 54.925], [13.792, 49.313]], b: [], l: [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]] }
+                facts: ['The <b>Pointers</b> find the North Star', '<b>Mizar &amp; Alcor</b> — the classic eyesight test', 'Part of the Great Bear, <b>Ursa Major</b>']
             },
             {
                 id: 'cassiopeia', name: 'Cassiopeia', dev: '', translit: 'The Queen',
                 ra: 0.675, dec: 56.537, minAlt: 12,
                 body_text: 'A bright, lopsided "W" (or "M", depending on the hour) of five stars, sitting in a rich part of the Milky Way. It circles the Pole Star opposite the Big Dipper, so when one is low, the other rides high.',
                 find: 'Find the North Star, then look to the side away from the Dipper for a zig-zag of five stars. On a dark night the Milky Way runs right through it.',
-                facts: ['Circles the pole — <b>never sets</b> from here', 'Sits in the <b>Milky Way</b>', 'Opposite the <b>Big Dipper</b>'],
-                fig: { s: [[0.153, 59.150], [0.675, 56.537], [0.945, 60.717], [1.430, 60.235], [1.907, 63.670]], b: [], l: [[0, 1], [1, 2], [2, 3], [3, 4]] }
+                facts: ['Circles the pole — <b>never sets</b> from here', 'Sits in the <b>Milky Way</b>', 'Opposite the <b>Big Dipper</b>']
             },
             {
                 id: 'taurus', name: 'Taurus', dev: 'वृषभ', translit: 'Vrishabha',
                 ra: 4.599, dec: 16.509, minAlt: 12,
                 body_text: 'The bull, marked by a "V" of stars forming his face, with the orange eye Aldebaran (रोहिणी) glaring out. Riding on his shoulder is the tiny, glittering knot of the Pleiades — one of the loveliest sights in binoculars.',
                 find: 'From Orion\'s Belt, follow the line up and to the right to reach orange Aldebaran and the V-shaped face. Keep going to find the little dipper-shaped Pleiades cluster.',
-                facts: ['<b>Aldebaran</b> = रोहिणी, the bull\'s eye', 'Carries the <b>Pleiades</b> star cluster', 'The <b>V</b> is the Hyades cluster'],
-                fig: { s: [[5.438, 28.608], [5.627, 21.142], [4.599, 16.509], [4.329, 15.628], [4.382, 17.542], [4.477, 19.180]], b: [2], l: [[3, 2], [3, 4], [4, 5], [5, 0], [2, 1]] }
+                facts: ['<b>Aldebaran</b> = रोहिणी, the bull\'s eye', 'Carries the <b>Pleiades</b> star cluster', 'The <b>V</b> is the Hyades cluster']
             },
             {
                 id: 'gemini', name: 'Gemini', dev: 'मिथुन', translit: 'Mithuna',
                 ra: 7.755, dec: 28.026, minAlt: 12,
                 body_text: 'The twins — two roughly equal bright stars, Castor and Pollux, sitting side by side like a pair of eyes, with two long parallel lines of fainter stars forming their bodies.',
                 find: 'Look up and to the left of Orion for two bright stars close together. Pollux is the slightly brighter, more golden one; Castor is white.',
-                facts: ['<b>Castor</b> is really six stars in one', '<b>Pollux</b> has a known planet', 'High overhead on <b>winter</b> evenings'],
-                fig: { s: [[7.577, 31.888], [7.755, 28.026], [6.732, 25.131], [6.383, 22.514], [6.629, 16.399], [7.335, 21.982]], b: [0, 1], l: [[0, 1], [0, 2], [2, 3], [1, 5], [5, 4]] }
+                facts: ['<b>Castor</b> is really six stars in one', '<b>Pollux</b> has a known planet', 'High overhead on <b>winter</b> evenings']
             },
             {
                 id: 'leo', name: 'Leo', dev: 'सिंह', translit: 'Simha',
                 ra: 10.139, dec: 11.967, minAlt: 12,
                 body_text: 'One of the few constellations that genuinely looks like its animal — a crouching lion. A backward question-mark of stars (the "Sickle") forms his mane and head, with a triangle behind for his hindquarters.',
                 find: 'Look for the backward question-mark; the bright star at its base, Regulus (मघा), is the lion\'s heart. A rides-high spring constellation.',
-                facts: ['<b>Regulus</b> = मघा, "the little king"', 'The <b>Sickle</b> is his head and mane', 'Host to the <b>Leonid</b> meteors in November'],
-                fig: { s: [[10.139, 11.967], [10.122, 16.763], [10.333, 19.842], [10.278, 23.417], [9.879, 26.007], [9.764, 23.774], [11.235, 20.524], [11.237, 15.430], [11.818, 14.572]], b: [0], l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [2, 6], [6, 8], [8, 7], [7, 0], [6, 7]] }
+                facts: ['<b>Regulus</b> = मघा, "the little king"', 'The <b>Sickle</b> is his head and mane', 'Host to the <b>Leonid</b> meteors in November']
             },
             {
                 id: 'bootes', name: 'Boötes', dev: '', translit: 'The Herdsman',
                 ra: 14.261, dec: 19.182, minAlt: 12,
                 body_text: 'A large kite- or ice-cream-cone-shaped figure, anchored by Arcturus (स्वाति) — a brilliant orange star, the brightest in the northern half of the sky.',
                 find: 'Follow the curve of the Big Dipper\'s handle away from the bowl — "arc to Arcturus" — and you land on the bright orange star at the base of the kite.',
-                facts: ['<b>Arcturus</b> = स्वाति, 4th-brightest star', 'Its light left the star <b>37 years</b> ago', '"Arc to Arcturus" from the <b>Dipper</b>'],
-                fig: { s: [[14.261, 19.182], [14.749, 27.074], [15.258, 33.315], [15.032, 40.390], [14.534, 38.308], [14.532, 30.371], [13.912, 18.398]], b: [0], l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [0, 6]] }
+                facts: ['<b>Arcturus</b> = स्वाति, 4th-brightest star', 'Its light left the star <b>37 years</b> ago', '"Arc to Arcturus" from the <b>Dipper</b>']
             },
             {
                 id: 'scorpius', name: 'Scorpius', dev: 'वृश्चिक', translit: 'Vrishchika',
                 ra: 16.490, dec: -26.432, minAlt: 10,
                 body_text: 'Another that truly looks the part: a long curving line of stars with a hooked tail — a scorpion. At its heart burns red Antares (ज्येष्ठा), a supergiant so large it would swallow the orbit of Mars.',
                 find: 'Low in the south on summer evenings. Find the bright red star (Antares) with two stars flanking it, then trace the body curving down to the stinger.',
-                facts: ['<b>Antares</b> = ज्येष्ठा, "rival of Mars"', 'Sits toward the <b>galactic centre</b>', 'Rich in <b>star clusters</b> for binoculars'],
-                fig: { s: [[16.090, -19.805], [16.005, -22.622], [15.981, -26.114], [16.490, -26.432], [16.598, -28.216], [16.836, -34.293], [16.864, -38.017], [16.911, -42.362], [17.203, -43.239], [17.622, -42.998], [17.708, -39.030], [17.560, -37.104]], b: [3], l: [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11]] }
+                facts: ['<b>Antares</b> = ज्येष्ठा, "rival of Mars"', 'Sits toward the <b>galactic centre</b>', 'Rich in <b>star clusters</b> for binoculars']
             },
             {
                 id: 'sagittarius', name: 'Sagittarius', dev: 'धनु', translit: 'Dhanu',
                 ra: 18.921, dec: -26.297, minAlt: 10,
                 body_text: 'Classically an archer, but almost everyone sees the "Teapot" — eight stars in the perfect shape of a kettle with a handle and spout. Its spout points straight at the centre of our own Milky Way galaxy.',
                 find: 'Low in the south in summer, just left of Scorpius. On a dark night the Milky Way rises like "steam" out of the teapot\'s spout.',
-                facts: ['Its spout aims at the <b>galaxy\'s core</b>', 'Densest <b>Milky Way</b> star clouds', 'Packed with <b>nebulae and clusters</b>'],
-                fig: { s: [[18.097, -30.424], [18.350, -29.828], [18.403, -34.385], [18.466, -25.421], [18.762, -26.991], [18.921, -26.297], [19.115, -27.670], [19.044, -29.880]], b: [5], l: [[0, 1], [0, 2], [1, 2], [2, 7], [7, 4], [4, 1], [3, 1], [3, 4], [4, 5], [5, 6], [6, 7]] }
+                facts: ['Its spout aims at the <b>galaxy\'s core</b>', 'Densest <b>Milky Way</b> star clouds', 'Packed with <b>nebulae and clusters</b>']
             },
             {
                 id: 'cygnus', name: 'Cygnus', dev: 'हंस', translit: 'Hamsa',
                 ra: 20.690, dec: 45.280, minAlt: 12,
                 body_text: 'A large, clear cross of bright stars flying down the Milky Way — the swan, with wings spread and neck outstretched. It is also called the Northern Cross. Bright Deneb marks the tail.',
                 find: 'High overhead on summer and autumn evenings. Deneb, Vega and Altair form the big "Summer Triangle"; Cygnus flies inside it, right along the Milky Way.',
-                facts: ['<b>Deneb</b> — one of the most luminous stars known', 'Flies along the <b>Milky Way</b>', 'Anchors the <b>Summer Triangle</b>'],
-                fig: { s: [[20.690, 45.280], [20.371, 40.257], [19.512, 27.960], [19.749, 45.131], [20.770, 33.970]], b: [0], l: [[0, 1], [1, 2], [3, 1], [1, 4]] }
+                facts: ['<b>Deneb</b> — one of the most luminous stars known', 'Flies along the <b>Milky Way</b>', 'Anchors the <b>Summer Triangle</b>']
             },
             {
                 id: 'lyra', name: 'Lyra', dev: '', translit: 'The Lyre',
                 ra: 18.615, dec: 38.784, minAlt: 12,
                 body_text: 'Small but easy, thanks to Vega — a brilliant blue-white star that is often the first to appear after sunset in summer. A little parallelogram of fainter stars hangs below it: the harp.',
                 find: 'Find the very bright bluish star high overhead in summer — that is Vega, the top corner of the Summer Triangle.',
-                facts: ['<b>Vega</b> — was the pole star 12,000 yrs ago', 'Holds the <b>Ring Nebula</b> (M57)', 'A corner of the <b>Summer Triangle</b>'],
-                fig: { s: [[18.615, 38.784], [18.740, 39.612], [18.746, 37.605], [18.908, 36.899], [18.982, 32.690], [18.834, 33.363]], b: [0], l: [[0, 1], [0, 2], [1, 2], [2, 5], [5, 4], [4, 3], [3, 2]] }
+                facts: ['<b>Vega</b> — was the pole star 12,000 yrs ago', 'Holds the <b>Ring Nebula</b> (M57)', 'A corner of the <b>Summer Triangle</b>']
             },
             {
                 id: 'canis', name: 'Canis Major', dev: '', translit: 'The Great Dog',
                 ra: 6.752, dec: -16.716, minAlt: 10,
                 body_text: 'Orion\'s hunting dog, and home to Sirius — the brightest star in the entire night sky. Sirius blazes white and, being low, often flashes red-green-blue as our air splits its light.',
                 find: 'Follow Orion\'s Belt down and to the left; it points straight at brilliant Sirius. Below it, a rough triangle of stars forms the dog\'s body.',
-                facts: ['<b>Sirius</b> — the brightest night-time star', 'Only <b>8.6 light-years</b> away', 'Its twinkling colours are our <b>atmosphere</b>'],
-                fig: { s: [[6.752, -16.716], [6.378, -17.956], [7.140, -26.393], [6.977, -28.972], [7.402, -29.303], [6.338, -30.063]], b: [0], l: [[1, 0], [0, 2], [2, 3], [2, 4], [3, 5]] }
+                facts: ['<b>Sirius</b> — the brightest night-time star', 'Only <b>8.6 light-years</b> away', 'Its twinkling colours are our <b>atmosphere</b>']
             },
             {
                 id: 'auriga', name: 'Auriga', dev: '', translit: 'The Charioteer',
                 ra: 5.278, dec: 45.998, minAlt: 12,
                 body_text: 'A big, bright pentagon riding high overhead in winter, crowned by the golden star Capella — the sixth-brightest star in the sky and one of the first you\'ll notice on a cold evening.',
                 find: 'Look nearly straight up on winter nights for a large ring of bright stars; the brightest, Capella, is a warm yellow.',
-                facts: ['<b>Capella</b> — actually four stars', 'Rides <b>high overhead</b> in winter', 'Strung with <b>star clusters</b>'],
-                fig: { s: [[5.278, 45.998], [5.992, 44.947], [5.995, 37.213], [5.438, 28.608], [4.950, 33.166]], b: [0], l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0]] }
+                facts: ['<b>Capella</b> — actually four stars', 'Rides <b>high overhead</b> in winter', 'Strung with <b>star clusters</b>']
             },
             {
                 id: 'pegasus', name: 'Pegasus & Andromeda', dev: '', translit: 'The Winged Horse',
                 ra: 0.139, dec: 29.09, minAlt: 12,
                 body_text: 'A huge, near-perfect square of four stars — the Great Square of Pegasus — dominates autumn evenings. From one corner, a chain of stars leads off to Andromeda, and to the farthest thing your eye can see.',
                 find: 'Spot the big empty square high in the east/overhead in autumn. Follow the two stars trailing from its top-left corner to reach the faint smudge of the Andromeda Galaxy.',
-                facts: ['The <b>Great Square</b> is a giant signpost', 'Points to the <b>Andromeda Galaxy</b>', 'An <b>autumn</b> landmark'],
-                fig: { s: [[23.079, 15.205], [23.063, 28.083], [0.140, 29.091], [0.220, 15.184], [1.162, 35.621], [2.065, 42.330]], b: [], l: [[0, 1], [1, 2], [2, 3], [3, 0], [2, 4], [4, 5]] }
+                facts: ['The <b>Great Square</b> is a giant signpost', 'Points to the <b>Andromeda Galaxy</b>', 'An <b>autumn</b> landmark']
             }
         ];
 

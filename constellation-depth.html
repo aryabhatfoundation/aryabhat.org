@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Redirecting — Constellation Atlas: Aryabhat</title>
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="https://aryabhat.org/constellations.html">
+
+    <!-- The depth view is no longer a page of its own: a constellation seen
+         from the side is the same constellation, so it is now the second
+         view inside its chart. This shim keeps every link that was ever
+         shared working, hash and all:
+
+             constellation-depth.html            -> constellations.html#orion/depth
+             constellation-depth.html#lyra       -> constellations.html#lyra/depth
+             constellation-depth.html#lyra/side  -> constellations.html#lyra/depth
+    -->
+    <script>
+        (function () {
+            var raw = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+            // Orion is the figure that makes the point best, for a bare visit.
+            var id = raw.split('/')[0] || 'orion';
+            var target = 'constellations.html#' + encodeURIComponent(id) + '/depth';
+            // replace(), not assign(): Back should return where the reader
+            // came from, not bounce through this page again.
+            window.location.replace(target);
+        })();
+    </script>
+</head>
+
+<body>
+    <p style="font-family: system-ui, sans-serif; color: #9fb3c8; text-align: center; padding: 3rem 1rem;">
+        The depth view now lives inside the constellation atlas.
+        <a href="constellations.html#orion/depth" style="color: #ffcc33;">Open it there →</a>
+    </p>
+</body>
+
+</html>

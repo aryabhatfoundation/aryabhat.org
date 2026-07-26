@@ -21,6 +21,8 @@ import os
 import re
 import sys
 
+import _bright_stars
+
 # Local checkout holding docs/constellation-lines and docs/star-names.
 # Override by passing a path as the first argument.
 DEFAULT_SOURCE_ROOT = os.environ.get("CONSTELLATION_SOURCE", "~/dev/bhagol")
@@ -31,6 +33,7 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 LINES_JSON = os.path.join(SOURCE_ROOT, "docs/constellation-lines/constellation-lines.json")
 NAMES_JSON = os.path.join(SOURCE_ROOT, "docs/star-names/star-names.json")
+BRIGHT_TXT = os.path.join(SOURCE_ROOT, "tools/src/main/resources/data/stardata_names.txt")
 
 GREEK = "αβγδεζηθικλμνξοπρστυφχψω"
 SUPERSCRIPT = {"1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵"}
@@ -177,7 +180,7 @@ def indian_name_kind(cid):
 # Payload
 # ---------------------------------------------------------------------------
 
-def trim_constellation(con):
+def trim_constellation(con, bright):
     stars = []
     for s in con["stars"]:
         star = {
@@ -190,6 +193,11 @@ def trim_constellation(con):
         }
         if s["figure"]:
             star["fig"] = 1
+            # Only the figure stars carry a distance: they are the ones
+            # constellation-depth.html lifts off the sky into real space.
+            row = _bright_stars.match(bright, s["ra_deg"], s["dec_deg"], s["mag"])
+            if _bright_stars.usable_distance(row):
+                star["pc"] = round(row["pc"], 2)
         for src, dst in (("designation", "desig"), ("bayer", "bayer"),
                          ("proper_name", "name"), ("spectral", "sp")):
             if s.get(src):
@@ -225,6 +233,7 @@ def main():
         star_names = json.load(fh)
 
     constellations = figures["constellations"]
+    bright = _bright_stars.load(BRIGHT_TXT)
     sanskrit, unmatched = build_sanskrit_index(constellations, star_names["stars"])
 
     payload = {
@@ -236,7 +245,7 @@ def main():
             "fieldStarLimit": figures["field_star_limit_mag"],
             "sanskritGenerated": star_names["generated"],
         },
-        "constellations": [trim_constellation(c) for c in constellations],
+        "constellations": [trim_constellation(c, bright) for c in constellations],
         "sanskritStars": sanskrit,
     }
 
@@ -270,6 +279,11 @@ def main():
     if unmatched:
         print("unmatched Sanskrit entries (%d): %s"
               % (len(unmatched), ", ".join(unmatched)))
+    figure_stars = sum(1 for c in payload["constellations"]
+                       for s in c["stars"] if s.get("fig"))
+    with_pc = sum(1 for c in payload["constellations"]
+                  for s in c["stars"] if s.get("pc"))
+    print("figure stars: %d, with a distance: %d" % (figure_stars, with_pc))
     print("wrote %s (%.0f KB)" % (OUT, os.path.getsize(OUT) / 1024))
 
 
