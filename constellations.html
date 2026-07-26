@@ -988,7 +988,7 @@
                     <div class="chip-row" id="filters" role="group" aria-label="Filters">
                         <button class="chip active" data-filter="all" type="button">All 88</button>
                         <button class="chip" data-filter="zodiac" type="button">Zodiac</button>
-                        <button class="chip" data-filter="sanskrit" type="button">Sanskrit names</button>
+                        <button class="chip" data-filter="sanskrit" type="button">Named in our texts</button>
                         <button class="chip" data-filter="season" type="button" id="chip-season">Best this
                             month</button>
                         <button class="chip" data-filter="bright" type="button">Bright stars</button>
@@ -1151,6 +1151,9 @@
 
             function matchesFilter(con) {
                 if (activeFilter === 'zodiac') return con.zodiac;
+                // Constellations holding a star our texts named — the nakshatra
+                // junction stars, the Saptarshi, Dhruva, Agastya — plus the few
+                // that carry an Indian name themselves.
                 if (activeFilter === 'sanskrit') return con.sanskritStars.length > 0 || !!con.devanagari;
                 if (activeFilter === 'bright') return con.brightest.mag < 2.0;
                 if (activeFilter === 'season') {
