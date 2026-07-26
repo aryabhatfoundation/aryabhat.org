@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build js/constellation-data.js for constellations.html.
 
-Reads two databases from the Bhagol repo:
+Reads two source databases:
 
   docs/constellation-lines/constellation-lines.json  — IAU figures, keyed to
       Hipparcos stars, with a stereographic projection per constellation.
@@ -9,11 +9,11 @@ Reads two databases from the Bhagol repo:
       attestations.
 
 and emits a single minified `window.CONSTELLATION_DATA` payload. The web page
-draws the charts itself from the projected coordinates, so the SVGs in the
-Bhagol repo are not copied here.
+draws the charts itself from the projected coordinates, so the rendered SVGs
+that sit beside those databases are not copied here.
 
 Usage:
-    python3 tools/build-constellation-data.py [path-to-bhagol]
+    python3 tools/build-constellation-data.py [path-to-source-databases]
 """
 
 import json
@@ -21,12 +21,16 @@ import os
 import re
 import sys
 
-BHAGOL = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser("~/dev/bhagol")
+# Local checkout holding docs/constellation-lines and docs/star-names.
+# Override by passing a path as the first argument.
+DEFAULT_SOURCE_ROOT = os.environ.get("CONSTELLATION_SOURCE", "~/dev/bhagol")
+
+SOURCE_ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(DEFAULT_SOURCE_ROOT)
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                    "..", "js", "constellation-data.js")
 
-LINES_JSON = os.path.join(BHAGOL, "docs/constellation-lines/constellation-lines.json")
-NAMES_JSON = os.path.join(BHAGOL, "docs/star-names/star-names.json")
+LINES_JSON = os.path.join(SOURCE_ROOT, "docs/constellation-lines/constellation-lines.json")
+NAMES_JSON = os.path.join(SOURCE_ROOT, "docs/star-names/star-names.json")
 
 GREEK = "αβγδεζηθικλμνξοπρστυφχψω"
 SUPERSCRIPT = {"1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵"}
@@ -206,11 +210,12 @@ def main():
         fh.write(
             "/*\n"
             " * constellation-data.js — generated, do not edit by hand.\n"
+            " * Rerun tools/build-constellation-data.py to refresh.\n"
             " *\n"
-            " * Built by tools/build-constellation-data.py from the Bhagol databases\n"
-            " * (docs/constellation-lines, docs/star-names). Rerun that script to\n"
-            " * refresh. Figures: IAU / Sky & Telescope (Alan MacRobert), CC BY 4.0,\n"
-            " * traced by d3-celestial (BSD-3-Clause). Stars: Hipparcos (ESA 1997).\n"
+            " * Figures: IAU / Sky & Telescope (Alan MacRobert), CC BY 4.0, traced\n"
+            " * by d3-celestial (BSD-3-Clause). Stars: Hipparcos (ESA 1997) via\n"
+            " * VizieR. Sanskrit names: Sūrya Siddhānta, Bṛhat Saṃhitā, Siddhānta\n"
+            " * Śiromaṇi and the Vedic corpus.\n"
             " */\n"
             "window.CONSTELLATION_DATA = "
         )
