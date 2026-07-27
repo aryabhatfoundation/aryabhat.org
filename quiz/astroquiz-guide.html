@@ -1188,8 +1188,11 @@
             var hint = document.getElementById('tapHint'); if (hint) hint.style.opacity = '';
         }
         function exit() {
-            if (document.referrer && document.referrer.indexOf('quiz.html') !== -1) history.back();
-            else window.location.href = 'quiz.html';
+            // The hub is /quiz/ (index.html) since the pages moved into the
+            // folder. This used to send people to a page that no longer
+            // exists at any depth, which is a 404 at the end of the story.
+            if (document.referrer && document.referrer.indexOf('/quiz/') !== -1) history.back();
+            else window.location.href = 'index.html';
         }
 
         // ── Gestures ───────────────────────────────────────────────
