@@ -388,13 +388,37 @@ body {
    from, injected by js/sky-night.js. It sits directly under the sub-nav so
    that "where am I standing, which night am I planning" is answered in the
    same spot on all four pages.
+
+   It must NOT read as a second row of navigation. The sub-nav above it is
+   a row of free-floating pills that take you somewhere; this is a settings
+   strip that changes what you are looking at. So it is drawn as one
+   enclosed panel, captioned, with square-shouldered controls inside —
+   different container, different shape, different job.
    -------------------------------------------------------------------------- */
 .sky-night-bar {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 6px;
-    padding: 8px 2px 0;
+    gap: 8px;
+    margin: 10px 0 2px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-left: 3px solid rgba(255, 204, 51, 0.5);
+    border-radius: var(--brand-shape);
+    background: rgba(10, 19, 28, 0.5);
+}
+
+/* The caption is what says "these are settings" at a glance, before any
+   shape or colour has to do the work. */
+.sky-night-bar::before {
+    content: "Showing";
+    font-family: var(--font-display);
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-right: 2px;
 }
 
 .sky-night-bar .night-slot {
@@ -403,17 +427,20 @@ body {
 }
 
 /* Both chips are one shape: a <button> for the place, a <label> wrapping a
-   real date input for the night. They must not look like two things. */
+   real date input for the night. They must not look like two things.
+
+   Square shoulders, not the sub-nav's 999px pills — inside a panel that is
+   already visibly a panel, that is enough to keep the two rows apart. */
 .main .sky-night-bar .night-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     position: relative;
     margin: 0;
-    padding: 8px 14px;
-    border-radius: 999px;
+    padding: 6px 11px;
+    border-radius: var(--brand-shape-tight);
     border: 1px solid var(--border);
-    background: rgba(10, 19, 28, 0.6);
+    background: rgba(4, 10, 18, 0.72);
     color: var(--ink);
     font-family: var(--font-display);
     font-size: .85rem;

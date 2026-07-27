@@ -1,0 +1,21 @@
+{
+  "name": "Aryabhat Foundation",
+  "short_name": "Aryabhat",
+  "description": "Foundation for promoting Basic Science — the Astronomy Quiz, the Sky Atlas, and science outreach across India.",
+  "icons": [
+    {
+      "src": "/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0b1a26",
+  "background_color": "#0b1a26",
+  "display": "standalone",
+  "start_url": "/"
+}

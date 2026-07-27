@@ -30,13 +30,16 @@
             // Place and date ride on the link itself — see decorate() below.
             key: 'whatsup',
             href: 'whatsup.html',
-            label: "What's up",
+            // One name throughout — the page brands itself "What's Up" on its
+            // cover, in its share text and in its OG tags, so the nav, the card
+            // and the button say that too rather than inventing two more.
+            label: "What's Up",
             icon: '🔭',
-            title: "What's up tonight",
-            blurb: 'A story-style walk through what an audience will actually see on the ' +
+            title: "What's Up",
+            blurb: 'A guided walk through what an audience will actually see on the ' +
                 'evening you pick — the Moon, the planets and the bright stars, in the ' +
-                'order they appear.',
-            cta: 'Open the evening show →'
+                'order they appear, one card at a time.',
+            cta: "Open What's Up →"
         },
         {
             key: 'constellations',

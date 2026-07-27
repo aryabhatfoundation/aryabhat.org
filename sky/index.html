@@ -7,7 +7,7 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sky Map: Aryabhat</title>
+    <title>Sky Atlas: Aryabhat</title>
     <meta name="description" content="Plan a night under the stars from any city or dark-sky site in India: moon phase, what is up that evening and a map of the whole sky.">
     <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -240,6 +240,68 @@
                 font-size: 0.82em;
                 padding: 8px 10px;
                 gap: 4px;
+            }
+        }
+
+        /* The night's numbers: sunset, full dark, what the Moon does, and how
+           much genuinely dark sky is left once both are accounted for. */
+        .night-times {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .ntime {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(30, 45, 66, 0.55), rgba(15, 26, 38, 0.6));
+        }
+
+        .ntime-label {
+            font-family: var(--font-display);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+        }
+
+        .ntime-value {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+
+        /* Dark-sky hours is the number that decides whether the night is
+           worth the drive, so it gets the gold. */
+        .ntime.lead {
+            border-color: rgba(255, 204, 51, 0.4);
+            background: linear-gradient(160deg, rgba(255, 204, 51, 0.10), rgba(15, 26, 38, 0.6));
+        }
+
+        .ntime.lead .ntime-value {
+            color: var(--gold);
+        }
+
+        @media (max-width: 550px) {
+            .night-times {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .ntime {
+                padding: 8px 10px;
+            }
+
+            .ntime-value {
+                font-size: 0.95rem;
             }
         }
 
@@ -622,10 +684,12 @@
                     <div class="sky-info-bar">
                         <span id="selected-date-display"></span>
                         <span class="sky-info-sep">·</span>
-                        <span id="sunset-info">Calculating sunset...</span>
-                        <span class="sky-info-sep">·</span>
                         <span id="place-info">📍</span>
                     </div>
+                    <!-- The four numbers a camp actually turns on, filled by
+                         updateSky(). Dark hours leads because it is the one
+                         that decides whether the night is worth the drive. -->
+                    <div class="night-times" id="night-times"></div>
                 </div>
                 <div class="twelve columns">
                     <div id="visibility-panel">
@@ -847,15 +911,112 @@
             }, 300);
         });
 
-        // Function to update map and sunset time
-        function updateSky(date) {
-            // Get sunset time for the date
-            var times = SunCalc.getTimes(date, LAT, LNG);
-            var night = times.night;
+        var DAY_MS = 24 * 60 * 60 * 1000;
 
-            // Update text
-            var timeStr = night.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('sunset-info').innerText = "Night begins " + timeStr;
+        function isTime(d) { return d && !isNaN(d.getTime()); }
+
+        /* Is the Sun above the horizon at midday here? What tells midnight
+           sun apart from polar night when SunCalc reports neither a sunrise
+           nor a sunset and every twilight comes back invalid. */
+        function sunUpAtNoon(date) {
+            var noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+            return SunCalc.getPosition(noon, LAT, LNG).altitude > 0;
+        }
+
+        /* When the sky is properly dark. Astronomical dusk where there is
+           one; nautical, then a flat 80 minutes after sunset where there is
+           not — a northern summer night genuinely never reaches −18°, and
+           the place list now covers 145 countries, so this cannot assume.
+           Returns null under midnight sun, and the whole day under polar
+           night, where "dusk" is not a moment the day contains. */
+        function darkStart(times, date) {
+            if (isTime(times.night)) return times.night;
+            if (isTime(times.nauticalDusk)) return times.nauticalDusk;
+            if (isTime(times.sunset)) return new Date(times.sunset.getTime() + 80 * 60000);
+            return sunUpAtNoon(date) ? null
+                : new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+        }
+
+        function darkEnd(date) {
+            var next = new Date(date.getTime() + DAY_MS);
+            var t = SunCalc.getTimes(next, LAT, LNG);
+            if (isTime(t.nightEnd)) return t.nightEnd;
+            if (isTime(t.nauticalDawn)) return t.nauticalDawn;
+            if (isTime(t.sunrise)) return new Date(t.sunrise.getTime() - 80 * 60000);
+            return sunUpAtNoon(next) ? null
+                : new Date(next.getFullYear(), next.getMonth(), next.getDate(), 0, 0, 0);
+        }
+
+        /* Hours of true dark: Sun below −18° and Moon below the horizon at
+           the same time. Sampled in five-minute steps rather than solved,
+           because the Moon can rise once, set once, do both or do neither
+           inside one night, and the closed form for how much of one window
+           overlaps the other is longer than the loop. */
+        function darkHours(date, times) {
+            var from = darkStart(times, date), to = darkEnd(date);
+            if (!isTime(from) || !isTime(to) || to <= from) return null;
+            var step = 5 * 60000, dark = 0;
+            for (var ms = from.getTime(); ms <= to.getTime(); ms += step) {
+                if (SunCalc.getMoonPosition(new Date(ms), LAT, LNG).altitude < 0) dark += step;
+            }
+            return dark;
+        }
+
+        function fmtDuration(ms) {
+            var mins = Math.round(ms / 60000);
+            var h = Math.floor(mins / 60), m = mins % 60;
+            if (!h) return m + 'm';
+            return h + 'h' + (m ? ' ' + m + 'm' : '');
+        }
+
+        /* The Moon event that matters for this evening: when it clears out if
+           it is already up at nightfall, when it arrives if it is not. Both
+           days are checked, because either event can fall past midnight. */
+        function moonEvent(from) {
+            var up = SunCalc.getMoonPosition(from, LAT, LNG).altitude > 0;
+            for (var d = 0; d <= 1; d++) {
+                var mt = SunCalc.getMoonTimes(new Date(from.getTime() + d * DAY_MS), LAT, LNG);
+                var when = up ? mt.set : mt.rise;
+                if (isTime(when) && when > from) {
+                    return { label: up ? 'Moon sets' : 'Moon rises', value: fmtTime(when) };
+                }
+            }
+            return { label: 'Moon', value: up ? 'up all night' : 'down all night' };
+        }
+
+        function renderNightTimes(date, times) {
+            var dark = darkHours(date, times);
+            var from = darkStart(times, date);
+            var cells = [
+                {
+                    label: 'Sunset',
+                    value: isTime(times.sunset) ? fmtTime(times.sunset)
+                        : (sunUpAtNoon(date) ? 'stays up' : 'stays down')
+                },
+                { label: 'Full dark', value: isTime(from) ? fmtTime(from) : '—' },
+                moonEvent(isTime(from) ? from : date),
+                {
+                    label: 'Dark sky', lead: true,
+                    value: dark === null ? 'no full dark'
+                        : dark < 60000 ? 'none — Moon up' : fmtDuration(dark)
+                }
+            ];
+            document.getElementById('night-times').innerHTML = cells.map(function (c) {
+                return '<div class="ntime' + (c.lead ? ' lead' : '') + '">'
+                    + '<span class="ntime-label">' + c.label + '</span>'
+                    + '<span class="ntime-value">' + c.value + '</span></div>';
+            }).join('');
+        }
+
+        // Function to update map and the night's times
+        function updateSky(date) {
+            var times = SunCalc.getTimes(date, LAT, LNG);
+            // Under midnight sun there is no nightfall to draw; the map still
+            // has to show something, so it takes local midnight.
+            var night = darkStart(times, date) ||
+                new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+
+            renderNightTimes(date, times);
 
             // Update Celestial Map Date
             if (typeof Celestial.date === 'function') Celestial.date(night);
