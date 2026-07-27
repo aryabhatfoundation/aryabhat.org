@@ -24,17 +24,17 @@
         rel="stylesheet">
 
     <!-- D3 Celestial Dependencies -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script type="text/javascript" src="js/vendor/d3.min.js"></script>
     <script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/d3-geo-projection/0.2.16/d3.geo.projection.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-celestial/celestial.min.js"></script>
+        src="js/vendor/d3.geo.projection.min.js"></script>
+    <script type="text/javascript" src="js/vendor/celestial.min.js"></script>
     <!-- celestial.css removed: its min-width:720px breaks mobile layout -->
 
     <!-- SunCalc -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+    <script src="js/vendor/suncalc.min.js"></script>
 
     <!-- Astronomy Engine — planet & DSO visibility calculations -->
-    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <script src="js/vendor/astronomy.browser.min.js"></script>
 
     <!-- The place and the night the whole section works from. Both must be
          resolved before the page script reads a latitude off them. -->
@@ -1175,7 +1175,7 @@
             location: false,
             geopos: [LAT, LNG],
             projection: "stereographic", // Circular projection
-            datapath: "https://ofrohn.github.io/data/", // Data path for stars/dsos
+            datapath: "data/celestial/", // Data path for stars/dsos
             form: false, // Disable default form
             background: { fill: "#0b1a26", stroke: "#0b1a26", opacity: 1 },
             stars: {
