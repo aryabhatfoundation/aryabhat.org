@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build js/whatsup-figures.js — the little star patterns whatsup.html draws.
+"""Build sky/js/whatsup-figures.js — the star patterns sky/whatsup.html draws.
 
 whatsup.html used to carry its own table of star coordinates, typed out by
 hand, for each of the fourteen patterns it shows. Those were the same stars
-already in js/constellation-data.js, entered a second time: every one of the
+already in sky/js/constellation-data.js, entered a second time: every one of
 98 positions matched a catalogue star to within two arcminutes. Two copies of
 the same sky is one copy too many — a correction to the database would have
 silently left the story player showing the old positions.
@@ -29,8 +29,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SOURCE = os.path.join(ROOT, "js", "constellation-data.js")
-TARGET = os.path.join(ROOT, "js", "whatsup-figures.js")
+SOURCE = os.path.join(ROOT, "sky", "js", "constellation-data.js")
+TARGET = os.path.join(ROOT, "sky", "js", "whatsup-figures.js")
 
 # Which stars each pattern draws, by Hipparcos number, and how they connect.
 #
@@ -141,7 +141,7 @@ FIGURES = {
 
 
 def load_catalogue():
-    """Every charted star from js/constellation-data.js, keyed by HIP."""
+    """Every charted star from sky/js/constellation-data.js, keyed by HIP."""
     with open(SOURCE, encoding="utf-8") as fh:
         text = fh.read()
     match = re.search(r"window\.CONSTELLATION_DATA\s*=\s*(\{.*\});?\s*$", text, re.S)
@@ -193,7 +193,7 @@ def build():
         " * Rerun tools/build-whatsup-figures.py to refresh.\n"
         " *\n"
         " * The star patterns whatsup.html draws. Positions come from\n"
-        " * js/constellation-data.js, so this file and the constellation atlas\n"
+        " * sky/js/constellation-data.js, so this file and the constellation atlas\n"
         " * can never disagree about where a star is; which stars each pattern\n"
         " * uses, and how they join up, is set in the build script.\n"
         " *\n"

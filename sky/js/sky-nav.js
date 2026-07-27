@@ -6,7 +6,7 @@
  * "what is in this section" and every page asks it the same question:
  *
  *   - the sub-nav strip at the top of each page (injected here)
- *   - the portal cards on sky.html (built from SkySection.pages)
+ *   - the hub cards on the section's landing page (SkySection.others)
  *
  * Adding a page to the section means adding one entry below. Nothing else
  * needs to know.
@@ -17,7 +17,7 @@
     var PAGES = [
         {
             key: 'sky',
-            href: 'sky.html',
+            href: 'index.html',
             label: 'Sky map',
             icon: '🌌',
             title: 'The sky on any night',
@@ -27,7 +27,7 @@
             cta: 'Open the sky map →'
         },
         {
-            // The city is what the story opens on; sky.html is Central India throughout.
+            // The city is what the story opens on; the sky map is Central India throughout.
             key: 'whatsup',
             href: 'whatsup.html?city=Bhopal',
             file: 'whatsup.html',
@@ -67,6 +67,7 @@
         return page.file || page.href.split('?')[0];
     }
 
+    // The section landing page answers to both /sky/ and /sky/index.html.
     function currentFile() {
         return window.location.pathname.split('/').pop() || 'index.html';
     }
@@ -106,7 +107,7 @@
         fileOf: fileOf,
         isCurrent: isCurrent,
         // Everything in the section except the page asking — what the hub
-        // cards on sky.html list.
+        // cards on the landing page list.
         others: function () {
             return PAGES.filter(function (p) { return !isCurrent(p); });
         }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build js/star-data.js for stars.html.
+"""Build sky/js/star-data.js for sky/stars.html.
 
 Selects the stars worth a page of their own — everything brighter than
 magnitude 2.5, plus every star the Sanskrit texts name, however faint — and
@@ -21,7 +21,7 @@ Sources, all read locally:
       common names.
 
 Charts are not duplicated here: stars.html draws its finder charts from
-js/constellation-data.js, which it loads alongside this file.
+sky/js/constellation-data.js, which it loads alongside this file.
 
 Usage:
     python3 tools/build-star-data.py [path-to-source-databases]
@@ -42,7 +42,7 @@ DEFAULT_SOURCE_ROOT = os.environ.get("CONSTELLATION_SOURCE", "~/dev/bhagol")
 
 SOURCE_ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(DEFAULT_SOURCE_ROOT)
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   "..", "js", "star-data.js")
+                   "..", "sky", "js", "star-data.js")
 
 LINES_JSON = os.path.join(SOURCE_ROOT, "docs/constellation-lines/constellation-lines.json")
 NAMES_JSON = os.path.join(SOURCE_ROOT, "docs/star-names/star-names.json")

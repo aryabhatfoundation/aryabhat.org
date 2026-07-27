@@ -3,7 +3,7 @@
  * Rerun tools/build-whatsup-figures.py to refresh.
  *
  * The star patterns whatsup.html draws. Positions come from
- * js/constellation-data.js, so this file and the constellation atlas
+ * sky/js/constellation-data.js, so this file and the constellation atlas
  * can never disagree about where a star is; which stars each pattern
  * uses, and how they join up, is set in the build script.
  *

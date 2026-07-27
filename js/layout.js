@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", function () {
     var headerHTML = `
     <div class="row">
         <div class="six columns offset-by-two ">
-          <img class="value-img" style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)) drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.5));" src="images/title.svg">
+          <img class="value-img" style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5)) drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.5));" src="/images/title.svg">
         </div>
         <div class="six columns logo">
           <img class="value-img" width="300" height="100"
-            style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.22)) drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));" src="images/aryabhat.svg">
+            style="filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.22)) drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));" src="/images/aryabhat.svg">
         </div>
     </div>`;
 
@@ -22,39 +22,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 2. Inject Navbar
     //
+    // Hrefs are root-absolute: not every page sits at the root any more, and
+    // a relative "index.html" from /sky/ would point inside the section.
+    //
     // "Sky" is one item covering a whole section — the sky map, the evening
     // show, the constellation atlas and the star list. Those four used to be
     // reachable two different ways with no visible relationship between
-    // them; they now share a sub-nav of their own (js/sky-nav.js), and the
-    // top bar just says which section you are in.
+    // them; they share a sub-nav of their own now (sky/js/sky-nav.js), and
+    // the top bar just says which section you are in. `prefix` marks an item
+    // that owns a directory rather than a single file.
     var navLinks = [
-        { href: "index.html", text: "Home" },
-        { href: "quiz.html", text: "Astronomy Quiz" },
-        {
-            href: "sky.html", text: "Sky",
-            section: ["sky.html", "whatsup.html", "constellations.html",
-                "stars.html", "constellation-depth.html"]
-        },
-        { href: "download.html", text: "Download" },
-        { href: "photos.html", text: "Photos" },
-        { href: "contact.html", text: "Contact Us" }
+        { href: "/index.html", text: "Home", also: ["/", "/oldindex.html"] },
+        { href: "/quiz.html", text: "Astronomy Quiz" },
+        { href: "/sky/", text: "Sky", prefix: "/sky/" },
+        { href: "/download.html", text: "Download" },
+        { href: "/photos.html", text: "Photos" },
+        { href: "/contact.html", text: "Contact Us" }
     ];
 
-    var currentFile = window.location.pathname.split('/').pop() || 'index.html';
+    // "/sky/" and "/sky/index.html" are the same page; normalise so either
+    // spelling matches.
+    var path = window.location.pathname;
+    if (path === '' || path === '/') path = '/index.html';
 
     var navListHTML = '<div class="container"><ul class="navbar-list">';
 
     navLinks.forEach(function (link) {
-        var isCurrent = link.section
-            ? link.section.indexOf(currentFile) !== -1
-            : currentFile === link.href;
+        var isCurrent = link.prefix
+            ? path.indexOf(link.prefix) === 0
+            : path === link.href || (link.also || []).indexOf(path) !== -1;
         var activeClass = isCurrent ? 'navbar-item current' : 'navbar-item';
-        // Note: previously text color class logic might have been different, but 'current' class handles styling now.
-        // There was a specific active class or style in CSS? 
-        // CSS: .navbar-link.active { color: #ffcc33; } 
-        // Step 206 change: .navbar-link.active styling.
-        // So we might need adding 'active' class to the <a> tag itself if it is current.
-
         var linkClass = isCurrent ? 'navbar-link active' : 'navbar-link';
 
         navListHTML += `<li class="${activeClass}"><a class="${linkClass}" href="${link.href}">${link.text}</a></li>`;
