@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // that owns a directory rather than a single file.
     var navLinks = [
         { href: "/index.html", text: "Home", also: ["/", "/oldindex.html"] },
-        { href: "/quiz.html", text: "Astronomy Quiz" },
+        { href: "/quiz/", text: "Astronomy Quiz", prefix: "/quiz/" },
         { href: "/sky/", text: "Sky", prefix: "/sky/" },
         { href: "/download.html", text: "Download" },
         { href: "/photos.html", text: "Photos" },

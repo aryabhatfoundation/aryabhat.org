@@ -17,6 +17,36 @@
         "destination": "/sky/whatsup.html",
         "type": 301
       },
+      {
+        "source": "/quiz.html",
+        "destination": "/quiz/",
+        "type": 301
+      },
+      {
+        "source": "/astroquiz-guide.html",
+        "destination": "/quiz/astroquiz-guide.html",
+        "type": 301
+      },
+      {
+        "source": "/online-attempt-guide.html",
+        "destination": "/quiz/online-attempt-guide.html",
+        "type": 301
+      },
+      {
+        "source": "/study-material.html",
+        "destination": "/quiz/study-material.html",
+        "type": 301
+      },
+      {
+        "source": "/participation.html",
+        "destination": "/quiz/participation.html",
+        "type": 301
+      },
+      {
+        "source": "/quizflow.html",
+        "destination": "/quiz/astroquiz-guide.html",
+        "type": 301
+      },
        {
         "source": "/quizform",
         "destination": "https://aryabhat.org/files/Institutional_format.xlsx",
@@ -281,7 +311,7 @@
     "rewrites": [
       {
         "source": "/study",
-        "destination": "/study-material.html"
+        "destination": "/quiz/study-material.html"
       }
     ]
   }

@@ -5,7 +5,16 @@ RewriteCond %{HTTP_USER_AGENT} !(Windows\ NT\ 5.1|Windows\ NT\ 5.2) [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
 
 # Shorthand for the unlisted study-material page (keeps the /study URL clean)
-RewriteRule ^study/?$ study-material.html [L]
+RewriteRule ^study/?$ quiz/study-material.html [L]
+
+# The quiz pages moved into /quiz/. Keep the old URLs working: they are in
+# print, in circulars to schools, and in years of search results.
+Redirect 301 /quiz.html /quiz/
+Redirect 301 /astroquiz-guide.html /quiz/astroquiz-guide.html
+Redirect 301 /online-attempt-guide.html /quiz/online-attempt-guide.html
+Redirect 301 /study-material.html /quiz/study-material.html
+Redirect 301 /participation.html /quiz/participation.html
+Redirect 301 /quizflow.html /quiz/astroquiz-guide.html
 
 Redirect 301 /study1 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study1.pdf
 Redirect 301 /study2 https://docs.google.com/viewerng/viewer?url=http://aryabhat.org/files/Study2.pdf
