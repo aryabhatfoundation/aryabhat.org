@@ -21,16 +21,15 @@
             label: 'Sky map',
             icon: '🌌',
             title: 'The sky on any night',
-            blurb: 'Pick a date and see what is up: which planets, deep-sky objects and ' +
-                'bright stars are visible that evening and until when, plus a map of the ' +
-                'whole sky as it will look from Central India once night falls.',
+            blurb: 'Plan an evening and see what is up: which planets, deep-sky objects and ' +
+                'bright stars are visible that night and until when, plus a map of the ' +
+                'whole sky as it will look from where you are once night falls.',
             cta: 'Open the sky map →'
         },
         {
-            // The city is what the story opens on; the sky map is Central India throughout.
+            // Place and date ride on the link itself — see decorate() below.
             key: 'whatsup',
-            href: 'whatsup.html?city=Bhopal',
-            file: 'whatsup.html',
+            href: 'whatsup.html',
             label: "What's up",
             icon: '🔭',
             title: "What's up tonight",
@@ -46,8 +45,7 @@
             icon: '✨',
             title: 'Constellation atlas',
             blurb: 'All 88 constellations as the IAU draws them. Tap any star for its ' +
-                'name and brightness, and — where our own texts named it — its ' +
-                'Sanskrit identification.',
+                'name, its brightness, and its Sanskrit name where it has one.',
             cta: 'Browse all 88 →'
         },
         {
@@ -57,7 +55,7 @@
             icon: '⭐',
             title: 'The brightest stars',
             blurb: 'The stars you can pick out from a city, one page each: how far away ' +
-                'it is, what colour it burns, and the name our own texts give it.',
+                'it is, what colour it burns, and its Sanskrit name.',
             cta: 'Open the star list →'
         }
     ];
@@ -65,6 +63,37 @@
     // The file a page entry lives at, ignoring any query string.
     function fileOf(page) {
         return page.file || page.href.split('?')[0];
+    }
+
+    /* Every link inside the section carries the chosen place and night, so
+       walking from the map to the atlas does not silently drop you back in
+       Central India tonight. js/sky-night.js owns those two; if a page has
+       not loaded it, links stay plain and each page falls back to its own
+       defaults. */
+    function decorate(href) {
+        return window.SkyNight ? window.SkyNight.href(href) : href;
+    }
+
+    /* The same for links written straight into a page's markup — a "back to
+       the sky map", a star's "its constellation". They are ordinary <a>s, so
+       without this a middle-click or open-in-new-tab drops the context that
+       an ordinary click would have kept. Idempotent: re-running it just
+       rewrites the same two parameters. */
+    function decorateLinks(root) {
+        if (!window.SkyNight) return;
+        var files = {};
+        PAGES.forEach(function (page) { files[fileOf(page)] = true; });
+
+        var links = (root || document).querySelectorAll('a[href]');
+        Array.prototype.forEach.call(links, function (link) {
+            var href = link.getAttribute('href');
+            // Relative, in-section links only: leave anchors, absolute URLs
+            // and links out to the rest of the site alone.
+            if (!href || href.charAt(0) === '#' || href.indexOf(':') !== -1 ||
+                href.charAt(0) === '/') return;
+            if (!files[href.split('#')[0].split('?')[0]]) return;
+            link.href = decorate(href);
+        });
     }
 
     // The section landing page answers to both /sky/ and /sky/index.html.
@@ -87,7 +116,7 @@
                 var here = isCurrent(page);
                 var link = document.createElement('a');
                 link.className = 'subnav-link' + (here ? ' active' : '');
-                link.href = page.href;
+                link.href = decorate(page.href);
                 if (here) link.setAttribute('aria-current', 'page');
 
                 var icon = document.createElement('span');
@@ -100,12 +129,18 @@
                 bar.appendChild(link);
             });
         });
+
+        decorateLinks();
     }
 
     window.SkySection = {
         pages: PAGES,
         fileOf: fileOf,
         isCurrent: isCurrent,
+        decorate: decorate,
+        decorateLinks: decorateLinks,
+        // Re-point every injected link at the current place and night.
+        refresh: render,
         // Everything in the section except the page asking — what the hub
         // cards on the landing page list.
         others: function () {
@@ -118,4 +153,7 @@
     } else {
         render();
     }
+
+    // Moving the place or the night re-points the links that carry them.
+    if (window.SkyNight) window.SkyNight.on(render);
 })();

@@ -376,6 +376,10 @@
                 <!-- Injected by js/sky-nav.js -->
             </nav>
 
+            <div class="sky-night-bar" role="group">
+                <!-- Injected by js/sky-night.js -->
+            </div>
+
             <!-- ================= ATLAS ================= -->
             <section id="atlas-view">
                 <div class="atlas-head">
@@ -383,7 +387,7 @@
                     <h1>All 88 <em>constellations</em></h1>
                     <p class="atlas-lede">The star figures the IAU publishes, drawn star by star. Pick a
                         constellation, then tap any star on its chart to see what it is called — in Latin, in
-                        Greek letters, and where our own texts named it, in Sanskrit.</p>
+                        Greek letters, and where it has one, in Sanskrit.</p>
                 </div>
 
                 <div class="atlas-toolbar">
@@ -393,7 +397,7 @@
                     <div class="chip-row" id="filters" role="group" aria-label="Filters">
                         <button class="chip active" data-filter="all" type="button">All 88</button>
                         <button class="chip" data-filter="zodiac" type="button">Zodiac</button>
-                        <button class="chip" data-filter="sanskrit" type="button">Named in our texts</button>
+                        <button class="chip" data-filter="sanskrit" type="button">Named in Sanskrit</button>
                         <button class="chip" data-filter="season" type="button" id="chip-season">Best this
                             month</button>
                         <button class="chip" data-filter="bright" type="button">Bright stars</button>
@@ -486,6 +490,9 @@
 
     <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
 
+    <!-- The place and the night the whole section works from -->
+    <script src="js/sky-places.js"></script>
+    <script src="js/sky-night.js"></script>
     <script src="js/constellation-data.js"></script>
     <script src="js/sky-charts.js"></script>
     <script src="js/sky-browse.js"></script>
@@ -520,7 +527,12 @@
             var DEPTH_SUB = 'depth';
             function isDepthSub(sub) { return sub === DEPTH_SUB || sub === 'side'; }
 
-            var thisMonth = new Date().getMonth();
+            /* The month the "best now" chip filters on, and the latitude the
+               visibility notes answer for, both come from the night bar rather
+               than from today and Bhopal. Plan for December from Hanle and the
+               atlas agrees with the map page instead of contradicting it. */
+            var thisMonth = SkyNight.date.getMonth();
+            SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
 
             // ---------------------------------------------------------
             // Derived fields
@@ -746,7 +758,7 @@
                 addFact('Brightest star', SC.starLabel(con.brightest),
                     'magnitude ' + con.brightest.mag);
                 addFact('Best evening view', MONTHS[con.month], 'highest around 9 pm');
-                addFact('From Central India', vis.text, vis.sub);
+                addFact('From ' + SC.PLACE, vis.text, vis.sub);
                 addFact('Charted stars', con.stars.length + '',
                     con.figureStars.length + ' on the figure');
                 if (con.sanskritStars.length) {
@@ -878,7 +890,7 @@
 
                 filter: function (con, active) {
                     if (active === 'zodiac') return con.zodiac;
-                    // Constellations holding a star our texts named — the
+                    // Constellations holding a star named in Sanskrit — the
                     // nakshatra junction stars, the Saptarshi, Dhruva, Agastya
                     // — plus the few that carry an Indian name themselves.
                     if (active === 'sanskrit') return con.sanskritStars.length > 0 || !!con.devanagari;
@@ -970,6 +982,19 @@
                 chartHint.textContent = 'Tap a star for its details, or swipe sideways for the '
                     + 'next constellation. Larger dots are brighter stars.';
             }
+
+            /* The atlas answers "from where, on which night", so it has to
+               move when those do: the season chip, every visibility note and
+               whatever detail page is open all re-derive from the night bar. */
+            SkyNight.on(function () {
+                thisMonth = SkyNight.date.getMonth();
+                SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
+                document.getElementById('chip-season').textContent =
+                    'Best in ' + MONTHS[thisMonth].slice(0, 3);
+                browse.render();
+                var open = browse.current();
+                if (open) openConstellation(open, browse.sub());
+            });
 
             browse.start();
         })();

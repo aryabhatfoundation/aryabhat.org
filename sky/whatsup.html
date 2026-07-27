@@ -41,7 +41,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
     <!-- Astronomy Engine — planet & object altitude / azimuth -->
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-    <!-- Content catalogues + city list (data only) -->
+    <!-- The place and the night the whole section works from -->
+    <script src="js/sky-places.js"></script>
+    <script src="js/sky-night.js"></script>
+    <!-- Content catalogues (data only) -->
     <script src="js/whatsup-data.js"></script>
     <script src="js/whatsup-figures.js"></script>
     <!-- satellite.js (vendored, MIT) — SGP4 pass prediction, no runtime API -->
@@ -169,6 +172,7 @@
             text-overflow: ellipsis;
         }
         .top-controls {
+            position: relative;   /* anchors the place popover below the row */
             margin-left: auto;
             display: flex;
             align-items: center;
@@ -214,6 +218,82 @@
             -webkit-appearance: none;
             appearance: none;
         }
+        /* City typeahead — the old <select> listed a hundred-odd places and
+           made you scroll to them; this searches the same curated list first
+           and the full catalogue behind it, so "sehore" is one word away. */
+        .place-pop {
+            position: absolute;
+            top: calc(100% + 7px);
+            right: 0;
+            z-index: 30;
+            width: min(300px, 78vw);
+            padding: 9px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 204, 51, .3);
+            background: #101c2b;
+            box-shadow: 0 16px 44px rgba(0, 0, 0, .7);
+            cursor: default;
+        }
+        .place-pop[hidden] { display: none; }
+        .place-pop input {
+            width: 100%;
+            height: 36px;
+            margin: 0 0 7px;
+            padding: 0 11px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(4, 10, 18, .85);
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: .9rem;
+            box-sizing: border-box;
+        }
+        .place-pop input:focus { outline: 0; border-color: rgba(255, 204, 51, .55); }
+        .place-list { max-height: 224px; overflow-y: auto; overscroll-behavior: contain; }
+        .place-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            width: 100%;
+            padding: 7px 9px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: .86rem;
+            text-align: left;
+            cursor: pointer;
+        }
+        .place-row.on, .place-row:hover { background: rgba(255, 204, 51, .15); color: var(--gold-soft); }
+        .place-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .place-note {
+            margin: 2px 0 5px;
+            padding: 0 9px;
+            color: var(--ink-dim);
+            font-size: .68rem;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+        .place-here {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            margin-top: 7px;
+            padding: 8px 9px 2px;
+            border: 0;
+            border-top: 1px solid var(--border);
+            background: transparent;
+            color: var(--ink-dim);
+            font-family: var(--font-display);
+            font-size: .76rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+        }
+        .place-here:hover:not(:disabled) { color: var(--gold-soft); }
+
         .story-icon {
             display: inline-flex;
             align-items: center;
@@ -740,10 +820,16 @@
             <div class="story-top">
                 <span class="story-brand">What's Up</span>
                 <div class="top-controls">
-                    <label class="story-pill" id="cityBtn">
+                    <button class="story-pill" id="cityBtn" type="button"
+                        aria-haspopup="dialog" aria-expanded="false" aria-label="Change place">
                         📍<span id="cityLabel">Bhopal</span> ▾
-                        <select id="citySelect" aria-label="Choose city"></select>
-                    </label>
+                    </button>
+                    <div class="place-pop" id="placePop" hidden>
+                        <input type="search" id="placeSearch" autocomplete="off"
+                            placeholder="Search a city or dark-sky site…" aria-label="Search for a place">
+                        <div class="place-list" id="placeList" role="listbox" aria-label="Places"></div>
+                        <button class="place-here" id="placeHere" type="button">📡 Use my location</button>
+                    </div>
                     <label class="story-pill" id="dateBtn">
                         <span id="dateBtnLabel">Tonight</span> ▾
                         <input type="date" id="dateInput" aria-label="Choose evening">
@@ -766,46 +852,28 @@
     (function () {
         'use strict';
 
-        // Cities + astronomy catalogues live in js/whatsup-data.js; the star
-        // patterns are generated from the same figure database the
-        // constellation atlas draws from, and keyed by the same id.
-        var CITIES = WHATSUP_DATA.CITIES;
+        // Astronomy catalogues live in js/whatsup-data.js; the star patterns
+        // are generated from the same figure database the constellation atlas
+        // draws from, and keyed by the same id. Places come from
+        // js/sky-places.js — the one list the whole section picks from.
         var FIGURES = window.WHATSUP_FIGURES || {};
-        function findCity(name) {
-            if (!name) return null;
-            name = String(name).trim().toLowerCase();
-            for (var i = 0; i < CITIES.length; i++) {
-                if (CITIES[i].name.toLowerCase() === name) return CITIES[i];
-            }
-            return null;
-        }
 
-        // ── Resolve location from URL: ?city=, or ?lat=&?lng=(&place=),
-        //    else default Bhopal. `loc` drives share links too. ──
+        // ── Where and when ──
+        // js/sky-night.js resolved both from the URL, the last place used, or
+        // the defaults, and it is what the rest of the section reads too. This
+        // page keeps local aliases because every slide builder wants them, but
+        // it never decides them: a change goes to SkyNight and comes back
+        // through the listener at the bottom of this block.
         var params = new URLSearchParams(window.location.search);
-        var loc;
-        var qLat = parseFloat(params.get('lat')), qLng = parseFloat(params.get('lng'));
-        if (!isNaN(qLat) && !isNaN(qLng)) {
-            loc = { name: params.get('place') || 'Custom location', lat: qLat, lng: qLng, custom: true };
-        } else {
-            var c0 = findCity(params.get('city')) || findCity('Bhopal');
-            loc = { name: c0.name, lat: c0.lat, lng: c0.lng };
-        }
-        // Mutable — recreated when the city changes.
-        var LAT = loc.lat, LNG = loc.lng, PLACE = loc.name;
+        var loc = SkyNight.place;
+        var LAT = loc.lat, LNG = loc.lng, PLACE = SkyPlaces.label(loc);
         var observer = new Astronomy.Observer(LAT, LNG, 500);
 
         var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // ── Selected evening ──
-        function parseDateParam(s) {
-            if (!s) return null;
-            var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-            if (!m) return null;
-            return new Date(+m[1], +m[2] - 1, +m[3], 12, 0, 0, 0);
-        }
-        var selectedDate = parseDateParam(params.get('date'));
-        if (!selectedDate) { selectedDate = new Date(); selectedDate.setHours(12, 0, 0, 0); }
+        var parseDateParam = SkyNight.parseYmd;
+        var selectedDate = SkyNight.date;
 
         // ── Content catalogue ──────────────────────────────────────
         // Planets. `body` is the astronomy-engine identifier.
@@ -1217,6 +1285,25 @@
             return '<ul class="facts"><li>' + arr.join('</li><li>') + '</li></ul>';
         }
 
+        /* What the horizon does to a fixed object from where the viewer is
+         * standing — computed, never asserted in the prose. The Saptarshi
+         * never set from Leh, dip below the horizon from Bhopal, and go
+         * properly down from Kochi; one sentence cannot cover all three, and
+         * the one we used to ship ("never fully set from our latitude") was
+         * written when this page was Bhopal and nothing else.
+         *
+         * `culm` is how high it ever climbs: the pole sits at the observer's
+         * latitude, so an object `|LAT − dec|` away from it is that far down
+         * from the zenith at its best.
+         */
+        function horizonFact(dec) {
+            var culm = 90 - Math.abs(LAT - dec);
+            if (culm <= 0) return null;                 // never rises; not offered anyway
+            if (dec > 90 - LAT) return 'Circles the pole — <b>never sets</b> from ' + esc(PLACE);
+            if (culm < 20) return 'Only <b>' + Math.round(culm) + '°</b> up at best — needs a clear horizon';
+            return 'Climbs to <b>' + Math.round(culm) + '°</b> from ' + esc(PLACE);
+        }
+
         function buildSlides(date) {
             var slides = [];
 
@@ -1367,7 +1454,9 @@
                         + '<p class="body">' + c.body_text + '</p>'
                         + chip(vis)
                         + '<p class="body dim">👁️ ' + c.find + '</p>'
-                        + factsHTML(c.facts)
+                        // The horizon fact is the one thing on this card that
+                        // changes with the place, so it leads the list.
+                        + factsHTML([horizonFact(c.dec)].filter(Boolean).concat(c.facts))
                         + '</div>'
                 });
             });
@@ -1578,7 +1667,7 @@
                     + '<li><span class="ti">🔭</span><span>Look with your <b>eyes first</b>, then binoculars, then the telescope. Learning the sky is half the joy.</span></li>'
                     + '</ul>'
                     + '<p class="body dim" style="margin-top:20px">Clear skies from <b style="color:var(--gold-soft)">Aryabhat</b>. 🔭</p>'
-                    + '<a class="story-btn" href="index.html">← Back to the Sky Map</a>'
+                    + '<a class="story-btn" href="' + esc(SkyNight.href('index.html')) + '">← Back to the Sky Map</a>'
                     + '</div>'
             });
 
@@ -1688,10 +1777,10 @@
         }
 
         function exit() {
-            if (document.referrer && document.referrer.indexOf('sky.html') !== -1) {
+            if (document.referrer && document.referrer.indexOf('/sky/') !== -1) {
                 history.back();
             } else {
-                window.location.href = 'sky.html';
+                window.location.href = SkyNight.href('index.html');
             }
         }
 
@@ -1757,7 +1846,7 @@
         dateInput.value = toInputValue(selectedDate);
         dateInput.addEventListener('change', function () {
             var d = parseDateParam(this.value);
-            if (d) { selectedDate = d; updateDateLabel(); syncURL(); render(selectedDate); }
+            if (d) SkyNight.setDate(d);   // comes back through the SkyNight listener
         });
         // Desktop browsers don't pop the calendar on a plain click of a
         // (transparent) date field — open it explicitly on the pill.
@@ -1767,45 +1856,136 @@
         });
 
         // ── City control ──
-        var citySel = document.getElementById('citySelect');
-        function updateCityLabel() {
-            document.getElementById('cityLabel').textContent = loc.name;
-        }
-        function renderCityOptions() {
-            var html = '';
-            if (loc.custom) html += '<option value="__custom" selected>' + esc(loc.name) + '</option>';
-            CITIES.forEach(function (c) {
-                var isSel = !loc.custom && c.name === loc.name;
-                html += '<option value="' + esc(c.name) + '"' + (isSel ? ' selected' : '') + '>' + esc(c.name) + '</option>';
-            });
-            citySel.innerHTML = html;
-        }
-        function applyLocation(newLoc, redraw) {
-            loc = newLoc;
-            LAT = loc.lat; LNG = loc.lng; PLACE = loc.name;
-            observer = new Astronomy.Observer(LAT, LNG, 500);
-            renderCityOptions();
-            updateCityLabel();
-            syncURL();
-            if (redraw) render(selectedDate);
-        }
-        citySel.onchange = function () {
-            var c = findCity(this.value);
-            if (c) applyLocation({ name: c.name, lat: c.lat, lng: c.lng }, true);
-        };
-        renderCityOptions();
+        // A search box rather than the old hundred-option <select>: the
+        // curated list answers instantly, and anything it cannot answer
+        // falls through to the full catalogue behind js/sky-places.js.
+        var cityBtn = document.getElementById('cityBtn');
+        var placePop = document.getElementById('placePop');
+        var placeSearch = document.getElementById('placeSearch');
+        var placeList = document.getElementById('placeList');
+        var placeHere = document.getElementById('placeHere');
 
-        // Nearest listed city to a lat/lng (flat approx — fine at city scale).
-        function nearestCity(lat, lng) {
-            var best = null, bestD = Infinity;
-            var kx = Math.cos(lat * Math.PI / 180);
-            CITIES.forEach(function (c) {
-                var dLat = c.lat - lat, dLng = (c.lng - lng) * kx;
-                var d = dLat * dLat + dLng * dLng;
-                if (d < bestD) { bestD = d; best = c; }
-            });
-            return { city: best, deg: Math.sqrt(bestD) };
+        function updateCityLabel() {
+            document.getElementById('cityLabel').textContent = PLACE;
         }
+
+        var placeRows = [], placeActive = -1, placeToken = 0;
+
+        function placeHighlight(i) {
+            var kids = placeList.querySelectorAll('.place-row');
+            for (var k = 0; k < kids.length; k++) {
+                kids[k].classList.toggle('on', k === i);
+                kids[k].setAttribute('aria-selected', k === i ? 'true' : 'false');
+            }
+            placeActive = i;
+            if (i >= 0 && kids[i]) kids[i].scrollIntoView({ block: 'nearest' });
+        }
+
+        function placeChoose(i) {
+            if (i < 0 || i >= placeRows.length) return;
+            SkyNight.setPlace(placeRows[i]);
+            closePlacePop();
+        }
+
+        function placeShow(items, note) {
+            placeRows = items;
+            placeList.innerHTML = '';
+            if (note) {
+                var head = document.createElement('p');
+                head.className = 'place-note';
+                head.textContent = note;
+                placeList.appendChild(head);
+            }
+            if (!items.length) {
+                var empty = document.createElement('p');
+                empty.className = 'place-note';
+                empty.textContent = 'No place by that name';
+                placeList.appendChild(empty);
+                placeActive = -1;
+                return;
+            }
+            items.forEach(function (item, i) {
+                var row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'place-row';
+                row.setAttribute('role', 'option');
+                row.setAttribute('aria-selected', 'false');
+                row.innerHTML = (item.dark ? '<span aria-hidden="true">🌌</span>' : '') +
+                    '<span>' + esc(SkyPlaces.label(item)) + '</span>';
+                row.onclick = function () { placeChoose(i); };
+                row.onmousemove = function () { placeHighlight(i); };
+                placeList.appendChild(row);
+            });
+            placeHighlight(note ? -1 : 0);
+        }
+
+        // Nothing typed: offer the dark-sky sites. They are why most people
+        // change the place at all, and the hardest names to spell blind.
+        function placeDefaults() {
+            placeShow(SkyPlaces.curated.filter(function (c) { return c.dark; }), 'Dark-sky sites');
+        }
+
+        function openPlacePop() {
+            placePop.hidden = false;
+            cityBtn.setAttribute('aria-expanded', 'true');
+            placeSearch.value = '';
+            placeDefaults();
+            placeSearch.focus();
+            pause();                    // don't advance the story behind the picker
+        }
+        function closePlacePop() {
+            if (placePop.hidden) return;
+            placePop.hidden = true;
+            cityBtn.setAttribute('aria-expanded', 'false');
+            resume();
+        }
+
+        cityBtn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            if (placePop.hidden) openPlacePop(); else closePlacePop();
+        });
+        // Taps inside the picker are not taps on the story.
+        placePop.addEventListener('click', function (e) { e.stopPropagation(); });
+        placePop.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+
+        placeSearch.addEventListener('input', function () {
+            var q = placeSearch.value, mine = ++placeToken;
+            if (!q.trim()) { placeDefaults(); return; }
+            SkyPlaces.search(q, 12, function (results, done) {
+                if (mine !== placeToken) return;   // a later keystroke owns the list
+                placeShow(results, done ? '' : null);
+            });
+        });
+        placeSearch.addEventListener('keydown', function (e) {
+            e.stopPropagation();                    // the story listens for arrows too
+            if (e.key === 'ArrowDown') { e.preventDefault(); placeHighlight(Math.min(placeActive + 1, placeRows.length - 1)); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); placeHighlight(Math.max(placeActive - 1, 0)); }
+            else if (e.key === 'Enter') { e.preventDefault(); placeChoose(placeActive >= 0 ? placeActive : 0); }
+            else if (e.key === 'Escape') { e.preventDefault(); closePlacePop(); }
+        });
+
+        placeHere.addEventListener('click', function () {
+            if (!navigator.geolocation) { placeHere.textContent = 'This browser cannot locate you'; return; }
+            placeHere.disabled = true;
+            placeHere.textContent = 'Locating…';
+            navigator.geolocation.getCurrentPosition(function (pos) {
+                applyGeolocation(pos.coords.latitude, pos.coords.longitude);
+                closePlacePop();
+            }, function () {
+                placeHere.disabled = false;
+                placeHere.textContent = '📡 Location not available';
+            }, { timeout: 8000, maximumAge: 600000 });
+        });
+
+        /* A raw coordinate becomes the nearest place we know when it is close
+           enough to one (~200 km), so it reads as somewhere rather than as a
+           number, and stays a bare coordinate when it isn't. */
+        function applyGeolocation(la, lo) {
+            var near = SkyPlaces.nearest(la, lo, 1.8);
+            if (near) SkyNight.setPlace(near.place);
+            else SkyNight.setPlace({ name: 'Your location', lat: la, lng: lo, custom: true });
+        }
+
         // Seed the location from the browser's geolocation when the URL
         // gave us no city (and no explicit lat/lng). Falls back silently.
         function seedFromGeolocation() {
@@ -1813,16 +1993,31 @@
             navigator.geolocation.getCurrentPosition(function (pos) {
                 // Don't yank the viewer if they've already left the cover.
                 if (current !== 0) return;
-                var la = pos.coords.latitude, lo = pos.coords.longitude;
-                var nc = nearestCity(la, lo);
-                if (nc.city && nc.deg < 1.8) {           // ~200 km: use the named city
-                    applyLocation({ name: nc.city.name, lat: nc.city.lat, lng: nc.city.lng }, true);
-                } else {                                  // far from any listed city
-                    applyLocation({ name: 'Your location', lat: la, lng: lo, custom: true }, true);
-                }
+                applyGeolocation(pos.coords.latitude, pos.coords.longitude);
             }, function () { /* denied / unavailable — keep default */ },
                 { timeout: 8000, maximumAge: 30 * 60 * 1000 });
         }
+
+        /* One way in: whatever moved the place or the night, it moved in
+           SkyNight, and the page catches up here. */
+        /* The ✕ is a real link, so a middle-click or open-in-new-tab has to
+           carry the context too — a plain click goes through exit(), which
+           already did. */
+        function updateCloseLink() {
+            document.getElementById('closeBtn').href = SkyNight.href('index.html');
+        }
+
+        SkyNight.on(function (night) {
+            loc = night.place;
+            LAT = loc.lat; LNG = loc.lng; PLACE = SkyPlaces.label(loc);
+            observer = new Astronomy.Observer(LAT, LNG, 500);
+            selectedDate = night.date;
+            dateInput.value = toInputValue(selectedDate);
+            updateCityLabel();
+            updateDateLabel();
+            updateCloseLink();
+            render(selectedDate);
+        });
 
         // Try to pull fresh TLEs live from Celestrak (a stable, CORS-enabled
         // source); fall back silently to the bundled ones on any failure.
@@ -1850,24 +2045,14 @@
                 .catch(function () { clearTimeout(to); /* keep bundled TLEs */ });
         }
 
-        // ── Shareable URL (city + date embedded, on the .html page) ──
+        // ── Shareable URL ──
+        // The place and the night are already in the address bar — SkyNight
+        // put them there and keeps them there. Sharing is just that URL,
+        // built off the full href so it still works from file://, where
+        // origin is the string "null".
         function currentShareURL() {
-            var p = new URLSearchParams();
-            if (loc.custom) {
-                p.set('lat', LAT); p.set('lng', LNG);
-                if (PLACE) p.set('place', PLACE);
-            } else {
-                p.set('city', loc.name);
-            }
-            p.set('date', toInputValue(selectedDate));
-            // Base off the full href (strip any query/hash). Using
-            // origin+pathname breaks on file:// where origin is "null".
             var base = window.location.href.split('#')[0].split('?')[0];
-            return base + '?' + p.toString();
-        }
-        // Keep the address bar in sync so a manual copy also works.
-        function syncURL() {
-            try { window.history.replaceState(null, '', currentShareURL()); } catch (e) { /* file:// etc. */ }
+            return SkyNight.href(base);
         }
 
         var toastTimer = null;
@@ -1901,13 +2086,14 @@
         });
 
         // Did the URL pin a location? If not, we may seed from geolocation.
-        var hadLocationParam = !!params.get('city') || (!isNaN(qLat) && !isNaN(qLng));
+        var hadLocationParam = !!params.get('city') ||
+            (!isNaN(parseFloat(params.get('lat'))) && !isNaN(parseFloat(params.get('lng'))));
 
         // ── Boot ──
         function boot() {
             updateCityLabel();
             updateDateLabel();
-            syncURL();
+            updateCloseLink();
             render(selectedDate);
             // Optional deep-link to a specific slide (?slide=N), handy for
             // jumping straight to a topic during a talk.

@@ -1,150 +1,19 @@
 /*
- * whatsup — content catalogues + city list (data only)
- * =====================================================
+ * whatsup — content catalogues (data only)
+ * =========================================
  * Split out of whatsup.html so content can be edited without touching the
  * engine. whatsup.html reads these via window.WHATSUP_DATA. Extend freely.
+ *
+ * Places are NOT here — they are in js/sky-places.js, shared with the rest
+ * of the Sky Atlas. Load that before this file.
  */
 window.WHATSUP_DATA = (function () {
 
-        var CITIES = [
-            { name: 'Agra', lat: 27.1767, lng: 78.0081 },
-            { name: 'Ahmedabad', lat: 23.0225, lng: 72.5714 },
-            { name: 'Ajmer', lat: 26.4499, lng: 74.6399 },
-            { name: 'Akola', lat: 20.7002, lng: 77.0082 },
-            { name: 'Aligarh', lat: 27.8974, lng: 78.088 },
-            { name: 'Amravati', lat: 20.9374, lng: 77.7796 },
-            { name: 'Amritsar', lat: 31.634, lng: 74.8723 },
-            { name: 'Asansol', lat: 23.6739, lng: 86.9524 },
-            { name: 'Aurangabad', lat: 19.8762, lng: 75.3433 },
-            { name: 'Bareilly', lat: 28.367, lng: 79.4304 },
-            { name: 'Belagavi', lat: 15.8497, lng: 74.4977 },
-            { name: 'Bengaluru', lat: 12.9716, lng: 77.5946 },
-            { name: 'Bhavnagar', lat: 21.7645, lng: 72.1519 },
-            { name: 'Bhilai', lat: 21.209, lng: 81.4285 },
-            { name: 'Bhiwandi', lat: 19.2967, lng: 73.0631 },
-            { name: 'Bhopal', lat: 23.2599, lng: 77.4126 },
-            { name: 'Bhubaneswar', lat: 20.2961, lng: 85.8245 },
-            { name: 'Bikaner', lat: 28.0229, lng: 73.3119 },
-            { name: 'Bilaspur', lat: 22.0797, lng: 82.1409 },
-            { name: 'Chandigarh', lat: 30.7333, lng: 76.7794 },
-            { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
-            { name: 'Coimbatore', lat: 11.0168, lng: 76.9558 },
-            { name: 'Cuttack', lat: 20.4625, lng: 85.883 },
-            { name: 'Davanagere', lat: 14.4644, lng: 75.9218 },
-            { name: 'Dehradun', lat: 30.3165, lng: 78.0322 },
-            { name: 'Delhi', lat: 28.6139, lng: 77.209 },
-            { name: 'Dhanbad', lat: 23.7957, lng: 86.4304 },
-            { name: 'Durgapur', lat: 23.5204, lng: 87.3119 },
-            { name: 'Erode', lat: 11.341, lng: 77.7172 },
-            { name: 'Faridabad', lat: 28.4089, lng: 77.3178 },
-            { name: 'Firozabad', lat: 27.1591, lng: 78.3958 },
-            { name: 'Gaya', lat: 24.7969, lng: 85.0002 },
-            { name: 'Ghaziabad', lat: 28.6692, lng: 77.4538 },
-            { name: 'Gorakhpur', lat: 26.7606, lng: 83.3732 },
-            { name: 'Guntur', lat: 16.3067, lng: 80.4365 },
-            { name: 'Gurugram', lat: 28.4595, lng: 77.0266 },
-            { name: 'Guwahati', lat: 26.1445, lng: 91.7362 },
-            { name: 'Gwalior', lat: 26.2183, lng: 78.1828 },
-            { name: 'Howrah', lat: 22.5958, lng: 88.2636 },
-            { name: 'Hubballi-Dharwad', lat: 15.3647, lng: 75.124 },
-            { name: 'Hyderabad', lat: 17.385, lng: 78.4867 },
-            { name: 'Indore', lat: 22.7196, lng: 75.8577 },
-            { name: 'Jabalpur', lat: 23.1815, lng: 79.9864 },
-            { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
-            { name: 'Jalandhar', lat: 31.326, lng: 75.5762 },
-            { name: 'Jalgaon', lat: 21.0077, lng: 75.5626 },
-            { name: 'Jammu', lat: 32.7266, lng: 74.857 },
-            { name: 'Jamnagar', lat: 22.4707, lng: 70.0577 },
-            { name: 'Jamshedpur', lat: 22.8046, lng: 86.2029 },
-            { name: 'Jhansi', lat: 25.4484, lng: 78.5685 },
-            { name: 'Jodhpur', lat: 26.2389, lng: 73.0243 },
-            { name: 'Kalaburagi', lat: 17.3297, lng: 76.8343 },
-            { name: 'Kalyan-Dombivli', lat: 19.2403, lng: 73.1305 },
-            { name: 'Kanpur', lat: 26.4499, lng: 80.3319 },
-            { name: 'Kochi', lat: 9.9312, lng: 76.2673 },
-            { name: 'Kolhapur', lat: 16.705, lng: 74.2433 },
-            { name: 'Kolkata', lat: 22.5726, lng: 88.3639 },
-            { name: 'Kota', lat: 25.2138, lng: 75.8648 },
-            { name: 'Kozhikode', lat: 11.2588, lng: 75.7804 },
-            { name: 'Lucknow', lat: 26.8467, lng: 80.9462 },
-            { name: 'Ludhiana', lat: 30.901, lng: 75.8573 },
-            { name: 'Madurai', lat: 9.9252, lng: 78.1198 },
-            { name: 'Mangaluru', lat: 12.9141, lng: 74.856 },
-            { name: 'Meerut', lat: 28.9845, lng: 77.7064 },
-            { name: 'Moradabad', lat: 28.8386, lng: 78.7733 },
-            { name: 'Mumbai', lat: 19.076, lng: 72.8777 },
-            { name: 'Mysuru', lat: 12.2958, lng: 76.6394 },
-            { name: 'Nagpur', lat: 21.1458, lng: 79.0882 },
-            { name: 'Nanded', lat: 19.1383, lng: 77.321 },
-            { name: 'Nashik', lat: 19.9975, lng: 73.7898 },
-            { name: 'Navi Mumbai', lat: 19.033, lng: 73.0297 },
-            { name: 'Nellore', lat: 14.4426, lng: 79.9865 },
-            { name: 'Noida', lat: 28.5355, lng: 77.391 },
-            { name: 'Panaji', lat: 15.4909, lng: 73.8278 },
-            { name: 'Patna', lat: 25.5941, lng: 85.1376 },
-            { name: 'Prayagraj', lat: 25.4358, lng: 81.8463 },
-            { name: 'Pune', lat: 18.5204, lng: 73.8567 },
-            { name: 'Raipur', lat: 21.2514, lng: 81.6296 },
-            { name: 'Rajkot', lat: 22.3039, lng: 70.8022 },
-            { name: 'Ranchi', lat: 23.3441, lng: 85.3096 },
-            { name: 'Rewa', lat: 24.5362, lng: 81.3037 },
-            { name: 'Rourkela', lat: 22.2604, lng: 84.8536 },
-            { name: 'Sagar', lat: 23.8388, lng: 78.7378 },
-            { name: 'Saharanpur', lat: 29.968, lng: 77.546 },
-            { name: 'Salem', lat: 11.6643, lng: 78.146 },
-            { name: 'Sangli', lat: 16.8524, lng: 74.5815 },
-            { name: 'Satna', lat: 24.6005, lng: 80.8322 },
-            { name: 'Shimla', lat: 31.1048, lng: 77.1734 },
-            { name: 'Siliguri', lat: 26.7271, lng: 88.3953 },
-            { name: 'Solapur', lat: 17.6599, lng: 75.9064 },
-            { name: 'Srinagar', lat: 34.0837, lng: 74.7973 },
-            { name: 'Surat', lat: 21.1702, lng: 72.8311 },
-            { name: 'Thane', lat: 19.2183, lng: 72.9781 },
-            { name: 'Thiruvananthapuram', lat: 8.5241, lng: 76.9366 },
-            { name: 'Tiruchirappalli', lat: 10.7905, lng: 78.7047 },
-            { name: 'Tirunelveli', lat: 8.7139, lng: 77.7567 },
-            { name: 'Tirupati', lat: 13.6288, lng: 79.4192 },
-            { name: 'Udaipur', lat: 24.5854, lng: 73.7125 },
-            { name: 'Ujjain', lat: 23.1765, lng: 75.7885 },
-            { name: 'Vadodara', lat: 22.3072, lng: 73.1812 },
-            { name: 'Varanasi', lat: 25.3176, lng: 82.9739 },
-            { name: 'Vasai-Virar', lat: 19.4259, lng: 72.8225 },
-            { name: 'Vidisha', lat: 23.5251, lng: 77.8081 },
-            { name: 'Vijayawada', lat: 16.5062, lng: 80.648 },
-            { name: 'Visakhapatnam', lat: 17.6868, lng: 83.2185 },
-            { name: 'Warangal', lat: 17.9689, lng: 79.5941 },
-
-            // ── Dark-sky sites & astronomy observatories ──────────────────
-            // Smaller places, but the ones that matter most for stargazing:
-            // high-altitude Ladakh/Himalaya, observatory towns, and India's
-            // best-known dark-sky destinations. (The list is sorted below, so
-            // new entries can be dropped in here in any order.)
-            { name: 'Leh', lat: 34.1642, lng: 77.5848 },
-            { name: 'Hanle', lat: 32.7794, lng: 78.9642 },              // Indian Astronomical Observatory; Hanle Dark Sky Reserve
-            { name: 'Kargil', lat: 34.5539, lng: 76.1349 },
-            { name: 'Diskit (Nubra)', lat: 34.5462, lng: 77.5540 },
-            { name: 'Pangong Tso', lat: 33.7500, lng: 78.6600 },
-            { name: 'Tso Moriri', lat: 32.9083, lng: 78.3200 },
-            { name: 'Kaza (Spiti)', lat: 32.2257, lng: 78.0716 },
-            { name: 'Gulmarg', lat: 34.0484, lng: 74.3805 },
-            { name: 'Chopta', lat: 30.4922, lng: 79.0212 },
-            { name: 'Nainital', lat: 29.3919, lng: 79.4542 },           // ARIES
-            { name: 'Devasthal', lat: 29.3614, lng: 79.6839 },          // ARIES 3.6m optical telescope
-            { name: 'Mount Abu', lat: 24.5926, lng: 72.7156 },          // PRL infrared observatory (Gurushikhar)
-            { name: 'Kavalur', lat: 12.5765, lng: 78.8253 },            // Vainu Bappu Observatory
-            { name: 'Kodaikanal', lat: 10.2381, lng: 77.4892 },         // solar observatory
-            { name: 'Gauribidanur', lat: 13.6086, lng: 77.4344 },       // radio observatory
-            { name: 'Ooty', lat: 11.4102, lng: 76.6950 },               // Ooty Radio Telescope
-            { name: 'Jaisalmer', lat: 26.9157, lng: 70.9083 },          // Thar desert skies
-            { name: 'Rann of Kutch', lat: 23.9060, lng: 69.6710 },
-            { name: 'Coorg (Madikeri)', lat: 12.4208, lng: 75.7397 },
-            { name: 'Munnar', lat: 10.0889, lng: 77.0595 },
-            { name: 'Mahabaleshwar', lat: 17.9307, lng: 73.6477 },
-            { name: 'Savandurga', lat: 12.9190, lng: 77.2900 },
-            { name: 'Pench (Dark Sky Park)', lat: 21.7167, lng: 79.2833 } // India's first Dark Sky Park
-        ];
-        // Keep the picker alphabetical no matter the insertion order above.
-        CITIES.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        // Places used to be a second copy of the same list, here. They now
+        // live in js/sky-places.js, which the whole section shares — one list
+        // to add a dark-sky site to, not two that drift apart. Re-exported so
+        // anything still asking WHATSUP_DATA for CITIES gets the real one.
+        var CITIES = window.SkyPlaces ? window.SkyPlaces.curated : [];
 
         var PLANETS = [
             {
@@ -201,7 +70,10 @@ window.WHATSUP_DATA = (function () {
             {
                 id: 'ursa', name: 'The Big Dipper', dev: 'सप्तर्षि', translit: 'Saptarshi',
                 ra: 13.398, dec: 54.926, minAlt: 12,
-                body_text: 'Seven bright stars shaped like a ladle or a question-mark. To Indian eyes these are the सप्तर्षि — the seven great sages. They wheel around the Pole Star through the night and never fully set from our latitude in the right season.',
+                // No claim here about whether it sets: that depends on where the
+                // viewer is standing, so whatsup.html computes it from the
+                // chosen place and appends it to `facts`.
+                body_text: 'Seven bright stars shaped like a ladle or a question-mark. To Indian eyes these are the सप्तर्षि — the seven great sages. They wheel around the Pole Star through the night, swinging low in autumn evenings and riding high in spring.',
                 find: 'The two stars at the front of the bowl are the "Pointers" — draw a line through them and it lands on Polaris, the North Star. The middle star of the handle, Mizar, has a faint companion Alcor — in tradition, Vashishtha and his wife Arundhati.',
                 facts: ['The <b>Pointers</b> find the North Star', '<b>Mizar &amp; Alcor</b> — the classic eyesight test', 'Part of the Great Bear, <b>Ursa Major</b>']
             },
@@ -210,7 +82,7 @@ window.WHATSUP_DATA = (function () {
                 ra: 0.675, dec: 56.537, minAlt: 12,
                 body_text: 'A bright, lopsided "W" (or "M", depending on the hour) of five stars, sitting in a rich part of the Milky Way. It circles the Pole Star opposite the Big Dipper, so when one is low, the other rides high.',
                 find: 'Find the North Star, then look to the side away from the Dipper for a zig-zag of five stars. On a dark night the Milky Way runs right through it.',
-                facts: ['Circles the pole — <b>never sets</b> from here', 'Sits in the <b>Milky Way</b>', 'Opposite the <b>Big Dipper</b>']
+                facts: ['Wheels around the <b>Pole Star</b>', 'Sits in the <b>Milky Way</b>', 'Opposite the <b>Big Dipper</b>']
             },
             {
                 id: 'taurus', name: 'Taurus', dev: 'वृषभ', translit: 'Vrishabha',

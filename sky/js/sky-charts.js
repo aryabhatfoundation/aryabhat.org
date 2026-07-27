@@ -11,9 +11,18 @@ window.SkyCharts = (function () {
 
     var SVGNS = 'http://www.w3.org/2000/svg';
 
-    // Central India (Bhopal) — the observer sky.html uses, so every page on the
-    // site answers "can I see it from here?" the same way.
+    /* Where the observer stands. js/sky-night.js owns this for the whole
+       section; a page that has not loaded it still gets a sensible sky
+       (Bhopal) rather than nothing, which is why there is a default here at
+       all. Callers set it through setObserver() and re-render — "can I see
+       it from here?" has to mean the place the visitor actually picked. */
     var LAT = 23.2599;
+    var PLACE = 'Central India';
+
+    function setObserver(lat, placeName) {
+        if (typeof lat === 'number' && !isNaN(lat)) LAT = lat;
+        if (placeName) PLACE = placeName;
+    }
 
     var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
         'August', 'September', 'October', 'November', 'December'];
@@ -120,14 +129,17 @@ window.SkyCharts = (function () {
         return d.getMonth();
     }
 
-    /* Highest it ever gets above the Central-India horizon. */
+    /* Highest it ever gets above the chosen place's horizon. */
     function culmination(decDeg) {
         return 90 - Math.abs(LAT - decDeg);
     }
 
     function visibilityNote(decDeg) {
         var alt = culmination(decDeg);
-        if (alt <= 0) return { text: 'Never rises here', sub: 'too far south for Central India' };
+        // A star north of the pole's complement never sets; one whose
+        // culmination is at or below the horizon never rises. Both flip
+        // when the observer moves, which is the point of asking per place.
+        if (alt <= 0) return { text: 'Never rises here', sub: 'too far south for ' + PLACE };
         if (decDeg > 90 - LAT) return { text: 'Circumpolar', sub: 'up every night of the year' };
         if (alt < 20) return {
             text: 'Low — ' + Math.round(alt) + '° up',
@@ -135,7 +147,7 @@ window.SkyCharts = (function () {
         };
         return {
             text: Math.round(alt) + '° above the horizon',
-            sub: 'at its highest, from Central India'
+            sub: 'at its highest, from ' + PLACE
         };
     }
 
@@ -374,7 +386,9 @@ window.SkyCharts = (function () {
     }
 
     return {
-        LAT: LAT,
+        get LAT() { return LAT; },
+        get PLACE() { return PLACE; },
+        setObserver: setObserver,
         MONTHS: MONTHS,
         /* Which stars get a page of their own on stars.html: this bright, or
            named in the Sanskrit texts at any brightness. Kept in step with

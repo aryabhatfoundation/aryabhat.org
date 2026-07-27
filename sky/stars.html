@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bright Stars: Aryabhat</title>
     <meta name="description"
-        content="The brightest stars in the night sky, one page each: distance, colour, constellation, and the name our own texts give it.">
+        content="The brightest stars in the night sky, one page each: distance, colour, constellation, and Sanskrit name.">
     <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
@@ -167,14 +167,19 @@
                 <!-- Injected by js/sky-nav.js -->
             </nav>
 
+            <div class="sky-night-bar" role="group">
+                <!-- Injected by js/sky-night.js -->
+            </div>
+
             <!-- ================= LIST ================= -->
             <section id="list-view">
                 <div class="atlas-head">
                     <span class="kicker">Sky Atlas</span>
                     <h1>The <em>brightest</em> stars</h1>
                     <p class="atlas-lede">Every star brighter than magnitude 2.5 — the ones you can pick out
-                        from a city — together with every star our own texts named, however faint. Open one to
-                        see how far away it is, what colour it burns, and the name our own texts give it.</p>
+                        from a city — together with every star the Sanskrit texts named, however faint. Open
+                        one to see how far away it is, what colour it burns, and what it is called in
+                        Sanskrit.</p>
                 </div>
 
                 <div class="atlas-toolbar">
@@ -241,6 +246,9 @@
 
     <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
 
+    <!-- The place and the night the whole section works from -->
+    <script src="js/sky-places.js"></script>
+    <script src="js/sky-night.js"></script>
     <script src="js/constellation-data.js"></script>
     <script src="js/star-data.js"></script>
     <script src="js/sky-charts.js"></script>
@@ -264,7 +272,12 @@
                 'vedic-asterism': 'Vedic asterism'
             };
 
-            var thisMonth = new Date().getMonth();
+            /* The month the "best now" chip filters on, and the latitude the
+               visibility notes answer for, both come from the night bar rather
+               than from today and Bhopal. Plan for December from Hanle and the
+               atlas agrees with the map page instead of contradicting it. */
+            var thisMonth = SkyNight.date.getMonth();
+            SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
 
             // ---------------------------------------------------------
             // Names and slugs
@@ -397,7 +410,7 @@
                         con.devanagari || null, 'constellations.html#' + con.id);
                 }
                 addFact('Best evening view', SC.MONTHS[star.month], 'highest around 9 pm');
-                addFact('From Central India', vis.text, vis.sub);
+                addFact('From ' + SC.PLACE, vis.text, vis.sub);
                 addFact('Right ascension', SC.formatRA(star.ra),
                     'declination ' + SC.formatDec(star.dec));
             }
@@ -468,8 +481,10 @@
                 renderFacts(star);
                 renderSanskrit(star);
 
-                document.getElementById('con-link').href = con
-                    ? 'constellations.html#' + con.id : 'constellations.html';
+                // Carries the place and night across, like every other link
+                // in the section — SkyNight.href() keeps the #hash.
+                document.getElementById('con-link').href = SkyNight.href(
+                    con ? 'constellations.html#' + con.id : 'constellations.html');
             }
 
             // ---------------------------------------------------------
@@ -561,6 +576,19 @@
                 document.querySelector('.atlas-lede').textContent +=
                     ' On a phone, swipe sideways to move to the next star.';
             }
+
+            /* The atlas answers "from where, on which night", so it has to
+               move when those do: the season chip, every visibility note and
+               whatever detail page is open all re-derive from the night bar. */
+            SkyNight.on(function () {
+                thisMonth = SkyNight.date.getMonth();
+                SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
+                document.getElementById('chip-season').textContent =
+                    'Best in ' + SC.MONTHS[thisMonth].slice(0, 3);
+                browse.render();
+                var open = browse.current();
+                if (open) openStar(open);
+            });
 
             browse.start();
         })();
