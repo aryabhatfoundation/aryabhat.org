@@ -385,9 +385,45 @@
             border-left-color: #66bb6a;
         }
 
-        .vis-item.not-visible {
-            opacity: 0.45;
-            border-left-color: rgba(255, 255, 255, 0.12);
+        /* The count is the point of the tab now, so it reads as a value and
+           not as part of the label. */
+        .vis-count {
+            display: inline-block;
+            min-width: 1.5em;
+            margin-left: 4px;
+            padding: 1px 5px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--ink-dim);
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .vis-tab.active .vis-count {
+            background: rgba(255, 204, 51, 0.18);
+            color: var(--gold);
+        }
+
+        /* Everything not up, as one line rather than six unreadable rows. */
+        .vis-absent {
+            margin: 8px 0 0;
+            color: var(--ink-dim);
+            font-size: 0.78em;
+            line-height: 1.5;
+        }
+
+        .vis-caveat {
+            margin: 0 0 8px;
+            color: #8296ab;
+            font-size: 0.72em;
+            line-height: 1.5;
+        }
+
+        .vis-window {
+            margin: 8px 0 0;
+            text-align: center;
+            color: var(--ink-dim);
+            font-size: 0.78em;
         }
 
         .vis-item .vis-icon {
@@ -515,8 +551,28 @@
             border: 1px solid #555;
         }
 
+        /* Two marks, two colours: green for a night to bring people to,
+           violet for a night to chase faint things on. */
         .calendar-day.best-viewing {
             border: 1px solid #66bb6a;
+        }
+
+        .calendar-day.darkest {
+            border: 1px solid #8a7cc8;
+        }
+
+        .night-mark {
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            font-size: 0.75em;
+            line-height: 1;
+        }
+
+        /* A camp lands on a Saturday whether or not the Moon agrees, so the
+           weekend has to be findable at a glance. */
+        .calendar-day.weekend .date-number {
+            color: var(--gold);
         }
 
         .calendar-day.major-phase .phase-name {
@@ -525,6 +581,47 @@
             color: #ffffff;
             text-transform: uppercase;
             margin-top: 2px;
+        }
+
+        .cal-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px 18px;
+            margin: 10px 0 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.8rem;
+            color: var(--ink-dim);
+        }
+
+        .cal-legend li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .cal-legend b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .lg-icon {
+            font-size: 0.95em;
+        }
+
+        .lg-swatch {
+            width: 34px;
+            height: 12px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            background: linear-gradient(90deg, #000 0%, #323232 100%);
+        }
+
+        .lg-weekend {
+            font-weight: 700;
+            color: var(--gold);
         }
 
         .cal-btn {
@@ -673,9 +770,9 @@
                     <p class="sky-intro">Everything below runs off the place and the night at the top of this
                         page. Pick a day on the calendar and the panels move with it: which planets, deep-sky
                         objects and bright stars are up that evening and until what time, and a map of the whole
-                        sky as it will look from <b id="intro-place">there</b> once night falls. Days marked ✅
-                        are the best ones for a camp — the Moon is a thin crescent that sets early and leaves
-                        the rest of the night dark.</p>
+                        sky as it will look from <b id="intro-place">there</b> once night falls. The calendar
+                        marks two different kinds of good night: 🌑 for the darkest skies, and 🔭 for the ones
+                        worth running a camp on.</p>
                 </div>
             </div>
 
@@ -693,31 +790,44 @@
                 </div>
                 <div class="twelve columns">
                     <div id="visibility-panel">
+                        <!-- Counts on the tabs: two thirds of the answer used to
+                             sit behind a click with nothing to say it was worth
+                             clicking. -->
                         <div class="vis-tabs" role="tablist" aria-label="What is up this evening">
                             <button class="vis-tab active" type="button" role="tab" aria-selected="true"
-                                aria-controls="tab-planets" onclick="switchVisTab('planets')">Planets</button>
+                                aria-controls="tab-planets" onclick="switchVisTab('planets')">Planets <span
+                                    class="vis-count" id="count-planets"></span></button>
                             <button class="vis-tab" type="button" role="tab" aria-selected="false"
-                                aria-controls="tab-dso" onclick="switchVisTab('dso')">Deep Sky</button>
+                                aria-controls="tab-dso" onclick="switchVisTab('dso')">Deep Sky <span
+                                    class="vis-count" id="count-dso"></span></button>
                             <button class="vis-tab" type="button" role="tab" aria-selected="false"
-                                aria-controls="tab-stars" onclick="switchVisTab('stars')">Stars</button>
+                                aria-controls="tab-stars" onclick="switchVisTab('stars')">Stars <span
+                                    class="vis-count" id="count-stars"></span></button>
                         </div>
                         <div class="vis-tab-content active" id="tab-planets">
                             <div class="vis-grid" id="planets-grid">
                                 <div class="vis-item"><span class="vis-name">Loading...</span></div>
                             </div>
+                            <p class="vis-absent" id="planets-grid-none" hidden></p>
                         </div>
                         <div class="vis-tab-content" id="tab-dso">
-                            <p style="font-size:0.7em; color:#777; margin:0 0 8px;">Faint objects — best seen under dark skies away from city lights, with patience and sufficient time</p>
+                            <p class="vis-caveat">Faint objects — best seen under dark skies away from city
+                                lights, with patience and sufficient time</p>
                             <div class="vis-grid" id="dso-grid">
                                 <div class="vis-item"><span class="vis-name">Loading...</span></div>
                             </div>
+                            <p class="vis-absent" id="dso-grid-none" hidden></p>
                         </div>
                         <div class="vis-tab-content" id="tab-stars">
                             <div class="vis-grid" id="stars-grid">
                                 <div class="vis-item"><span class="vis-name">Loading...</span></div>
                             </div>
+                            <p class="vis-absent" id="stars-grid-none" hidden></p>
                         </div>
                     </div>
+                    <!-- "all evening" meant nothing without saying which hours
+                         the panel above is actually scanning. -->
+                    <p class="vis-window" id="vis-window"></p>
                     <script>
                         function switchVisTab(tab) {
                             document.querySelectorAll('.vis-tab').forEach(function (t) {
@@ -741,7 +851,17 @@
                             <!-- JS generates grid here -->
                         </div>
                     </div>
-                    <p class="center">✅ best dates for night sky viewing camp </p>
+                    <!-- Three signals on the grid, none of which explained
+                         itself before: the two marks, and the cell shading. -->
+                    <ul class="cal-legend">
+                        <li><span class="lg-icon">🌑</span> <b>Darkest skies</b> — no Moon to wash out the
+                            faint things</li>
+                        <li><span class="lg-icon">🔭</span> <b>Good for a camp</b> — a Moon worth showing
+                            people, gone by mid-evening</li>
+                        <li><span class="lg-swatch" aria-hidden="true"></span> Cell brightness is how much of
+                            the Moon is lit</li>
+                        <li><span class="lg-weekend" aria-hidden="true">6</span> Weekends in gold</li>
+                    </ul>
                 </div>
             </div>
 
@@ -1129,18 +1249,22 @@
                             cell.classList.add('major-phase');
                         }
 
-                        var bestView = "";
-                        if (phase >= 0.10 && phase <= 0.25) {
-                            bestView = "<span style='position:absolute; top:0px; right:2px; font-size: 0.8em;'>✅</span>";
-                            cell.classList.add('best-viewing');
+                        var mark = nightMark(phase);
+                        var markHTML = "";
+                        if (mark) {
+                            markHTML = "<span class='night-mark'>" + mark.icon + "</span>";
+                            cell.classList.add(mark.cls);
                         }
+                        // Saturdays and Sundays, because a school camp happens
+                        // on one whether the Moon cooperates or not.
+                        if (rw === 0 || rw === 6) cell.classList.add('weekend');
 
-                        cell.innerHTML = bestView + "<span class='date-number'>" + d + "</span><span class='moon-icon'>" + icon + "</span><span class='phase-name'>" + phaseName + "</span>";
+                        cell.innerHTML = markHTML + "<span class='date-number'>" + d + "</span><span class='moon-icon'>" + icon + "</span><span class='phase-name'>" + phaseName + "</span>";
 
                         // Read out as a date and a phase, not as "19 🌒 Waxing".
                         cell.setAttribute('aria-label',
                             dateObj.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }) +
-                            ' · ' + phaseName + (cell.classList.contains('best-viewing') ? ' · good for a camp' : ''));
+                            ' · ' + phaseName + (mark ? ' · ' + mark.label : ''));
 
                         var isSelected = selectedDate.getDate() === d &&
                             selectedDate.getMonth() === month &&
@@ -1180,6 +1304,31 @@
             if (phase < 0.72) return "🌖";
             if (phase < 0.78) return "🌗";
             return "🌘";
+        }
+
+        /* Two different kinds of good night, which one ✅ used to conflate.
+         *
+         * 🌑 is for the darkest skies: within about three nights of new moon,
+         * when nothing washes out the faint clusters, the galaxies or the
+         * Milky Way. Those nights carried no mark at all before, which was
+         * the wrong way round — they are the best the month offers.
+         *
+         * 🔭 is for running a camp, which is not the same thing. A crescent
+         * to first-quarter Moon is the finest object there is to put a
+         * beginner behind a telescope for, and it still sets early enough to
+         * leave real dark afterwards. That was the old rule's range — but the
+         * caption promised "a thin crescent that sets early", which stops
+         * being true well before the range ends: a first-quarter Moon is
+         * half lit and up until midnight. Two marks say what one could not.
+         */
+        function nightMark(phase) {
+            if (phase < 0.10 || phase > 0.90) {
+                return { icon: '🌑', cls: 'darkest', label: 'darkest skies' };
+            }
+            if (phase <= 0.25) {
+                return { icon: '🔭', cls: 'best-viewing', label: 'good for a camp' };
+            }
+            return null;
         }
 
         function getMoonPhaseName(phase) {
@@ -1277,16 +1426,43 @@
             return null;
         }
 
+        /* One tab's list: what is up, then a single line standing in for
+           everything that is not. Six greyed-out rows at 45% opacity were
+           both unreadable and mostly noise — the reader wants the four
+           things they can point at, not the two they cannot. */
+        function renderVisGrid(id, items) {
+            var up = items.filter(function (i) { return i.visible; });
+            var down = items.filter(function (i) { return !i.visible; });
+
+            document.getElementById(id).innerHTML = up.length
+                ? up.map(function (i) { return i.html; }).join('')
+                : '<p class="vis-absent">Nothing on this list is up during the session.</p>';
+
+            var note = document.getElementById(id + '-none');
+            if (note) {
+                note.hidden = !down.length;
+                note.textContent = down.length
+                    ? 'Not up this evening: ' + down.map(function (i) { return i.name; }).join(', ')
+                    : '';
+            }
+            return up.length;
+        }
+
         function updateVisibility(date) {
             var times = SunCalc.getTimes(date, LAT, LNG);
             var sunset = times.sunset;
-            var nightStart = times.night;
+            var nightStart = darkStart(times, date) || sunset;
             // evening window: sunset to midnight
             var midnight = new Date(date);
             midnight.setHours(23, 59, 0, 0);
 
+            document.getElementById('vis-window').textContent = isTime(sunset)
+                ? 'Scanned between ' + fmtTime(sunset) + ' and ' + fmtTime(midnight)
+                  + ' — "all evening" means up for that whole stretch.'
+                : 'The Sun does not set here on this date.';
+
             // ── Planets ──
-            var planetsHTML = '';
+            var planetItems = [];
             planets.forEach(function (p) {
                 var altAtSunset = getAltitude(p.body, sunset);
                 var altAtNight = getAltitude(p.body, nightStart);
@@ -1310,17 +1486,18 @@
                     timeText = 'rises ' + fmtTime(riseEvt.date);
                 }
 
-                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
-                planetsHTML += '<div class="' + cls + '">'
-                    + '<span class="vis-hindi">' + p.hindi + '</span>'
-                    + '<span class="vis-name">' + p.name + '</span>'
-                    + '<span class="vis-time">' + timeText + '</span>'
-                    + '</div>';
+                planetItems.push({
+                    visible: isVisible, name: p.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-hindi">' + p.hindi + '</span>'
+                        + '<span class="vis-name">' + p.name + '</span>'
+                        + '<span class="vis-time">' + timeText + '</span>'
+                        + '</div>'
+                });
             });
-            document.getElementById('planets-grid').innerHTML = planetsHTML;
 
             // ── Deep Sky Objects ──
-            var dsoHTML = '';
+            var dsoItems = [];
             dsoList.forEach(function (dso) {
                 var altAtNight = getAltitude(dso.star, nightStart);
                 var setEvt = Astronomy.SearchRiseSet(dso.star, observer, -1, sunset, 1);
@@ -1344,17 +1521,18 @@
                     }
                 }
 
-                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
-                dsoHTML += '<div class="' + cls + '">'
-                    + '<span class="vis-icon">🔭</span>'
-                    + '<span class="vis-name">' + dso.name + '</span>'
-                    + '<span class="vis-time">' + dso.desc + ' · ' + timeText + '</span>'
-                    + '</div>';
+                dsoItems.push({
+                    visible: isVisible, name: dso.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-icon">🔭</span>'
+                        + '<span class="vis-name">' + dso.name + '</span>'
+                        + '<span class="vis-time">' + dso.desc + ' · ' + timeText + '</span>'
+                        + '</div>'
+                });
             });
-            document.getElementById('dso-grid').innerHTML = dsoHTML;
 
             // ── Stars ──
-            var starsHTML = '';
+            var starItems = [];
             starList.forEach(function (s) {
                 var altAtNight = getStarAltitude(s.ra, s.dec, nightStart);
                 var isVisible = false;
@@ -1376,14 +1554,22 @@
                     }
                 }
 
-                var cls = isVisible ? 'vis-item visible' : 'vis-item not-visible';
-                starsHTML += '<div class="' + cls + '">'
-                    + '<span class="vis-icon">⭐</span>'
-                    + '<span class="vis-name">' + s.name + '</span>'
-                    + '<span class="vis-time">' + s.desc + ' · ' + timeText + '</span>'
-                    + '</div>';
+                starItems.push({
+                    visible: isVisible, name: s.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-icon">⭐</span>'
+                        + '<span class="vis-name">' + s.name + '</span>'
+                        + '<span class="vis-time">' + s.desc + ' · ' + timeText + '</span>'
+                        + '</div>'
+                });
             });
-            document.getElementById('stars-grid').innerHTML = starsHTML;
+
+            document.getElementById('count-planets').textContent =
+                renderVisGrid('planets-grid', planetItems);
+            document.getElementById('count-dso').textContent =
+                renderVisGrid('dso-grid', dsoItems);
+            document.getElementById('count-stars').textContent =
+                renderVisGrid('stars-grid', starItems);
         }
 
     </script>
