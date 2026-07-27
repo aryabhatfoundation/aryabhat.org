@@ -666,6 +666,175 @@
             text-align: center;
         }
 
+        /* --- map furniture: status, caption, scrubber, hint --- */
+        .map-status {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            padding: 20px;
+            color: var(--ink-dim);
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            background: rgba(11, 26, 38, 0.85);
+            border-radius: 12px;
+            z-index: 12;
+        }
+
+        .map-status[hidden] {
+            display: none;
+        }
+
+        .map-status.failed {
+            color: #ffb4a2;
+        }
+
+        .main .map-retry {
+            height: auto;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 204, 51, 0.5);
+            background: transparent;
+            color: var(--gold);
+            font-family: var(--font-display);
+            font-size: 0.82rem;
+            box-shadow: none;
+            text-shadow: none;
+            cursor: pointer;
+        }
+
+        .map-caption {
+            margin: 0;
+            padding: 0 0 6px;
+            text-align: center;
+            color: var(--ink-dim);
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            letter-spacing: .02em;
+        }
+
+        .map-time {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 520px;
+            margin: 6px auto 0;
+            padding: 0 14px;
+        }
+
+        .map-time-label,
+        .map-time-value {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            letter-spacing: .04em;
+            white-space: nowrap;
+        }
+
+        .map-time-label {
+            color: var(--ink-dim);
+            text-transform: uppercase;
+        }
+
+        .map-time-value {
+            color: var(--gold);
+            font-weight: 600;
+            min-width: 4.2em;
+            text-align: right;
+        }
+
+        #map-time-slider {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 22px;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        #map-time-slider::-webkit-slider-runnable-track {
+            height: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255, 164, 27, .5), rgba(120, 150, 200, .45));
+        }
+
+        #map-time-slider::-moz-range-track {
+            height: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255, 164, 27, .5), rgba(120, 150, 200, .45));
+        }
+
+        #map-time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 17px;
+            height: 17px;
+            margin-top: -6.5px;
+            border-radius: 50%;
+            border: 2px solid #0b1a26;
+            background: var(--gold);
+        }
+
+        #map-time-slider::-moz-range-thumb {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            border: 2px solid #0b1a26;
+            background: var(--gold);
+        }
+
+        #map-time-slider:focus-visible {
+            outline: 0;
+        }
+
+        #map-time-slider:focus-visible::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(255, 204, 51, 0.3);
+        }
+
+        .map-hint {
+            max-width: 560px;
+            margin: 12px auto 0;
+            text-align: center;
+            color: var(--ink-dim);
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .map-hint b {
+            color: var(--ink);
+        }
+
+        .map-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .map-note {
+            font-size: 0.8em;
+            color: var(--ink-dim);
+            margin-top: 6px;
+        }
+
+        @media (max-width: 550px) {
+            .map-time {
+                padding: 0 4px;
+                gap: 8px;
+            }
+
+            .map-caption {
+                font-size: 0.78rem;
+            }
+        }
+
         /* Force hide celestial form if generated */
         /* Force hide celestial form if generated */
         #celestial-form {
@@ -866,30 +1035,76 @@
             </div>
 
             <div class="twelve columns">
-                <div class="map-wrapper">
-                    <div id="celestial-map"></div>
-                    <div class="cardinal north">N</div>
-                    <div class="cardinal south">S</div>
-                    <div class="cardinal east">E</div>
-                    <div class="cardinal west">W</div>
+                <!-- What Save Map captures. The caption is inside it because a
+                     printed chart with no date, place or time on it is not a
+                     chart of anything. -->
+                <div id="map-capture">
+                    <div class="map-wrapper">
+                        <div id="celestial-map"></div>
+                        <div class="cardinal north">N</div>
+                        <div class="cardinal south">S</div>
+                        <div class="cardinal east">E</div>
+                        <div class="cardinal west">W</div>
+                        <!-- The star catalogue is fetched from a third party at
+                             runtime; without this the failure is a blank box. -->
+                        <div class="map-status" id="map-status">Drawing the sky…</div>
+                    </div>
+                    <p class="map-caption" id="map-caption"></p>
                 </div>
-                <div style="text-align: center; margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                    <a class="button button-primary" onclick="saveMap()">💾 Save Map</a>
+
+                <!-- The sky turns 15° an hour. A camp runs three of them, so a
+                     chart frozen at nightfall is wrong for most of the session. -->
+                <div class="map-time">
+                    <label class="map-time-label" for="map-time-slider">Sky at</label>
+                    <input type="range" id="map-time-slider" min="0" max="420" step="10" value="0"
+                        aria-label="Time of evening to draw the sky for">
+                    <output class="map-time-value" id="map-time-value" for="map-time-slider"></output>
                 </div>
-                <p class="center" style="font-size:0.8em; color:var(--ink-dim); margin-top:6px;">Saves the map above as a picture, to print or share before a camp</p>
+
+                <p class="map-hint">Hold it flat above your head with <b>N</b> pointing north and it lines up
+                    with the real sky — which is why east sits on the left, not the right.</p>
+
+                <div class="map-actions">
+                    <button class="button button-primary" type="button" onclick="saveMap()">💾 Save Map</button>
+                </div>
+                <p class="center map-note">Saves the map above as a picture, to print or share before a camp</p>
             </div>
         </div>
     </div>
 
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
+        /* html2canvas is ~200 KB and only this button ever needs it, so it is
+           fetched on the first click rather than on every page view — and from
+           jsDelivr with an integrity hash, rather than from the author's own
+           domain with none. */
+        var html2canvasReady = null;
+        function loadHtml2Canvas() {
+            if (html2canvasReady) return html2canvasReady;
+            html2canvasReady = new Promise(function (resolve, reject) {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+                s.crossOrigin = 'anonymous';
+                s.onload = resolve;
+                s.onerror = function () { html2canvasReady = null; reject(new Error('load failed')); };
+                document.head.appendChild(s);
+            });
+            return html2canvasReady;
+        }
+
         function saveMap() {
-            var element = document.querySelector(".map-wrapper");
-            html2canvas(element, {
-                backgroundColor: null,
-                ignoreElements: function (el) {
-                    return el.id === 'celestial-zoomin' || el.id === 'celestial-zoomout';
-                }
+            var btn = document.querySelector('.map-actions .button');
+            var label = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Preparing…';
+
+            loadHtml2Canvas().then(function () {
+                return html2canvas(document.getElementById('map-capture'), {
+                    backgroundColor: '#0b1a26',
+                    ignoreElements: function (el) {
+                        return el.id === 'celestial-zoomin' || el.id === 'celestial-zoomout'
+                            || el.id === 'map-status';
+                    }
+                });
             }).then(function (canvas) {
                 var link = document.createElement('a');
 
@@ -900,6 +1115,14 @@
 
                 link.href = canvas.toDataURL();
                 link.click();
+                btn.disabled = false;
+                btn.textContent = label;
+            }).catch(function () {
+                // Offline, or the CDN is blocked. Say so rather than leaving
+                // the button stuck on "Preparing…" forever.
+                btn.disabled = false;
+                btn.textContent = 'Could not save — try again';
+                setTimeout(function () { btn.textContent = label; }, 4000);
             });
         }
     </script>
@@ -993,6 +1216,37 @@
             interactive: false // Disable zoom/pan
         };
 
+        /* The chart's star and constellation data is fetched from a third
+           party (config.datapath) after the page has loaded. When that is slow
+           or blocked the library draws the background and stops, which looked
+           exactly like a working map of an empty sky. Watch for a chart that
+           never gains any stars and say what happened instead. */
+        function watchMapDraw() {
+            var status = document.getElementById('map-status');
+            var container = document.getElementById('celestial-map');
+            var waited = 0;
+
+            (function poll() {
+                // A drawn chart has thousands of nodes; the bare background
+                // has a handful.
+                if (container.querySelectorAll('path, circle, use, text').length > 50) {
+                    status.hidden = true;
+                    return;
+                }
+                waited += 400;
+                if (waited < 12000) { setTimeout(poll, 400); return; }
+                status.className = 'map-status failed';
+                status.innerHTML = 'The star catalogue did not load. '
+                    + '<button type="button" class="map-retry">Try again</button>';
+                status.querySelector('.map-retry').onclick = function () {
+                    status.className = 'map-status';
+                    status.textContent = 'Drawing the sky…';
+                    if (typeof Celestial.reload === 'function') Celestial.reload(config);
+                    watchMapDraw();
+                };
+            })();
+        }
+
         // Defer display until layout is ready so we get the correct container width
         function initCelestial() {
             var container = document.getElementById('celestial-map');
@@ -1000,6 +1254,7 @@
             if (w < 200) w = 200;
             config.width = w;
             Celestial.display(config);
+            watchMapDraw();
 
             // Fix any inline styles the library sets on the container
             container.style.minWidth = '0';
@@ -1128,6 +1383,48 @@
             }).join('');
         }
 
+        /* The evening the slider scrubs through: seven hours from sunset,
+           which covers any session anyone runs. `chartOffset` is where the
+           handle sits within it, in minutes, and survives a change of date so
+           that stepping through nights compares like with like. */
+        var chartStart = null;
+        var chartOffset = null;
+        var chartRedraw = null;
+
+        function chartInstant() {
+            return new Date(chartStart.getTime() + chartOffset * 60000);
+        }
+
+        function updateMapCaption() {
+            var when = chartInstant();
+            document.getElementById('map-caption').textContent =
+                selectedDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+                + ' · ' + fmtTime(when) + ' · ' + SkyPlaces.label(SkyNight.place);
+            document.getElementById('map-time-value').textContent = fmtTime(when);
+        }
+
+        /* Redrawing the whole chart on every pixel of a drag is far more work
+           than one frame allows, so the handle moves freely and the sky
+           catches up on a short timer.
+
+           Deliberately not requestAnimationFrame: a backgrounded tab never
+           runs those, which both freezes the chart and — because the pending
+           flag never clears — leaves it frozen after you come back. A timeout
+           still fires when the tab is hidden. */
+        function drawChartAt() {
+            updateMapCaption();          // the label tracks the handle immediately
+            if (chartRedraw) clearTimeout(chartRedraw);
+            chartRedraw = setTimeout(function () {
+                chartRedraw = null;
+                if (typeof Celestial.date === 'function') Celestial.date(chartInstant());
+            }, 60);
+        }
+
+        document.getElementById('map-time-slider').addEventListener('input', function () {
+            chartOffset = +this.value;
+            drawChartAt();
+        });
+
         // Function to update map and the night's times
         function updateSky(date) {
             var times = SunCalc.getTimes(date, LAT, LNG);
@@ -1138,8 +1435,18 @@
 
             renderNightTimes(date, times);
 
+            chartStart = isTime(times.sunset) ? times.sunset
+                : new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0);
+            // First look at a night opens at full dark — the moment the chart
+            // was frozen at before there was a slider at all.
+            if (chartOffset === null) {
+                chartOffset = Math.max(0, Math.round((night - chartStart) / 60000));
+            }
+            document.getElementById('map-time-slider').value = chartOffset;
+            updateMapCaption();
+
             // Update Celestial Map Date
-            if (typeof Celestial.date === 'function') Celestial.date(night);
+            if (typeof Celestial.date === 'function') Celestial.date(chartInstant());
 
             // Update visibility panel
             updateVisibility(date);
