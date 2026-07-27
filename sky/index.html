@@ -477,24 +477,32 @@
             margin-bottom: 10px;
         }
 
+        /* Weekdays across the top, weeks down the page — the way every
+           calendar anyone has ever used is laid out. This grid used to be
+           transposed, which read as a clever piece of design and cost the
+           reader a moment of "wait, which way does this run?" every time. A
+           date picker is the one place where recognition beats novelty. */
         .calendar-grid {
             display: grid;
-            grid-template-columns: 60px repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 5px;
         }
 
         .calendar-day-header {
             font-family: var(--font-display);
             font-weight: 600;
-            padding: 5px;
+            padding: 5px 2px;
+            text-align: center;
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
             color: var(--gold);
             letter-spacing: .04em;
             text-transform: uppercase;
-            font-size: .82em;
-            margin-right: 15px;
-            /* Visual gap */
+            font-size: .78em;
+        }
+
+        .calendar-day-header.weekend {
+            background-color: rgba(255, 204, 51, 0.10);
         }
 
         .calendar-day {
@@ -507,7 +515,7 @@
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
-            min-height: 50px;
+            min-height: 58px;
             position: relative;
             transition: background-color .15s ease, box-shadow .15s ease;
         }
@@ -850,24 +858,51 @@
         @media (max-width: 550px) {
             .calendar-grid {
                 gap: 2px;
-                grid-template-columns: 35px repeat(6, 1fr);
             }
 
+            /* Seven columns on a 360px phone is about 48px a cell, which
+               fits a date and a Moon but not a phase name. The name is the
+               least of the three: the icon says the same thing, and the
+               aria-label still reads it out. */
             .calendar-day {
-                padding: 4px;
-                min-height: 40px;
+                padding: 2px;
+                min-height: 46px;
                 font-size: 0.8em;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .phase-name {
+                display: none;
+            }
+
+            .calendar-day.major-phase .phase-name {
+                display: none;
+            }
+
+            .date-number {
+                position: static;
+                align-self: flex-start;
+                margin-left: 2px;
+                font-size: 0.95em;
             }
 
             .moon-icon {
-                font-size: 1em;
+                font-size: 1.05em;
+                margin-top: 0;
+                margin-bottom: 2px;
+            }
+
+            .night-mark {
+                top: 0;
+                right: 1px;
+                font-size: 0.62em;
             }
 
             .calendar-day-header {
-                font-size: 0.8em;
-                padding: 2px;
-                margin-right: 5px;
-                /* Smaller gap on mobile */
+                font-size: 0.66em;
+                padding: 3px 0;
+                letter-spacing: 0;
             }
 
             /* Reducing padding on map wrapper for small screens */
@@ -1517,22 +1552,22 @@
             var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var firstDayIndex = new Date(year, month, 1).getDay();
             var daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Five rows hold most months; only February-starting-on-a-Sunday
+            // needs four, and a 31-day month starting on Friday needs six.
+            var weeks = Math.ceil((firstDayIndex + daysInMonth) / 7);
 
-            // Iterate Rows (Days of Week)
-            for (var rw = 0; rw < 7; rw++) {
-                // 1. Header (First Column)
+            // 1. The weekday header row.
+            for (var hd = 0; hd < 7; hd++) {
                 var dh = document.createElement('div');
-                dh.className = "calendar-day-header";
-                dh.innerText = days[rw];
-                // Center header text
-                dh.style.display = "flex";
-                dh.style.alignItems = "center";
-                dh.style.justifyContent = "center";
+                dh.className = "calendar-day-header" + (hd === 0 || hd === 6 ? " weekend" : "");
+                dh.innerText = days[hd];
                 grid.appendChild(dh);
+            }
 
-                // 2. Weeks (Columns 1..6)
-                for (var wk = 0; wk < 6; wk++) {
-                    var d = (wk * 7 + rw) - firstDayIndex + 1;
+            // 2. One row per week, Sunday to Saturday.
+            for (var wk = 0; wk < weeks; wk++) {
+                for (var dow = 0; dow < 7; dow++) {
+                    var d = (wk * 7 + dow) - firstDayIndex + 1;
 
                     if (d > 0 && d <= daysInMonth) {
                         // A real <button>: the calendar is the main control on
@@ -1564,7 +1599,7 @@
                         }
                         // Saturdays and Sundays, because a school camp happens
                         // on one whether the Moon cooperates or not.
-                        if (rw === 0 || rw === 6) cell.classList.add('weekend');
+                        if (dow === 0 || dow === 6) cell.classList.add('weekend');
 
                         cell.innerHTML = markHTML + "<span class='date-number'>" + d + "</span><span class='moon-icon'>" + icon + "</span><span class='phase-name'>" + phaseName + "</span>";
 

@@ -74,3 +74,33 @@ Redirect 302 /faqs/ScoreImprovementAttempt https://www.youtube.com/watch?v=hjg3e
 Redirect 302 /faqs/DoubleRegistration https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1040s
 Redirect 302 /faqs/QuizDateMissed https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1055s
 Redirect 302 /faqs/MessageForParticipants https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1069s
+
+# ── Caching ───────────────────────────────────────────────────────────
+# Mirrors the "headers" block in firebase.json; keep the two in step.
+#
+# The star catalogues and the pinned library versions never change in
+# place — a refreshed catalogue goes in a NEW directory (see
+# sky/js/vendor/README.md) — so they get a year and immutable, and a
+# repeat visitor pays nothing for them.
+<IfModule mod_headers.c>
+    <If "%{REQUEST_URI} =~ m#^/sky/(data/celestial|js/vendor)/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+    <If "%{REQUEST_URI} =~ m#^/sky/data/cities\.csv$#">
+        Header set Cache-Control "public, max-age=2592000"
+    </If>
+    <If "%{REQUEST_URI} =~ m#^/files/#">
+        Header set Cache-Control "public, max-age=604800"
+    </If>
+    <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+# Our own CSS and JS change whenever a page is edited: a day, revalidated.
+# Scoped so it cannot reach /sky/js/vendor/, which the rule above owns.
+<IfModule mod_headers.c>
+    <If "%{REQUEST_URI} =~ m#^/(css|js)/[^/]+\.(css|js)$# || %{REQUEST_URI} =~ m#^/sky/(css|js)/[^/]+\.(css|js)$# || %{REQUEST_URI} =~ m#^/concepts/.*\.(css|js)$#">
+        Header set Cache-Control "public, max-age=86400, must-revalidate"
+    </If>
+</IfModule>

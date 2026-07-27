@@ -313,6 +313,61 @@
         "source": "/study",
         "destination": "/quiz/study-material.html"
       }
+    ],
+    "headers": [
+      {
+        "//": "Star catalogues and pinned library versions. These files never change in place: a refreshed catalogue goes in a NEW directory (see sky/js/vendor/README.md), so a year and immutable are safe and repeat visits cost nothing.",
+        "source": "/sky/data/celestial/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "source": "/sky/js/vendor/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "//": "The place database: lazily fetched, rarely edited, and harmless if a month stale.",
+        "source": "/sky/data/cities.csv",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=2592000" }
+        ]
+      },
+      {
+        "//": "Images, fonts and icons. Long, but not immutable — these do get replaced in place.",
+        "source": "**/*.@(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=2592000" }
+        ]
+      },
+      {
+        "//": "PDFs and downloads — circulars and handbooks, replaced season to season.",
+        "source": "/files/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800" }
+        ]
+      },
+      {
+        "//": "Our own CSS and JS change whenever a page is edited, so a day with revalidation rather than a year. Deliberately NOT a blanket **/*.js: that would also match /sky/js/vendor/, and the two rules would then disagree about the same file. A single '*' does not cross a '/', so /sky/js/*.js leaves the vendor directory to the immutable rule above.",
+        "source": "/@(css|js)/*.@(css|js)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+        ]
+      },
+      {
+        "source": "/sky/@(css|js)/*.@(css|js)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+        ]
+      },
+      {
+        "source": "/concepts/**/*.@(css|js)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+        ]
+      }
     ]
   }
 }
