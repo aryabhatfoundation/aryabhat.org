@@ -8,29 +8,13 @@
     ],
     "redirects": [
        {
-        "comment": "The sky pages moved into /sky/ as one section.",
         "source": "/sky.html",
         "destination": "/sky/",
         "type": 301
       },
       {
-        "source": "/constellations.html",
-        "destination": "/sky/constellations.html",
-        "type": 301
-      },
-      {
-        "source": "/stars.html",
-        "destination": "/sky/stars.html",
-        "type": 301
-      },
-      {
         "source": "/whatsup.html",
         "destination": "/sky/whatsup.html",
-        "type": 301
-      },
-      {
-        "source": "/constellation-depth.html",
-        "destination": "/sky/constellation-depth.html",
         "type": 301
       },
        {
