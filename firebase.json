@@ -350,6 +350,13 @@
         ]
       },
       {
+        "//": "Governance and compliance PDFs. Same reasoning as /files/**, but this directory had no rule of its own and so fell back to Firebase's one-hour default — expensive, since ByLaws.pdf alone is 4.8 MB and never changes between AGMs.",
+        "source": "/docs/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800" }
+        ]
+      },
+      {
         "//": "Our own CSS and JS change whenever a page is edited, so a day with revalidation rather than a year. Deliberately NOT a blanket **/*.js: that would also match /sky/js/vendor/, and the two rules would then disagree about the same file. A single '*' does not cross a '/', so /sky/js/*.js leaves the vendor directory to the immutable rule above.",
         "source": "/@(css|js)/*.@(css|js)",
         "headers": [

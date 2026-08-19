@@ -1,0 +1,61 @@
+# robots.txt for aryabhat.org
+#
+# Purpose: keep the site fully discoverable in search while turning away the
+# crawlers that only cost bandwidth. Roughly 44 MB of this site is PDFs, ZIPs
+# and images that cannot be compressed, so an unguided crawl is expensive.
+# Cache lifetimes for the same files live in firebase.json.
+
+# ---------------------------------------------------------------------------
+# AI training and dataset scrapers. These pull the full payload and send no
+# visitors back. Note that Google-Extended and Applebot-Extended govern AI
+# training only -- normal Google and Apple search indexing is NOT affected.
+# ---------------------------------------------------------------------------
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: Amazonbot
+User-agent: Applebot-Extended
+User-agent: Google-Extended
+User-agent: meta-externalagent
+User-agent: FacebookBot
+User-agent: Diffbot
+User-agent: ImagesiftBot
+User-agent: Omgili
+User-agent: YouBot
+User-agent: cohere-ai
+User-agent: Timpibot
+User-agent: Webzio-Extended
+Disallow: /
+
+# ---------------------------------------------------------------------------
+# Commercial SEO and backlink crawlers. Heavy, and of no use to a nonprofit.
+# ---------------------------------------------------------------------------
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DataForSeoBot
+User-agent: MJ12bot
+User-agent: DotBot
+User-agent: BLEXBot
+User-agent: PetalBot
+User-agent: SeekportBot
+Disallow: /
+
+# ---------------------------------------------------------------------------
+# Real search engines. The site stays indexable; only the bulk archives and
+# the brand-asset index are held back. Neither makes a useful search result,
+# and the two ZIPs alone are 7 MB that transfers at full size every fetch.
+# Crawl-delay is honoured by Bing and Yandex; Google ignores it and is
+# rate-limited from Search Console instead.
+# ---------------------------------------------------------------------------
+User-agent: *
+Crawl-delay: 10
+Disallow: /logos/
+Disallow: /*.zip$
+Allow: /
