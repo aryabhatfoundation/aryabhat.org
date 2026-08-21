@@ -380,9 +380,6 @@
             margin-top: 4px;
             line-height: 1.45;
         }
-        /* red-flavoured cards for the "never do this" list */
-        .cardlist.dont li { background: linear-gradient(160deg, rgba(66, 30, 32, .7), rgba(38, 16, 18, .7)); border-color: rgba(239, 83, 80, .35); }
-        .cardlist.dont .ico { filter: drop-shadow(0 0 8px rgba(239, 83, 80, .35)); }
 
         /* ============================================================
            SCREEN MOCKS — the pieces the child will actually see
@@ -795,7 +792,7 @@
                     '<p class="kicker">For students · through school</p>' +
                     '<h2>Attempting the <em>Online Quiz</em></h2>' +
                     '<p class="devnag">ऑनलाइन क्विज़ कैसे दें</p>' +
-                    '<p class="body dim">Aryabhat Astronomy Quiz — the six steps from login to your score, and the one thing you must never do.</p>' +
+                    '<p class="body dim">Aryabhat Astronomy Quiz — the six steps from login to your score, and the one rule once it starts.</p>' +
                     '<p class="cover-start">Tap anywhere to begin<small>शुरू करने के लिए कहीं भी टैप करें</small></p>' +
                     '<div class="cover-brand"><img class="cover-logo" src="/images/aryabhat.svg" alt="Aryabhat Foundation"></div>'
             },
@@ -880,21 +877,15 @@
                     '<div class="dial-wrap">' + dial([{ a0: 0, a1: 108, fill: 'rgba(255,204,51,.32)' }], '3', 'MIN') + '</div>' +
                     '<p class="body dev">क्विज़ के लिए तीन मिनट मिलते हैं — समय पूरा होते ही quiz अपने आप बंद हो जाती है। सोचिए, पर अटकिए नहीं।</p>'
             },
-            {   // 8 — the warning
-                dur: 9500,
+            {   // 8 — the one rule
+                dur: 8500, center: true,
                 html:
                     '<p class="kicker">Most important</p>' +
                     '<div class="warn-glyph">⚠️</div>' +
-                    '<h2>While the quiz is <em>running</em></h2>' +
-                    // Each line carries its own "do not" — the negation is never
-                    // factored out into the heading, or a card read on its own
-                    // (or glanced at in one language) reads as an instruction.
-                    '<ul class="cardlist dont">' +
-                    '<li><span class="ico">🚫</span><span class="txt"><span class="en">Do not close the window</span><span class="hi">विंडो बंद न करें।</span></span></li>' +
-                    '<li><span class="ico">🚫</span><span class="txt"><span class="en">Do not refresh the page</span><span class="hi">पेज refresh न करें।</span></span></li>' +
-                    '<li><span class="ico">🚫</span><span class="txt"><span class="en">Do not switch browser tabs</span><span class="hi">दूसरी tab पर न जाएँ।</span></span></li>' +
-                    '</ul>' +
-                    '<p class="body dim">Your attempt can end right there — and the clock keeps running.</p>'
+                    '<h2>Once started, it must be <em>finished</em></h2>' +
+                    '<p class="body">The quiz runs in one sitting — there is no pausing it and coming back later.</p>' +
+                    '<p class="body dev">एक बार <b>Start Quiz</b> दबाने के बाद क्विज़ एक ही बार में पूरी करनी होती है — बीच में रोककर बाद में नहीं लौट सकते।</p>' +
+                    '<p class="body dim">Settle in before you press Start Quiz.</p>'
             },
             {   // 9 — after the quiz
                 dur: 8000,
