@@ -51,8 +51,8 @@
            site uses; needed here for the "Aryabhat Foundation" sign-off. */
         @font-face {
             font-family: 'renfrewregular';
-            src: url('css/renfrew-webfont.woff2') format('woff2'),
-                 url('css/renfrew-webfont.woff') format('woff');
+            src: url('/css/renfrew-webfont.woff2') format('woff2'),
+                 url('/css/renfrew-webfont.woff') format('woff');
             font-weight: normal;
             font-style: normal;
             font-display: swap;
@@ -867,7 +867,7 @@
         // dur = auto-advance time (ms) when voice-over is OFF.
         var SLIDES = [
             {   // 0 — cover
-                dur: 5200, audio: 'files/aq-audio/v1.mp3', center: true,
+                dur: 5200, audio: '/files/aq-audio/v1.mp3', center: true,
                 html:
                     '<div class="visual-stars">' + starfield() + '</div>' +
                     '<p class="kicker">A guide for schools</p>' +
@@ -879,7 +879,7 @@
                     '<div class="cover-brand"><img class="cover-logo" src="/images/aryabhat.svg" alt="Aryabhat Foundation"></div>'
             },
             {   // 1 — what we'll cover
-                dur: 6500, audio: 'files/aq-audio/v2.mp3',
+                dur: 6500, audio: '/files/aq-audio/v2.mp3',
                 html:
                     '<p class="kicker">In this guide</p>' +
                     '<h2>We\'ll cover just <em>3 things</em></h2>' +
@@ -891,7 +891,7 @@
                     '</ul>'
             },
             {   // 2 — why (three highlights)
-                dur: 8000, audio: 'files/aq-audio/v3.mp3',
+                dur: 8000, audio: '/files/aq-audio/v3.mp3',
                 html:
                     '<p class="kicker">Why Aryabhat AstroQuiz</p>' +
                     '<h2>Three decades. <em>One of a kind.</em></h2>' +
@@ -902,7 +902,7 @@
                     '</ul>'
             },
             {   // 3 — participation chart
-                dur: 6500, audio: 'files/aq-audio/v4.mp3',
+                dur: 6500, audio: '/files/aq-audio/v4.mp3',
                 html:
                     '<p class="kicker">A growing movement</p>' +
                     '<h2>Participation keeps <em>climbing</em></h2>' +
@@ -911,7 +911,7 @@
                     '<ul class="facts"><li><b>10,842</b> students in 2025-26</li><li>Boys <b>&</b> girls</li></ul>'
             },
             {   // 4 — hands-on learning
-                dur: 7000, audio: 'files/aq-audio/v5.mp3',
+                dur: 7000, audio: '/files/aq-audio/v5.mp3',
                 html:
                     '<p class="kicker">Learn by doing</p>' +
                     '<h2>~30 telescopes. <em>Built by the kids.</em></h2>' +
@@ -920,7 +920,7 @@
                     '<ul class="facts"><li><b>~30</b> telescopes</li><li>Equipment <b>built by students</b></li><li>Solar &amp; stellar filters</li></ul>'
             },
             {   // 5 — inspiring experiences gallery
-                dur: 8500, audio: 'files/aq-audio/v6.mp3',
+                dur: 8500, audio: '/files/aq-audio/v6.mp3',
                 html:
                     '<p class="kicker">Moments that inspire</p>' +
                     '<h2>Where winners <em>get to go</em></h2>' +
@@ -932,7 +932,7 @@
                     '<p class="body dev">यह विलक्षण अनुभव आर्यभट AstroQuiz की gravity का अंदाज़ा देता है।</p>'
             },
             {   // 6 — eligibility
-                dur: 6500, audio: 'files/aq-audio/v7.mp3', center: true,
+                dur: 6500, audio: '/files/aq-audio/v7.mp3', center: true,
                 html:
                     '<p class="kicker">Who can take part</p>' +
                     '<h2>Classes <em>6 to 9</em></h2>' +
@@ -942,7 +942,7 @@
                     '<ul class="facts"><li>Any school in <b>Madhya Pradesh</b></li><li>Class <b>6–9</b></li><li><b>100% free</b></li></ul>'
             },
             {   // 7 — registration process
-                dur: 8000, audio: 'files/aq-audio/v8.mp3',
+                dur: 8000, audio: '/files/aq-audio/v8.mp3',
                 html:
                     '<p class="kicker">How to register</p>' +
                     '<h2>Four simple <em>steps</em></h2>' +
@@ -954,7 +954,7 @@
                     '</ul>'
             },
             {   // 8 — the format
-                dur: 6500, audio: 'files/aq-audio/v9.mp3',
+                dur: 6500, audio: '/files/aq-audio/v9.mp3',
                 html:
                     '<p class="kicker">The format</p>' +
                     '<h2>Grab the <em>entry format</em></h2>' +
@@ -971,7 +971,7 @@
                     '<p class="body dim">Email the filled sheet — please don\'t post a print-out.</p>'
             },
             {   // 9 — fewer computers
-                dur: 7000, audio: 'files/aq-audio/v10.mp3', center: true,
+                dur: 7000, audio: '/files/aq-audio/v10.mp3', center: true,
                 html:
                     '<p class="kicker">A common worry</p>' +
                     '<h2>Fewer computers? <em>Register everyone.</em></h2>' +
@@ -985,7 +985,7 @@
                     '<p class="body dev">कुछ स्कूल कम computers के कारण सब बच्चों को रजिस्टर नहीं करते — ऐसा न करें। सबका रजिस्ट्रेशन करें और सबको मौका दें। आइए गणित देखते हैं।</p>'
             },
             {   // 10 — 3 minutes
-                dur: 6000, audio: 'files/aq-audio/v11.mp3', center: true,
+                dur: 6000, audio: '/files/aq-audio/v11.mp3', center: true,
                 html:
                     '<p class="kicker">The math · 1</p>' +
                     '<h2>180 seconds <em>per quiz</em></h2>' +
@@ -993,7 +993,7 @@
                     '<p class="body dev">हर बच्चे को 180 सेकंड यानी तीन मिनट मिलते हैं — इसके बाद quiz खुद ही बंद हो जाती है।</p>'
             },
             {   // 11 — 5 minutes
-                dur: 6000, audio: 'files/aq-audio/v12.mp3', center: true,
+                dur: 6000, audio: '/files/aq-audio/v12.mp3', center: true,
                 html:
                     '<p class="kicker">The math · 2</p>' +
                     '<h2>~5 minutes <em>per child</em></h2>' +
@@ -1004,7 +1004,7 @@
                     '<p class="body dev">आने-जाने का समय जोड़ लें तब भी सामान्यतः कोई बच्चा पाँच मिनट से ज़्यादा computer पर नहीं रुकता।</p>'
             },
             {   // 12 — 12 per hour
-                dur: 6500, audio: 'files/aq-audio/v13.mp3', center: true,
+                dur: 6500, audio: '/files/aq-audio/v13.mp3', center: true,
                 html:
                     '<p class="kicker">The math · 3</p>' +
                     '<h2>12 children <em>per computer, hourly</em></h2>' +
@@ -1013,7 +1013,7 @@
                     '<div class="vischip"><span class="when">1 computer × 1 hour = 12 kids</span></div>'
             },
             {   // 13 — randomizer
-                dur: 6500, audio: 'files/aq-audio/v14.mp3', center: true,
+                dur: 6500, audio: '/files/aq-audio/v14.mp3', center: true,
                 html:
                     '<p class="kicker">No shortcuts</p>' +
                     '<h2>Everyone gets a <em>different set</em></h2>' +
@@ -1021,7 +1021,7 @@
                     '<p class="body dev">यह चिंता न करें कि बाहर निकलकर बच्चे सवाल बता देंगे — software का randomiser हर बच्चे को अलग set of questions देता है।</p>'
             },
             {   // 14 — ready + contact
-                dur: 9000, audio: 'files/aq-audio/v15.mp3',
+                dur: 9000, audio: '/files/aq-audio/v15.mp3',
                 html:
                     '<p class="kicker">You\'re ready</p>' +
                     '<h2>Register your <em>school</em></h2>' +
