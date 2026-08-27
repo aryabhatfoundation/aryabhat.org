@@ -4,10 +4,11 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      "**/.*/**",
       "**/node_modules/**"
     ],
     "redirects": [
-       {
+      {
         "source": "/sky.html",
         "destination": "/sky/",
         "type": 301
@@ -47,7 +48,7 @@
         "destination": "/quiz/astroquiz-guide.html",
         "type": 301
       },
-       {
+      {
         "source": "/quizform",
         "destination": "https://aryabhat.org/files/Institutional_format.xlsx",
         "type": 301
@@ -306,6 +307,36 @@
         "source": "/faqs/MessageForParticipants",
         "destination": "https://www.youtube.com/watch?v=hjg3ed7WKK4&t=1069s",
         "type": 302
+      },
+      {
+        "source": "**/*.php",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/@(wp|wordpress|blog)",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/@(wp|wordpress|blog)/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-@(admin|content|includes|json|login)/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/.env",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/.git/**",
+        "destination": "/",
+        "type": 301
       }
     ],
     "rewrites": [
@@ -319,60 +350,87 @@
         "//": "Star catalogues and pinned library versions. These files never change in place: a refreshed catalogue goes in a NEW directory (see sky/js/vendor/README.md), so a year and immutable are safe and repeat visits cost nothing.",
         "source": "/sky/data/celestial/**",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
         ]
       },
       {
         "source": "/sky/js/vendor/**",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
         ]
       },
       {
         "//": "The place database: lazily fetched, rarely edited, and harmless if a month stale.",
         "source": "/sky/data/cities.csv",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=2592000" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000"
+          }
         ]
       },
       {
         "//": "Images, fonts and icons. Long, but not immutable — these do get replaced in place.",
         "source": "**/*.@(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot)",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=2592000" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000"
+          }
         ]
       },
       {
         "//": "PDFs and downloads — circulars and handbooks, replaced season to season.",
         "source": "/files/**",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=604800" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
         ]
       },
       {
         "//": "Governance and compliance PDFs. Same reasoning as /files/**, but this directory had no rule of its own and so fell back to Firebase's one-hour default — expensive, since ByLaws.pdf alone is 4.8 MB and never changes between AGMs.",
         "source": "/docs/**",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=604800" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
         ]
       },
       {
         "//": "Our own CSS and JS change whenever a page is edited, so a day with revalidation rather than a year. Deliberately NOT a blanket **/*.js: that would also match /sky/js/vendor/, and the two rules would then disagree about the same file. A single '*' does not cross a '/', so /sky/js/*.js leaves the vendor directory to the immutable rule above.",
         "source": "/@(css|js)/*.@(css|js)",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, must-revalidate"
+          }
         ]
       },
       {
         "source": "/sky/@(css|js)/*.@(css|js)",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, must-revalidate"
+          }
         ]
       },
       {
         "source": "/concepts/**/*.@(css|js)",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, must-revalidate"
+          }
         ]
       }
     ]
