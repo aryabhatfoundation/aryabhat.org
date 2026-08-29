@@ -309,26 +309,6 @@
         "type": 302
       },
       {
-        "source": "**/*.php",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/@(wp|wordpress|blog)",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/@(wp|wordpress|blog)/**",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/wp-@(admin|content|includes|json|login)/**",
-        "destination": "/",
-        "type": 301
-      },
-      {
         "source": "/.env",
         "destination": "/",
         "type": 301
