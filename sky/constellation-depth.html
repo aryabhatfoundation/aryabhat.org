@@ -2,39 +2,958 @@
 <html lang="en">
 
 <head>
+    <!-- Google Analytics 4 (centralized in /js/analytics.js) -->
+    <script src="/js/analytics.js"></script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Redirecting — Constellation Atlas: Aryabhat</title>
-    <meta name="robots" content="noindex">
-    <link rel="canonical" href="https://aryabhat.org/constellations.html">
+    <title>Constellation Depth Lab: Aryabhat</title>
+    <meta name="description"
+        content="Every constellation is a trick of perspective. See the stars of any of the 88 figures at their real distances — through head-motion parallax, a wiggle, red-cyan glasses or a cross-eyed stereo pair.">
+    <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+    <link rel="canonical" href="https://aryabhat.org/sky/constellation-depth.html">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />
+    <!-- Tokens, navbar, buttons, sub-nav and the atlas furniture: css/sky.css -->
+    <link rel="stylesheet" type="text/css" href="css/sky.css" media="screen" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
-    <!-- The depth view is no longer a page of its own: a constellation seen
-         from the side is the same constellation, so it is now the second
-         view inside its chart. This shim keeps every link that was ever
-         shared working, hash and all:
+    <style>
+        /* ==========================================================
+           constellation-depth.html — only what is peculiar to this
+           page: the stage, its overlay and its control strip.
+           Everything shared with the rest of the Sky Atlas section is
+           in css/sky.css.
+           ========================================================== */
 
-             constellation-depth.html            -> constellations.html#orion/depth
-             constellation-depth.html#lyra       -> constellations.html#lyra/depth
-             constellation-depth.html#lyra/side  -> constellations.html#lyra/depth
-    -->
-    <script>
-        (function () {
-            var raw = decodeURIComponent(window.location.hash.replace(/^#/, ''));
-            // Orion is the figure that makes the point best, for a bare visit.
-            var id = raw.split('/')[0] || 'orion';
-            var target = 'constellations.html#' + encodeURIComponent(id) + '/depth';
-            // replace(), not assign(): Back should return where the reader
-            // came from, not bounce through this page again.
-            window.location.replace(target);
-        })();
-    </script>
+        /* ============================================================
+           STAGE — the canvas, with the readout in one corner and the
+           controls in a strip along the foot
+           ============================================================ */
+        .lab-stage {
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            background: #070a16;
+            margin: 0 auto 1rem;
+        }
+
+        .lab-canvas {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            /* Vertical drags still scroll the page; sideways ones drive
+               the parallax. */
+            touch-action: pan-y;
+            cursor: crosshair;
+        }
+
+        /* ============================================================
+           IMMERSIVE — the stage alone, edge to edge. The canvas fills
+           the screen; the readout and the controls float over it and
+           fade once the pointer has rested. Real full screen where the
+           browser grants it, and the same thing pinned over the page
+           where it does not (an iPhone, a webview) — one look, one
+           class, either way.
+           ============================================================ */
+        .lab-stage.is-immersive {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            background: #070a16;
+        }
+
+        .lab-stage.is-immersive .lab-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: auto;
+            max-height: none;
+        }
+
+        .lab-stage.is-immersive .lab-head,
+        .lab-stage.is-immersive .lab-controls {
+            position: absolute;
+            left: 0;
+            right: 0;
+            /* Above the canvas, which is positioned too and comes later. */
+            z-index: 2;
+            border: 0;
+            transition: opacity .4s ease;
+        }
+
+        .lab-stage.is-immersive .lab-head {
+            top: 0;
+            padding: calc(16px + env(safe-area-inset-top, 0px)) 24px 18px;
+            background: linear-gradient(180deg, rgba(7, 10, 22, .92) 0%, rgba(7, 10, 22, .55) 60%, rgba(7, 10, 22, 0) 100%);
+        }
+
+        .lab-stage.is-immersive .lab-controls {
+            bottom: 0;
+            padding: 18px 24px calc(18px + env(safe-area-inset-bottom, 0px));
+            background: linear-gradient(0deg, rgba(7, 10, 22, .94) 0%, rgba(7, 10, 22, .6) 65%, rgba(7, 10, 22, 0) 100%);
+        }
+
+        .lab-stage.is-immersive .lab-ruler {
+            flex-basis: 340px;
+        }
+
+        /* Once the pointer has rested, the sky is all there is. */
+        .lab-stage.is-immersive.is-idle .lab-head,
+        .lab-stage.is-immersive.is-idle .lab-controls {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .lab-stage.is-immersive.is-idle .lab-canvas {
+            cursor: none;
+        }
+
+        /* The page beneath the pinned stage must not scroll under it. */
+        html.lab-locked,
+        html.lab-locked body {
+            overflow: hidden;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .lab-stage.is-immersive .lab-head,
+            .lab-stage.is-immersive .lab-controls {
+                transition: none;
+            }
+        }
+
+        /* --- the readout strip: which figure, and how deep it is --- */
+        .lab-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px 24px;
+            padding: 11px 16px 9px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 19, 28, .88);
+        }
+
+        .main .lab-title {
+            font-family: var(--font-brand);
+            font-size: clamp(1.25rem, 3vw, 1.7rem);
+            line-height: 1.15;
+            letter-spacing: 0;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        .lab-title em {
+            font-style: normal;
+            color: var(--gold);
+        }
+
+        .lab-deva {
+            font-family: var(--font-body);
+            font-size: .95rem;
+            font-weight: 400;
+            color: var(--gold);
+            margin-left: 6px;
+            white-space: nowrap;
+        }
+
+        /* The depth ruler: one tick per star, placed by its true distance
+           on a log scale, so a figure's spread in depth is visible before
+           any of the views has to prove it. */
+        .lab-ruler {
+            flex: 0 1 300px;
+            min-width: 200px;
+        }
+
+        .lab-ruler-track {
+            position: relative;
+            height: 18px;
+            border-bottom: 1px solid rgba(159, 179, 200, .35);
+        }
+
+        .lab-tick {
+            position: absolute;
+            bottom: 0;
+            width: 1px;
+            height: 8px;
+            background: var(--ink-dim);
+        }
+
+        .lab-tick.near {
+            background: var(--gold);
+            width: 2px;
+            height: 13px;
+        }
+
+        .lab-tick.far {
+            width: 2px;
+            height: 13px;
+        }
+
+        .lab-ruler-labels {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 4px;
+            font-family: var(--font-display);
+            font-size: .64rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            white-space: nowrap;
+        }
+
+        .lab-ruler-labels b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .lab-ruler-labels .near b {
+            color: var(--gold);
+        }
+
+        /* --- the control strip --- */
+        .lab-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            padding: 10px 14px 12px;
+            border-top: 1px solid var(--border);
+            background: rgba(10, 19, 28, .88);
+        }
+
+        .lab-caption {
+            text-align: center;
+            color: var(--ink-dim);
+            font-size: .86rem;
+            line-height: 1.45;
+            min-height: 1.25em;
+        }
+
+        .lab-caption b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .lab-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lab-opt {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lab-opt label {
+            display: inline;
+            margin: 0;
+            font-family: var(--font-display);
+            font-size: .68rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            white-space: nowrap;
+        }
+
+        /* css/style.css paints every <select>, <input> and <button> for
+           forms; each control here opts out down to the square-shouldered
+           chips the night bar uses. */
+        .main .lab-select {
+            height: 34px;
+            margin: 0;
+            padding: 0 30px 0 11px;
+            max-width: 240px;
+            border-radius: var(--brand-shape-tight);
+            border: 1px solid var(--border);
+            background: rgba(4, 10, 18, .8) no-repeat right 10px center;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffcc33' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            color: var(--ink);
+            font-family: var(--font-display);
+            font-size: .88rem;
+            font-weight: 500;
+            line-height: 1.2;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            text-overflow: ellipsis;
+        }
+
+        .main .lab-select:hover {
+            border-color: rgba(255, 204, 51, .45);
+        }
+
+        .main .lab-select:focus {
+            outline: 0;
+            border-color: rgba(255, 204, 51, .7);
+            box-shadow: 0 0 0 3px rgba(255, 204, 51, .18);
+        }
+
+        .lab-select option {
+            background: #101c2b;
+            color: var(--ink);
+        }
+
+        .main .lab-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 120px;
+            height: 2px;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: rgba(159, 179, 200, .4);
+            cursor: pointer;
+        }
+
+        .main .lab-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 0;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 8px rgba(255, 204, 51, .5);
+        }
+
+        .main .lab-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border: 0;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 8px rgba(255, 204, 51, .5);
+        }
+
+        .main .lab-range:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(255, 204, 51, .18);
+        }
+
+        .main .lab-btn {
+            height: 34px;
+            margin: 0;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--brand-shape-tight);
+            background: rgba(4, 10, 18, .72);
+            color: var(--ink);
+            font-family: var(--font-display);
+            font-size: .82rem;
+            font-weight: 500;
+            letter-spacing: .02em;
+            text-transform: none;
+            text-shadow: none;
+            box-shadow: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color .2s ease, background .2s ease, border-color .2s ease;
+        }
+
+        .main .lab-btn:hover,
+        .main .lab-btn:focus {
+            color: var(--gold-soft);
+            border-color: rgba(255, 204, 51, .45);
+            background: rgba(10, 19, 28, .6);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .main .lab-btn:focus-visible {
+            border-color: rgba(255, 204, 51, .7);
+            box-shadow: 0 0 0 3px rgba(255, 204, 51, .18);
+        }
+
+        .main .lab-btn:active {
+            transform: none;
+            margin-bottom: 0;
+            border-bottom-width: 1px;
+            box-shadow: none;
+        }
+
+        .main .lab-btn.off {
+            color: var(--ink-dim);
+            border-style: dashed;
+        }
+
+        /* The one loud control: a phone cannot tilt until it is tapped. */
+        .main .lab-btn.tilt {
+            color: #100c02;
+            font-weight: 600;
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .main .lab-btn.tilt:hover,
+        .main .lab-btn.tilt:focus {
+            color: #100c02;
+            background: var(--gold-soft);
+            border-color: var(--gold-soft);
+        }
+
+        /* ============================================================
+           BELOW THE STAGE — what the figure's depth amounts to
+           ============================================================ */
+        .payoff {
+            max-width: 720px;
+            margin: 0 auto 1.2rem;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 14px 14px 0;
+            background: linear-gradient(160deg, rgba(40, 34, 16, 0.5), rgba(18, 22, 30, 0.85));
+            color: var(--ink);
+            font-size: .95rem;
+            line-height: 1.6;
+        }
+
+        .payoff strong {
+            color: var(--gold-soft);
+            font-weight: 600;
+        }
+
+        .caveat {
+            max-width: 720px;
+            margin: 0 auto 1.2rem;
+            color: var(--ink-dim);
+            font-size: .8rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .lab-explain {
+            max-width: 720px;
+            margin: 0 auto 1rem;
+            color: var(--ink-dim);
+            font-size: .88rem;
+            line-height: 1.65;
+        }
+
+        .lab-explain b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            /* Square, so the caption and the pickers still fit under it
+               on one screen. */
+            .lab-canvas {
+                aspect-ratio: 1 / 1;
+                max-height: 70vh;
+            }
+
+            .lab-head {
+                padding: 9px 12px 8px;
+                gap: 6px 16px;
+            }
+
+            .lab-ruler {
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+
+            .lab-controls {
+                padding: 9px 10px 11px;
+                gap: 8px;
+            }
+
+            .lab-row {
+                gap: 8px 12px;
+            }
+
+            .lab-caption {
+                font-size: .8rem;
+            }
+
+            .main .lab-select {
+                max-width: 200px;
+                font-size: .84rem;
+            }
+
+            .main .lab-range {
+                width: 96px;
+            }
+
+            .payoff {
+                font-size: .88rem;
+                padding: 12px 14px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <p style="font-family: system-ui, sans-serif; color: #9fb3c8; text-align: center; padding: 3rem 1rem;">
-        The depth view now lives inside the constellation atlas.
-        <a href="constellations.html#orion/depth" style="color: #ffcc33;">Open it there →</a>
-    </p>
+    <div class="container">
+        <section class="header">
+            <!-- Injected by js/layout.js -->
+        </section>
+
+        <nav class="navbar">
+            <!-- Injected by js/layout.js -->
+        </nav>
+
+        <div class="main">
+
+            <nav class="sky-subnav" aria-label="Sky Atlas">
+                <!-- Injected by js/sky-nav.js -->
+            </nav>
+
+            <div class="atlas-head">
+                <span class="kicker">Sky Atlas</span>
+                <h1>A constellation, <em>in depth</em></h1>
+                <p class="atlas-lede">A constellation is a shape only because we see it from one place. Its
+                    stars can be a hundred times farther apart in depth than they are across the sky. Here
+                    every star of a figure stands at its real distance, and you pick the way your eyes take
+                    the depth in: move the view, wiggle it, or put on a pair of glasses.</p>
+            </div>
+
+            <!-- ================= THE STAGE ================= -->
+            <div class="lab-stage" id="stage">
+                <!-- The readout: which figure, and how deep it is. A strip
+                     above the canvas rather than an overlay on it, so the
+                     figure's own stars never hide behind it. -->
+                <div class="lab-head" aria-live="polite">
+                    <h2 class="lab-title">Depth of <em id="hud-name">—</em>
+                        <span class="lab-deva" id="hud-deva"></span></h2>
+                    <div class="lab-ruler" aria-hidden="true">
+                        <div class="lab-ruler-track" id="ruler-track"></div>
+                        <div class="lab-ruler-labels">
+                            <span class="near">nearest <b id="near-val"></b></span>
+                            <span>farthest <b id="far-val"></b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <canvas class="lab-canvas" id="canvas" aria-label="The constellation, drawn in depth"
+                    role="img"></canvas>
+
+                <div class="lab-controls">
+                    <p class="lab-caption" id="caption"></p>
+                    <div class="lab-row">
+                        <span class="lab-opt">
+                            <label for="const-select">Figure</label>
+                            <select class="lab-select" id="const-select" aria-label="Constellation"></select>
+                        </span>
+                        <span class="lab-opt">
+                            <label for="mode-select">View</label>
+                            <select class="lab-select" id="mode-select" aria-label="Way of seeing depth"></select>
+                        </span>
+                        <span class="lab-opt">
+                            <label for="depth-range">Depth</label>
+                            <input type="range" class="lab-range" id="depth-range" min="0" max="1" step="0.01"
+                                value="0.5" aria-label="Depth strength">
+                        </span>
+                        <button class="lab-btn" type="button" id="labels-btn">Labels · on</button>
+                        <button class="lab-btn tilt hidden" type="button" id="tilt-btn">Enable tilt</button>
+                        <button class="lab-btn" type="button" id="fullscreen-btn">⛶ Full screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payoff" id="payoff"></div>
+            <p class="caveat" id="caveat"></p>
+
+            <p class="lab-explain">Nothing here is a diagram. The eye really does sit a little way from Earth,
+                looking at the middle of the figure, and each star really is at its catalogued distance. The
+                <b>depth</b> slider sets how far the eye is allowed to move: at full strength it roams about
+                half the distance to the nearest star of the figure, which is why a figure with one close
+                star swings so much more than one whose stars are all far off. A figure that barely moves at
+                any setting is one whose stars really are at much the same distance.</p>
+
+            <div class="cta-row">
+                <a class="button" id="atlas-link" href="constellations.html">✨ See it in the atlas →</a>
+                <button class="button" type="button" id="copy-link">🔗 Copy link to this view</button>
+            </div>
+
+            <p class="sources">
+                Star positions, magnitudes, spectral types and parallax distances come from the Hipparcos
+                catalogue (ESA 1997) via VizieR; the far distances are estimates, and a parallax too small to
+                measure is reported as no distance rather than a large one, so such a star is left out of the
+                figure here. Star figures are the ones the IAU publishes, drawn by Alan MacRobert for
+                <em>Sky &amp; Telescope</em>, used under
+                <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>; the
+                machine-readable tracing is from
+                <a href="https://github.com/ofrohn/d3-celestial" rel="noopener">d3-celestial</a> (BSD-3-Clause).
+                Proper names are those approved by the IAU Working Group on Star Names.
+            </p>
+        </div>
+    </div>
+
+    <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+
+    <!-- The place and the night the whole section works from: not used
+         here, but loaded so the links out of this page carry them on. -->
+    <script src="js/sky-places.js"></script>
+    <script src="js/sky-night.js"></script>
+    <script src="js/constellation-data.js"></script>
+    <script src="js/sky-charts.js"></script>
+    <script src="js/depth-lab.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            var SC = window.SkyCharts;
+            var Lab = window.DepthLab;
+            var formatLy = Lab.formatLy;
+
+            var byId = {};
+            var CONS = window.CONSTELLATION_DATA.constellations
+                .filter(Lab.placeable)
+                .sort(function (a, b) { return a.latin < b.latin ? -1 : a.latin > b.latin ? 1 : 0; });
+            CONS.forEach(function (c) { byId[c.id] = c; });
+
+            // Orion makes the point best, for a bare visit: its belt looks
+            // like three stars in a row and is nothing of the kind.
+            var DEFAULT_ID = byId.orion ? 'orion' : CONS[0].id;
+
+            var $ = function (id) { return document.getElementById(id); };
+            var stage = $('stage'), canvas = $('canvas');
+            var constSel = $('const-select'), modeSel = $('mode-select');
+            var depthRange = $('depth-range');
+            var labelsBtn = $('labels-btn'), tiltBtn = $('tilt-btn'), fullBtn = $('fullscreen-btn');
+            var caption = $('caption'), payoff = $('payoff'), caveat = $('caveat');
+            var atlasLink = $('atlas-link');
+
+            var lab = Lab.create({
+                canvas: canvas,
+                surface: canvas,
+                // Once the phone is reporting its tilt there is nothing left
+                // to enable.
+                onTilt: function () { tiltBtn.classList.add('hidden'); }
+            });
+
+            var current = null;
+
+            // ---- the pickers ----
+
+            CONS.forEach(function (c) {
+                var o = document.createElement('option');
+                o.value = c.id;
+                o.textContent = c.latin + (c.devanagari ? ' · ' + c.devanagari : '');
+                constSel.appendChild(o);
+            });
+
+            Lab.MODES.forEach(function (m) {
+                var o = document.createElement('option');
+                o.value = m.id;
+                o.textContent = m.label;
+                modeSel.appendChild(o);
+            });
+
+            // A phone has no mouse to wave, and may not have tilt yet, so it
+            // opens on the view that moves by itself.
+            var defaultMode = lab.coarse ? 'orbit' : 'parallax';
+
+            // ---- the readouts ----
+
+            function el(tag, className, text) {
+                var node = document.createElement(tag);
+                if (className) node.className = className;
+                if (text !== undefined) node.textContent = text;
+                return node;
+            }
+
+            function describe() {
+                var info = lab.info();
+                if (!info) return;
+                var con = info.con;
+
+                $('hud-name').textContent = con.latin;
+                $('hud-deva').textContent = con.devanagari || '';
+                $('near-val').textContent = formatLy(info.nearest);
+                $('far-val').textContent = formatLy(info.farthest);
+
+                // One tick per star, log-placed by distance.
+                var track = $('ruler-track');
+                track.textContent = '';
+                var lo = Math.log(info.nearest), hi = Math.log(info.farthest);
+                info.stars.forEach(function (s) {
+                    var tick = el('div', 'lab-tick');
+                    var f = (hi - lo) < 1e-6 ? 0.5 : (Math.log(s.ly) - lo) / (hi - lo);
+                    tick.style.left = (f * 100).toFixed(2) + '%';
+                    tick.title = SC.starLabel(s.star) + ' · ' + formatLy(s.ly);
+                    if (s.star === info.near) tick.classList.add('near');
+                    if (s.star === info.far) tick.classList.add('far');
+                    track.appendChild(tick);
+                });
+
+                var ratio = info.farthest / info.nearest;
+                payoff.textContent = '';
+                payoff.appendChild(document.createTextNode('In ' + con.latin + ', '));
+                payoff.appendChild(el('strong', null, SC.starLabel(info.near)));
+                payoff.appendChild(document.createTextNode(' is the nearest star of the figure at '));
+                payoff.appendChild(el('strong', null, formatLy(info.nearest)));
+                payoff.appendChild(document.createTextNode(', and '));
+                payoff.appendChild(el('strong', null, SC.starLabel(info.far)));
+                payoff.appendChild(document.createTextNode(' the farthest at '));
+                payoff.appendChild(el('strong', null, formatLy(info.farthest)));
+                payoff.appendChild(document.createTextNode(' — '
+                    + (ratio >= 10 ? Math.round(ratio) : Math.round(ratio * 10) / 10)
+                    + ' times farther away. From Earth they sit side by side in the same figure.'));
+
+                if (info.dropped.length) {
+                    var names = info.dropped.map(function (s) { return SC.starLabel(s); });
+                    caveat.textContent = names.length + ' star' + (names.length === 1 ? '' : 's')
+                        + ' of the figure (' + names.join(', ') + ') '
+                        + (names.length === 1 ? 'has' : 'have')
+                        + ' no parallax distance in this catalogue, and so cannot be placed here.';
+                } else {
+                    caveat.textContent = '';
+                }
+
+                atlasLink.href = 'constellations.html#' + encodeURIComponent(con.id);
+                atlasLink.textContent = '✨ ' + con.latin + ' in the atlas →';
+                if (window.SkySection) window.SkySection.decorateLinks();
+
+                document.title = 'Depth of ' + con.latin + ' — Constellation Depth Lab: Aryabhat';
+            }
+
+            function showCaption() {
+                var m = Lab.MODES.filter(function (x) { return x.id === lab.mode(); })[0];
+                // The captions are this page's own strings, with <b> in them.
+                caption.innerHTML = m ? m.cap : '';
+            }
+
+            // ---- the address bar: #<id> or #<id>/<mode> ----
+            //
+            // The old standalone depth page used #<id>/side; a link to that
+            // still opens the right figure, and the unknown sub-part is
+            // simply not a mode.
+
+            function parseHash() {
+                var raw = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+                var parts = raw.split('/');
+                return { id: parts[0] || null, mode: parts[1] || null };
+            }
+
+            // The mode always rides on the link, so "copy link to this
+            // view" copies this view even to a device whose default differs.
+            function writeHash() {
+                if (!current) return;
+                var hash = '#' + encodeURIComponent(current.id) + '/' + lab.mode();
+                if (window.location.hash === hash) return;
+                window.history.replaceState(null, '',
+                    window.location.pathname + window.location.search + hash);
+            }
+
+            function select(con) {
+                current = con;
+                constSel.value = con.id;
+                lab.show(con);
+                describe();
+                writeHash();
+            }
+
+            function setMode(id) {
+                modeSel.value = lab.setMode(id);
+                showCaption();
+                writeHash();
+            }
+
+            function route() {
+                var h = parseHash();
+                var con = (h.id && byId[h.id]) || byId[DEFAULT_ID];
+                var wanted = Lab.MODES.some(function (m) { return m.id === h.mode; })
+                    ? h.mode : defaultMode;
+                if (con !== current) select(con);
+                // Unconditionally: on first load the picker and the caption
+                // have not been told anything yet, whatever the lab defaults to.
+                setMode(wanted);
+            }
+
+            // ---- wiring ----
+
+            constSel.addEventListener('change', function () {
+                var con = byId[constSel.value];
+                if (con) select(con);
+            });
+
+            modeSel.addEventListener('change', function () { setMode(modeSel.value); });
+
+            depthRange.addEventListener('input', function () { lab.setDepth(depthRange.value); });
+            lab.setDepth(depthRange.value);
+
+            function paintLabels() {
+                labelsBtn.textContent = 'Labels · ' + (lab.labels() ? 'on' : 'off');
+                labelsBtn.classList.toggle('off', !lab.labels());
+            }
+            labelsBtn.addEventListener('click', function () {
+                lab.setLabels(!lab.labels());
+                paintLabels();
+            });
+            paintLabels();
+
+            // Tilt is offered on a touch screen that has an orientation
+            // sensor and has not started reporting it on its own.
+            if (lab.coarse && window.DeviceOrientationEvent && !lab.tiltOn()) {
+                tiltBtn.classList.remove('hidden');
+            }
+            tiltBtn.addEventListener('click', function () {
+                lab.enableTilt().then(function (ok) {
+                    if (ok) {
+                        tiltBtn.classList.add('hidden');
+                        setMode('parallax');
+                    } else {
+                        tiltBtn.textContent = 'Tilt unavailable';
+                        tiltBtn.disabled = true;
+                    }
+                });
+            });
+
+            // ---- immersive: the stage alone, edge to edge ----
+            //
+            // The Fullscreen API is asked first. Where it is missing (an
+            // iPhone), refuses (a webview, an iframe) or simply does
+            // nothing, the stage is pinned over the page instead, and the
+            // same class dresses both so they look identical.
+
+            var head = stage.querySelector('.lab-head');
+            var controls = stage.querySelector('.lab-controls');
+            var immersive = false, idleTimer = null;
+            var IDLE_MS = 3000;
+
+            var fsRequest = stage.requestFullscreen || stage.webkitRequestFullscreen;
+            var fsExit = document.exitFullscreen || document.webkitExitFullscreen;
+            function fsElement() {
+                return document.fullscreenElement || document.webkitFullscreenElement || null;
+            }
+
+            // The figure keeps clear of the two floating strips.
+            function measureInsets() {
+                lab.setInsets(immersive
+                    ? { top: head.offsetHeight, bottom: controls.offsetHeight }
+                    : { top: 0, bottom: 0 });
+            }
+
+            /* Someone is using the controls: the pointer rests on them, or
+               they were reached by keyboard. A button that merely kept
+               focus from the click that opened the view does not count,
+               or the chrome would never fade at all. */
+            function onControls() {
+                try {
+                    return controls.matches(':hover') || !!controls.querySelector(':focus-visible');
+                } catch (e) {
+                    return controls.contains(document.activeElement);
+                }
+            }
+
+            function wake() {
+                if (stage.classList.contains('is-idle')) stage.classList.remove('is-idle');
+                clearTimeout(idleTimer);
+                if (!immersive) return;
+                idleTimer = setTimeout(function () {
+                    if (onControls()) { wake(); return; }
+                    stage.classList.add('is-idle');
+                }, IDLE_MS);
+            }
+
+            function setImmersive(on) {
+                if (immersive === on) return;
+                immersive = on;
+                stage.classList.toggle('is-immersive', on);
+                document.documentElement.classList.toggle('lab-locked', on);
+                fullBtn.textContent = on ? '✕ Exit full screen' : '⛶ Full screen';
+                fullBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                if (on) fullBtn.blur();
+                wake();
+                lab.resize();
+                measureInsets();
+            }
+
+            function enterImmersive() {
+                if (!fsRequest) { setImmersive(true); return; }
+                var result = null;
+                try { result = fsRequest.call(stage); } catch (e) { result = null; }
+                // Granted: fullscreenchange dresses the stage. Refused, or
+                // answered with silence (some webviews never settle the
+                // promise at all): pin it ourselves. Either way the stage
+                // is immersive within a blink of the tap.
+                var settle = function () { setImmersive(true); };
+                if (result && typeof result.then === 'function') result.then(settle, settle);
+                setTimeout(settle, 300);
+            }
+
+            function leaveImmersive() {
+                if (fsElement() && fsExit) fsExit.call(document);   // -> fullscreenchange
+                else setImmersive(false);
+            }
+
+            fullBtn.addEventListener('click', function () {
+                if (immersive) leaveImmersive(); else enterImmersive();
+            });
+            canvas.addEventListener('dblclick', function () {
+                if (immersive) leaveImmersive(); else enterImmersive();
+            });
+
+            // Only a real full screen that was actually entered can be
+            // left this way: a webview that fails its own attempt still
+            // fires this event, and that must not undo the pinned stage.
+            var realFull = false;
+            function onFullChange() {
+                if (fsElement()) {
+                    realFull = true;
+                    setImmersive(true);
+                } else if (realFull) {
+                    realFull = false;
+                    setImmersive(false);
+                }
+            }
+            document.addEventListener('fullscreenchange', onFullChange);
+            document.addEventListener('webkitfullscreenchange', onFullChange);
+
+            document.addEventListener('keydown', function (e) {
+                if (!immersive) return;
+                // Real full screen answers Escape itself.
+                if (e.key === 'Escape' && !fsElement()) leaveImmersive();
+                else wake();
+            });
+            stage.addEventListener('pointermove', wake);
+            stage.addEventListener('pointerdown', wake);
+            window.addEventListener('resize', function () { if (immersive) measureInsets(); });
+
+            $('copy-link').addEventListener('click', function () {
+                var url = window.location.href;
+                var btn = this;
+                function done() {
+                    btn.textContent = '✓ Link copied';
+                    setTimeout(function () { btn.textContent = '🔗 Copy link to this view'; }, 1800);
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(done, function () {
+                        window.prompt('Copy this link:', url);
+                    });
+                } else {
+                    window.prompt('Copy this link:', url);
+                }
+            });
+
+            window.addEventListener('hashchange', route);
+            route();
+        })();
+    </script>
+    <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+    <script src="/js/cosmos-bg.js"></script>
+    <script src="/js/layout.js"></script>
+    <script src="js/sky-nav.js"></script>
 </body>
 
 </html>

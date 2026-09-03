@@ -52,6 +52,16 @@
             cta: 'Browse all 88 →'
         },
         {
+            key: 'depth',
+            href: 'constellation-depth.html',
+            label: 'Depth lab',
+            icon: '🧊',
+            title: 'Constellation depth lab',
+            blurb: 'Every constellation is a trick of perspective. See the stars of any figure at ' +
+                'their real distances: move the view, wiggle it, or put on red-cyan glasses.',
+            cta: 'Open the depth lab →'
+        },
+        {
             key: 'stars',
             href: 'stars.html',
             label: 'Bright stars',
