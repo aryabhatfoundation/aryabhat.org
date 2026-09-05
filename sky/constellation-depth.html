@@ -15,10 +15,14 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <!-- The Sky section installs as an app of its own: sky.webmanifest
+         names it, gives it the hub as its front door and the section as
+         its scope. The colour is the one behind every page here. -->
+    <meta name="theme-color" content="#0b1a26">
+    <link rel="manifest" href="sky.webmanifest">
     <link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />
-    <!-- Tokens, navbar, buttons, sub-nav and the atlas furniture: css/sky.css -->
-    <link rel="stylesheet" type="text/css" href="css/sky.css" media="screen" />
+    <!-- Tokens, the shell, buttons and the atlas furniture: css/sky.css -->
+    <link rel="stylesheet" type="text/css" href="css/sky.css?v=20260905b" media="screen" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -503,22 +507,15 @@
 
 <body>
     <div class="container">
-        <section class="header">
-            <!-- Injected by js/layout.js -->
-        </section>
-
-        <nav class="navbar">
-            <!-- Injected by js/layout.js -->
-        </nav>
+        <header class="sky-shell">
+            <!-- The section's shell — mark, name, tools, site menu: injected
+                 by js/sky-nav.js. No night bar: depth is the same from
+                 anywhere. -->
+        </header>
 
         <div class="main">
 
-            <nav class="sky-subnav" aria-label="Sky Atlas">
-                <!-- Injected by js/sky-nav.js -->
-            </nav>
-
             <div class="atlas-head">
-                <span class="kicker">Sky Atlas</span>
                 <h1>A constellation, <em>in depth</em></h1>
                 <p class="atlas-lede">A constellation is a shape only because we see it from one place. Its
                     stars can be a hundred times farther apart in depth than they are across the sky. Here
@@ -603,7 +600,12 @@
     <!-- The place and the night the whole section works from: not used
          here, but loaded so the links out of this page carry them on. -->
     <script src="js/sky-places.js"></script>
-    <script src="js/sky-night.js"></script>
+    <script src="js/sky-night.js?v=20260905b"></script>
+    <!-- The section's registry and shell. /js/layout.js draws nothing on
+         these pages (there is no site header here) but exports the list of
+         the site's sections that the shell's menu shows. -->
+    <script src="/js/layout.js?v=20260905b"></script>
+    <script src="js/sky-nav.js?v=20260905b"></script>
     <script src="js/constellation-data.js"></script>
     <script src="js/sky-charts.js"></script>
     <script src="js/depth-lab.js"></script>
@@ -952,8 +954,6 @@
     </script>
     <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
     <script src="/js/cosmos-bg.js"></script>
-    <script src="/js/layout.js"></script>
-    <script src="js/sky-nav.js"></script>
 </body>
 
 </html>

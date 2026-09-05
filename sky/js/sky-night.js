@@ -19,15 +19,20 @@
  *   SkyNight.on(fn)       → fn({ place, date, changed: ['place'|'date'] })
  *   SkyNight.href(url)    → that url carrying the current place and date
  *   SkyNight.isTonight()  → is the chosen night actually tonight?
+ *   SkyNight.configure({ url: bool })
+ *                         → does this page keep them in its address bar?
  *
  * Persistence splits the two deliberately. A place is a standing fact
  * about you and survives in localStorage. A date is not: coming back next
  * week should mean tonight, not the evening you were once planning. It
  * lives in sessionStorage, so it survives a reload and a walk across the
  * section, and resets when the visit does. A URL always wins over both —
- * that is what makes a shared link land where the sender meant.
+ * that is what makes a shared link land where the sender meant. Not every
+ * page keeps them in its URL, though: see configure() below.
  *
- * Requires js/sky-places.js. Renders into any <div class="sky-night-bar">.
+ * Requires js/sky-places.js. Renders the whole control into any
+ * <div class="sky-night-bar">, and the place chip on its own into any
+ * <span class="sky-place-inline">.
  */
 window.SkyNight = (function () {
     'use strict';
@@ -172,10 +177,39 @@ window.SkyNight = (function () {
         render();
     }
 
+    /* Whether this page keeps the place and night in its address bar. The
+       pages that compute from them do: that is what makes a shared link
+       land where the sender meant. A page that does not — the atlas, where
+       a constellation is the same constellation from anywhere — is told so
+       by js/sky-nav.js from the section's registry, and keeps a clean URL:
+       a link into it carrying the two is still honoured on arrival, and the
+       parameters are then dropped, so what gets copied and shared from the
+       page says only what the page is about. */
+    var carriesUrl = true;
+    var CONTEXT_KEYS = ['lat', 'lng', 'place', 'city', 'date'];
+
+    function configure(opts) {
+        if (!opts || typeof opts.url !== 'boolean') return;
+        carriesUrl = opts.url;
+        if (!carriesUrl) forgetUrl();
+    }
+
+    function forgetUrl() {
+        if (!window.history || !window.history.replaceState) return;
+        var next = new URLSearchParams(window.location.search);
+        var had = CONTEXT_KEYS.some(function (key) { return next.has(key); });
+        if (!had) return;
+        CONTEXT_KEYS.forEach(function (key) { next.delete(key); });
+        var qs = next.toString();
+        window.history.replaceState(null, '',
+            window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+    }
+
     /* Keep the address bar honest, without stacking a history entry per
        keystroke — the back button should leave the section, not walk back
        through every date someone tried. */
     function syncUrl() {
+        if (!carriesUrl) return;
         if (!window.history || !window.history.replaceState) return;
         var next = new URLSearchParams(window.location.search);
         next.delete('lat'); next.delete('lng'); next.delete('place'); next.delete('city');
@@ -425,9 +459,45 @@ window.SkyNight = (function () {
         return panel;
     }
 
+    /* The place control: the chip that says where you are standing, and
+       the typeahead it opens. The night bar puts it beside the date; an
+       atlas page uses it on its own, inline in the sentence beside the one
+       thing there that depends on where you are. Every control of the bar
+       sits in a .night-slot, which is what the stylesheet hangs the chips
+       and the popover off. */
+    function placeControl(extraClass) {
+        var placeBtn = el('button', 'night-chip' + (extraClass ? ' ' + extraClass : ''));
+        placeBtn.type = 'button';
+        placeBtn.setAttribute('data-role', 'place');
+        placeBtn.setAttribute('aria-expanded', 'false');
+        placeBtn.setAttribute('aria-haspopup', 'dialog');
+        placeBtn.innerHTML = '<span aria-hidden="true">📍</span> ' +
+            '<span class="night-chip-value"></span> <span class="night-caret" aria-hidden="true">▾</span>';
+        placeBtn.querySelector('.night-chip-value').textContent = window.SkyPlaces.label(place);
+        placeBtn.setAttribute('aria-label', 'Observing from ' + window.SkyPlaces.label(place) + '. Change place');
+
+        var panel = buildPlacePanel(placeBtn);
+        placeBtn.onclick = function (e) {
+            e.stopPropagation();
+            var wasOpen = openPanel && openPanel.panel === panel;
+            closePanel();
+            if (wasOpen) return;
+            panel.hidden = false;
+            placeBtn.setAttribute('aria-expanded', 'true');
+            openPanel = { panel: panel, button: placeBtn };
+            panel._reset();
+        };
+
+        var placeWrap = el('span', 'night-slot');
+        placeWrap.appendChild(placeBtn);
+        placeWrap.appendChild(panel);
+        return placeWrap;
+    }
+
     function render() {
         var bars = document.querySelectorAll('.sky-night-bar');
-        if (!bars.length) return;
+        var inlines = document.querySelectorAll('.sky-place-inline');
+        if (!bars.length && !inlines.length) return;
 
         /* Rebuilding the bar detaches whatever had focus. Note which control
            held it so the same one can be handed it back — otherwise picking a
@@ -435,7 +505,8 @@ window.SkyNight = (function () {
            exactly the moment a keyboard user least wants to be moved. */
         var wasFocused = document.activeElement;
         var refocus = wasFocused && wasFocused.closest ?
-            (wasFocused.closest('.sky-night-bar') ? wasFocused.getAttribute('data-role') : null) : null;
+            (wasFocused.closest('.sky-night-bar, .sky-place-inline') ?
+                wasFocused.getAttribute('data-role') : null) : null;
 
         // Any popover belonged to the bar we are about to replace.
         openPanel = null;
@@ -445,38 +516,14 @@ window.SkyNight = (function () {
             bar.setAttribute('aria-label', 'Place and night');
 
             // — place —
-            var placeBtn = el('button', 'night-chip');
-            placeBtn.type = 'button';
-            placeBtn.setAttribute('data-role', 'place');
-            placeBtn.setAttribute('aria-expanded', 'false');
-            placeBtn.setAttribute('aria-haspopup', 'dialog');
-            placeBtn.innerHTML = '<span aria-hidden="true">📍</span> ' +
-                '<span class="night-chip-value"></span> <span class="night-caret" aria-hidden="true">▾</span>';
-            placeBtn.querySelector('.night-chip-value').textContent = window.SkyPlaces.label(place);
-            placeBtn.setAttribute('aria-label', 'Observing from ' + window.SkyPlaces.label(place) + '. Change place');
-
-            var panel = buildPlacePanel(placeBtn);
-            placeBtn.onclick = function (e) {
-                e.stopPropagation();
-                var wasOpen = openPanel && openPanel.panel === panel;
-                closePanel();
-                if (wasOpen) return;
-                panel.hidden = false;
-                placeBtn.setAttribute('aria-expanded', 'true');
-                openPanel = { panel: panel, button: placeBtn };
-                panel._reset();
-            };
-
-            var placeWrap = el('span', 'night-slot');
-            placeWrap.appendChild(placeBtn);
-            placeWrap.appendChild(panel);
-            bar.appendChild(placeWrap);
+            bar.appendChild(placeControl());
 
             bar.appendChild(el('span', 'night-sep', '·'));
 
             // — night —
             // A <label> wrapping a real date input: taps open the platform
             // picker, which beats anything we would draw ourselves.
+            var dateSlot = el('span', 'night-slot');
             var dateBtn = el('label', 'night-chip');
             dateBtn.innerHTML = '<span aria-hidden="true">🌙</span> ' +
                 '<span class="night-chip-value"></span> <span class="night-caret" aria-hidden="true">▾</span>';
@@ -500,25 +547,36 @@ window.SkyNight = (function () {
                 try { dateInput.showPicker(); } catch (err) { dateInput.focus(); }
             };
             dateBtn.appendChild(dateInput);
-            bar.appendChild(dateBtn);
+            dateSlot.appendChild(dateBtn);
+            bar.appendChild(dateSlot);
 
             // — back to tonight —
             // Only once there is something to come back from.
             if (!isTonight()) {
+                var backSlot = el('span', 'night-slot');
                 var back = el('button', 'night-chip ghost');
                 back.type = 'button';
                 back.setAttribute('data-role', 'today');
                 back.innerHTML = '<span aria-hidden="true">↺</span> Tonight';
                 back.setAttribute('aria-label', 'Back to tonight');
                 back.onclick = function () { setDate(new Date()); };
-                bar.appendChild(back);
+                backSlot.appendChild(back);
+                bar.appendChild(backSlot);
             }
+        });
+
+        // The place chip on its own, for a page that has no night to set.
+        Array.prototype.forEach.call(inlines, function (slot) {
+            slot.textContent = '';
+            slot.appendChild(placeControl('inline'));
         });
 
         // Hand focus back to the control that had it, or — when that control
         // was "back to tonight" and has just removed itself — to the date.
         if (refocus) {
-            var target = document.querySelector('.sky-night-bar [data-role="' + refocus + '"]') ||
+            var target = document.querySelector(
+                '.sky-night-bar [data-role="' + refocus + '"], ' +
+                '.sky-place-inline [data-role="' + refocus + '"]') ||
                 document.querySelector('.sky-night-bar [data-role="date"]');
             if (target) target.focus();
         }
@@ -549,6 +607,7 @@ window.SkyNight = (function () {
         set: set,
         on: on,
         href: href,
+        configure: configure,
         render: render,
         isTonight: isTonight,
         ymd: ymd,

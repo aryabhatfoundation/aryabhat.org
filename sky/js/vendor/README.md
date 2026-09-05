@@ -16,10 +16,15 @@ reason; this directory extends that to the rest.
 | `celestial.min.js` | d3-celestial (latest at fetch) | jsDelivr | BSD-3-Clause, © 2015-2020 Olaf Frohn |
 | `suncalc.min.js` | 1.9.0 | cdnjs | BSD-2-Clause, © 2014 Vladimir Agafonkin |
 | `astronomy.browser.min.js` | 2.1.19 | jsDelivr | MIT, © Don Cross |
+| `html2canvas.min.js` | 1.4.1 | jsDelivr | MIT, © 2022 Niklas von Hertzen |
 
 The star, constellation and Milky Way catalogues d3-celestial reads at runtime
 are in `../data/celestial/`, taken from <https://ofrohn.github.io/data/> — the
 same files, previously fetched from GitHub Pages on every page view.
+
+`html2canvas.min.js` is loaded only when someone presses Save Map on the
+chart, not at page load; it is here so that button works at a camp site too,
+and so `sw.js` can keep a copy of it with the rest of the section.
 
 ## Refreshing
 

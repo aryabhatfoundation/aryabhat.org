@@ -1,6 +1,8 @@
 /* ==========================================================================
-   sky.css — the shared stylesheet for the Sky Atlas section
-   (sky.html, constellations.html, stars.html)
+   sky.css — the shared stylesheet for the Sky section
+   (index.html, planner.html, chart.html, constellations.html, stars.html,
+   constellation-depth.html; whatsup.html is a full-screen story and draws
+   its own)
 
    Everything here used to be pasted into each of those pages' own <style>
    block, four copies drifting apart a declaration at a time. It is in one
@@ -9,15 +11,16 @@
    Load it AFTER css/style.css: several rules here exist to undo the
    site-wide <button> treatment, and they need to win on source order.
 
-   Part 1 is the design-system overlay from design.md — tokens, navbar,
-   buttons, footer. It is not sky-specific, and is a candidate for lifting
+   Part 1 is the design-system overlay from design.md — tokens, buttons,
+   footer. It is not sky-specific, and is a candidate for lifting
    site-wide the next time the other pages are touched.
-   Part 2 is the section's own furniture: sub-nav, page head, toolbar,
-   detail chrome, charts, facts.
+   Part 2 is the section's own furniture: the shell, the night bar, the
+   night's numbers, page head, toolbar, detail chrome, charts, facts.
 
    Page-specific components stay in their page's <style> block: the atlas
    grid and star panel in constellations.html, the star cards in
-   stars.html, the map / calendar / visibility panel in sky.html.
+   stars.html, the tiles in index.html, the calendar and visibility panel
+   in planner.html, the map in chart.html.
    ========================================================================== */
 
 
@@ -48,6 +51,12 @@ body {
     font-family: var(--font-body);
 }
 
+/* css/style.css pads .main without border-box, so a full-width grid or
+   map inside it would spill out by the padding. */
+.main {
+    box-sizing: border-box;
+}
+
 .main h1,
 .main h2,
 .main h3,
@@ -57,150 +66,6 @@ body {
     font-family: var(--font-display);
     font-weight: 500;
     letter-spacing: -0.01em;
-}
-
-/* --------------------------------------------------------------------------
-   NAVBAR
-   -------------------------------------------------------------------------- */
-.navbar {
-    position: relative;
-    height: auto;
-    min-height: 4.4rem;
-    background: linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.86) 100%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
-    backdrop-filter: blur(16px) saturate(150%);
-    border-bottom: 1px solid rgba(255, 204, 51, 0.18);
-    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.navbar::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-}
-
-.navbar::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    height: 2px;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 204, 51, 0.18) 15%,
-            rgba(255, 204, 51, 0.7) 50%,
-            rgba(255, 204, 51, 0.18) 85%,
-            transparent 100%);
-    pointer-events: none;
-}
-
-.navbar > .container {
-    width: max-content;
-    min-width: 100%;
-    min-height: 4.4rem;
-    padding: 0 14px;
-    display: flex;
-    align-items: center;
-}
-
-.navbar-list {
-    display: flex;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.navbar-item {
-    float: none !important;
-    flex: 0 0 auto;
-    border-bottom: none;
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.navbar-item.current {
-    background: transparent;
-    border-radius: 0;
-}
-
-.navbar-link {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: .05em;
-    text-transform: none;
-    line-height: 1.3;
-    color: var(--ink);
-    margin: 0;
-    padding: 11px 20px;
-    border-radius: 999px;
-    position: relative;
-    transition: color .2s ease, background .2s ease, box-shadow .25s ease;
-}
-
-.navbar-link:hover,
-.navbar-link:focus {
-    color: var(--gold-soft);
-    background: rgba(255, 204, 51, 0.10);
-    outline: 0;
-}
-
-.navbar-link.active {
-    color: var(--gold);
-    background: rgba(255, 204, 51, 0.12);
-    font-family: var(--font-display);
-    font-weight: 600;
-    text-transform: none;
-    border-radius: var(--brand-shape-tight);
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 204, 51, 0.4),
-        0 0 16px rgba(255, 204, 51, 0.12);
-}
-
-.navbar-link.active:hover,
-.navbar-link.active:focus {
-    color: var(--gold-soft);
-    background: rgba(255, 204, 51, 0.18);
-}
-
-@media (max-width: 700px) {
-    .navbar {
-        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
-        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 56px), transparent 100%);
-    }
-}
-
-@media (max-width: 600px) {
-    .navbar,
-    .navbar > .container {
-        min-height: 3.5rem;
-    }
-
-    .navbar > .container {
-        padding: 0 6px;
-    }
-
-    .navbar-list {
-        gap: 4px;
-    }
-
-    .navbar-link {
-        font-size: .88rem;
-        padding: 8px 14px;
-        letter-spacing: .04em;
-    }
 }
 
 /* --------------------------------------------------------------------------
@@ -277,12 +142,11 @@ body {
 .main .chip,
 .main .star-row,
 .main .star-card,
-.main .subnav-link,
 .main .vis-tab,
 .main .calendar-day,
-.main .sky-night-bar .night-chip,
-.main .sky-night-bar .night-result,
-.main .sky-night-bar .night-here {
+.shell-menu,
+.shell-install,
+.night-slot button {
     height: auto;
     box-shadow: none;
     text-shadow: none;
@@ -327,36 +191,100 @@ body {
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   SUB-NAV — the section's own row of destinations, injected by js/sky-nav.js.
-   This replaces the ad-hoc "see also" button rows each page used to end
-   with, which listed the other pages in a different order every time.
+   SHELL — the bar every page of the section sits under, injected by
+   js/sky-nav.js: the Aryabhat mark (home), the section's name, the row of
+   tools, and a menu for the rest of the site.
+
+   The rest of the site opens with two large logos and a full-width navbar.
+   This section is an app rather than a page — its visitors are mostly on a
+   phone, at night, and want the tool, not the masthead — so that furniture
+   is folded into one slim bar. Where a page has a night bar, it hangs
+   directly under this one (see NIGHT BAR).
    -------------------------------------------------------------------------- */
-.sky-subnav {
+.sky-shell {
+    margin: 10px 0 12px;
+}
+
+.shell-bar {
     display: flex;
-    gap: 6px;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 4px 10px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 204, 51, 0.18);
+    border-radius: var(--brand-shape);
+    background: linear-gradient(180deg, rgba(10, 19, 28, 0.96) 0%, rgba(10, 19, 28, 0.88) 100%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
+}
+
+/* The mark: design.md §1.6 — a white halo, never gold, never tinted. */
+.shell-home {
+    display: inline-flex;
+    flex: 0 0 auto;
+    padding: 2px;
+    border-radius: 50%;
+    line-height: 0;
+}
+
+.shell-home img {
+    display: block;
+    width: 34px;
+    height: 34px;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.55)) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.shell-home:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 2px var(--gold);
+}
+
+.shell-brand {
+    flex: 0 0 auto;
+    font-family: var(--font-brand);
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 5px 8px 2px 0;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: .02em;
+    text-shadow: 0 0 12px rgba(255, 204, 51, 0.25);
+}
+
+.shell-brand:hover,
+.shell-brand:focus-visible {
+    color: var(--gold-soft);
+    outline: 0;
+}
+
+.shell-tools {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    padding: 2px 0;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: 10px 2px 0;
-    margin-bottom: 2px;
 }
 
-.sky-subnav::-webkit-scrollbar {
+.shell-tools::-webkit-scrollbar {
     display: none;
     width: 0;
     height: 0;
 }
 
-.main .subnav-link {
+.shell-tool {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     flex: 0 0 auto;
-    padding: 8px 15px;
+    padding: 7px 12px;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(10, 19, 28, 0.6);
+    border: 1px solid transparent;
     color: var(--ink-dim);
     font-family: var(--font-display);
     font-size: .85rem;
@@ -367,40 +295,200 @@ body {
     transition: color .2s ease, background .2s ease, border-color .2s ease;
 }
 
-.main .subnav-link:hover {
+.shell-tool:hover,
+.shell-tool:focus-visible {
     color: var(--gold-soft);
+    background: rgba(255, 204, 51, 0.08);
+    outline: 0;
+}
+
+.shell-tool.active {
+    color: var(--gold);
+    background: rgba(255, 204, 51, 0.12);
     border-color: rgba(255, 204, 51, 0.45);
 }
 
-.main .subnav-link.active {
-    color: var(--gold);
-    background: rgba(255, 204, 51, 0.12);
-    border-color: rgba(255, 204, 51, 0.5);
-}
-
-.subnav-link .subnav-icon {
+.shell-tool-icon {
     font-size: .95rem;
     line-height: 1;
 }
 
-/* --------------------------------------------------------------------------
-   NIGHT BAR — the place and the evening every page in the section works
-   from, injected by js/sky-night.js. It sits directly under the sub-nav so
-   that "where am I standing, which night am I planning" is answered in the
-   same spot on all four pages.
+.shell-site {
+    position: relative;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
 
-   It must NOT read as a second row of navigation. The sub-nav above it is
-   a row of free-floating pills that take you somewhere; this is a settings
+/* A <button>, so the site's extruded CTA treatment has to be undone here
+   as well as in the reset above. */
+.shell-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    padding: 7px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(4, 10, 18, 0.5);
+    color: var(--ink-dim);
+    font-family: var(--font-display);
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .03em;
+    text-transform: none;
+    cursor: pointer;
+    transition: color .2s ease, border-color .2s ease;
+}
+
+.shell-menu:hover,
+.shell-menu:focus,
+.shell-menu[aria-expanded="true"] {
+    color: var(--gold-soft);
+    border-color: rgba(255, 204, 51, 0.45);
+    background: rgba(10, 19, 28, 0.6);
+    transform: none;
+    box-shadow: none;
+    outline: 0;
+}
+
+.shell-menu:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255, 204, 51, 0.18);
+}
+
+.shell-menu-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.shell-site-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 70;
+    min-width: 200px;
+    padding: 8px;
+    border-radius: var(--brand-shape);
+    border: 1px solid rgba(255, 204, 51, 0.28);
+    background: #101c2b;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .65);
+}
+
+.shell-site-menu[hidden] {
+    display: none;
+}
+
+.shell-site-caption {
+    margin: 2px 0 6px;
+    padding: 0 10px;
+    color: var(--ink-dim);
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.shell-site-link {
+    display: block;
+    padding: 9px 10px;
+    border-radius: var(--brand-shape-tight);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: .92rem;
+    text-decoration: none;
+}
+
+.shell-site-link:hover,
+.shell-site-link:focus-visible {
+    background: rgba(255, 204, 51, 0.14);
+    color: var(--gold-soft);
+    outline: 0;
+}
+
+.shell-site-link.current {
+    color: var(--gold);
+}
+
+/* The install entry: a <button> drawn like the links above it, at the
+   foot of the menu, only once the browser has offered (js/sky-nav.js). */
+.shell-site-menu .shell-install {
+    display: block;
+    width: 100%;
+    margin: 6px 0 0;
+    padding: 10px 10px 8px;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    color: var(--gold);
+    font-family: var(--font-display);
+    font-size: .88rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-align: left;
+    text-transform: none;
+    cursor: pointer;
+}
+
+.shell-site-menu .shell-install:hover,
+.shell-site-menu .shell-install:focus {
+    color: var(--gold-soft);
+    background: rgba(255, 204, 51, 0.10);
+    transform: none;
+    box-shadow: none;
+    outline: 0;
+}
+
+.shell-site-menu .shell-install[hidden] {
+    display: none;
+}
+
+/* Narrow: mark, name and menu on the first line; the tools on a second,
+   which scrolls, with the right edge faded to say so. */
+@media (max-width: 759px) {
+    .shell-bar {
+        padding: 6px 8px 4px;
+    }
+
+    .shell-tools {
+        order: 10;
+        flex-basis: 100%;
+        -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 36px), transparent 100%);
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 36px), transparent 100%);
+    }
+}
+
+@media (max-width: 419px) {
+    .shell-menu-text {
+        display: none;
+    }
+
+    .shell-menu {
+        padding: 7px 9px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   NIGHT BAR — the place and the evening a page works from, injected by
+   js/sky-night.js into the strip js/sky-nav.js hangs under the shell. Only
+   the pages that compute from a place and a night get one (the registry's
+   `needs`); an atlas page answers for a place alone, and says so inline —
+   see PLACE NOTE below.
+
+   It must NOT read as a second row of navigation. The shell above it is a
+   row of free-floating pills that take you somewhere; this is a settings
    strip that changes what you are looking at. So it is drawn as one
    enclosed panel, captioned, with square-shouldered controls inside —
    different container, different shape, different job.
+
+   Every control of the bar sits in a .night-slot, and the chip and popover
+   rules hang off that rather than off the bar, because the place chip and
+   its typeahead also appear on their own, inside a sentence.
    -------------------------------------------------------------------------- */
 .sky-night-bar {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 10px 0 2px;
+    margin: 8px 0 0;
     padding: 9px 12px;
     border: 1px solid var(--border);
     border-left: 3px solid rgba(255, 204, 51, 0.5);
@@ -421,7 +509,7 @@ body {
     margin-right: 2px;
 }
 
-.sky-night-bar .night-slot {
+.night-slot {
     position: relative;
     display: inline-flex;
 }
@@ -429,9 +517,9 @@ body {
 /* Both chips are one shape: a <button> for the place, a <label> wrapping a
    real date input for the night. They must not look like two things.
 
-   Square shoulders, not the sub-nav's 999px pills — inside a panel that is
+   Square shoulders, not the shell's 999px pills — inside a panel that is
    already visibly a panel, that is enough to keep the two rows apart. */
-.main .sky-night-bar .night-chip {
+.night-slot .night-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -454,7 +542,7 @@ body {
     transition: color .2s ease, background .2s ease, border-color .2s ease;
 }
 
-.main .sky-night-bar .night-chip:hover {
+.night-slot .night-chip:hover {
     color: var(--gold-soft);
     border-color: rgba(255, 204, 51, 0.45);
     background: rgba(10, 19, 28, 0.6);
@@ -462,28 +550,30 @@ body {
     box-shadow: none;
 }
 
-.main .sky-night-bar .night-chip:focus-visible,
-.main .sky-night-bar .night-chip:focus-within {
+.night-slot .night-chip:focus-visible,
+.night-slot .night-chip:focus-within {
     outline: 0;
     border-color: rgba(255, 204, 51, 0.7);
+    background: rgba(10, 19, 28, 0.6);
+    transform: none;
     box-shadow: 0 0 0 3px rgba(255, 204, 51, 0.18);
 }
 
-.sky-night-bar .night-chip-value {
+.night-slot .night-chip-value {
     color: var(--gold);
 }
 
-.sky-night-bar .night-caret {
+.night-slot .night-caret {
     color: var(--ink-dim);
     font-size: .7em;
 }
 
-.main .sky-night-bar .night-chip.ghost {
+.night-slot .night-chip.ghost {
     border-style: dashed;
     border-color: rgba(255, 204, 51, 0.3);
 }
 
-.main .sky-night-bar .night-chip.ghost .night-chip-value {
+.night-slot .night-chip.ghost .night-chip-value {
     color: inherit;
 }
 
@@ -494,7 +584,7 @@ body {
 /* The date input covers its own chip so a tap anywhere on it opens the
    platform picker — and stays invisible rather than display:none, because
    a hidden input cannot be opened on iOS. */
-.sky-night-bar .night-date {
+.night-slot .night-date {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -510,7 +600,7 @@ body {
 }
 
 /* --- the place typeahead --- */
-.sky-night-bar .night-panel {
+.night-slot .night-panel {
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
@@ -525,13 +615,14 @@ body {
     border: 1px solid rgba(255, 204, 51, 0.28);
     background: #101c2b;
     box-shadow: 0 18px 50px rgba(0, 0, 0, .65);
+    text-align: left;
 }
 
-.sky-night-bar .night-panel[hidden] {
+.night-slot .night-panel[hidden] {
     display: none;
 }
 
-.main .sky-night-bar .night-search {
+.night-slot .night-search {
     width: 100%;
     height: 40px;
     margin: 0 0 8px;
@@ -545,18 +636,18 @@ body {
     box-sizing: border-box;
 }
 
-.main .sky-night-bar .night-search:focus {
+.night-slot .night-search:focus {
     outline: 0;
     border-color: rgba(255, 204, 51, 0.55);
 }
 
-.sky-night-bar .night-results {
+.night-slot .night-results {
     max-height: 244px;
     overflow-y: auto;
     overscroll-behavior: contain;
 }
 
-.main .sky-night-bar .night-result {
+.night-slot .night-result {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -580,28 +671,28 @@ body {
 
 /* One highlight for both the mouse and the arrow keys, so the keyboard
    never leaves you guessing which row Enter will take. */
-.main .sky-night-bar .night-result.on,
-.main .sky-night-bar .night-result:hover {
+.night-slot .night-result.on,
+.night-slot .night-result:hover {
     background: rgba(255, 204, 51, 0.14);
     color: var(--gold-soft);
     transform: none;
     box-shadow: none;
 }
 
-.sky-night-bar .night-result-tag {
+.night-slot .night-result-tag {
     flex: 0 0 auto;
     font-size: .85em;
 }
 
-.sky-night-bar .night-result-name {
+.night-slot .night-result-name {
     flex: 1 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.sky-night-bar .night-hint,
-.sky-night-bar .night-empty {
+.night-slot .night-hint,
+.night-slot .night-empty {
     margin: 2px 0 6px;
     padding: 0 10px;
     color: var(--ink-dim);
@@ -610,14 +701,14 @@ body {
     text-transform: uppercase;
 }
 
-.sky-night-bar .night-empty {
+.night-slot .night-empty {
     text-transform: none;
     letter-spacing: 0;
     font-size: .88rem;
     padding: 10px;
 }
 
-.main .sky-night-bar .night-here {
+.night-slot .night-here {
     display: flex;
     align-items: center;
     gap: 7px;
@@ -639,20 +730,20 @@ body {
     cursor: pointer;
 }
 
-.main .sky-night-bar .night-here:hover:not(:disabled) {
+.night-slot .night-here:hover:not(:disabled) {
     color: var(--gold-soft);
     background: transparent;
     transform: none;
     box-shadow: none;
 }
 
-.main .sky-night-bar .night-here:disabled {
+.night-slot .night-here:disabled {
     cursor: default;
     opacity: .6;
 }
 
 @media (max-width: 550px) {
-    .main .sky-night-bar .night-chip {
+    .night-slot .night-chip {
         font-size: .8rem;
         padding: 7px 12px;
     }
@@ -663,21 +754,108 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   PLACE NOTE — an atlas page's one dependence on where you stand, said in
+   a sentence beside the facts it changes, with the place chip inline in it.
+   No bar of settings over a page that is otherwise the same from anywhere.
+   -------------------------------------------------------------------------- */
+.place-note {
+    position: relative;
+    margin: -4px 0 16px;
+    color: var(--ink-dim);
+    font-size: .82rem;
+    line-height: 1.7;
+}
+
+/* The chip sits mid-sentence, so a popover hung off its left edge runs off
+   the right of a phone. Hang it off the sentence instead, centred: the
+   paragraph is the full content width, and the popover is narrower. */
+.place-note .night-slot {
+    position: static;
+    vertical-align: middle;
+}
+
+.place-note .night-slot .night-panel {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.place-note .night-slot .night-chip.inline {
+    padding: 3px 9px;
+    font-size: .8rem;
+}
+
+/* --------------------------------------------------------------------------
+   NIGHT TIMES — the four numbers a night turns on: sunset, full dark, what
+   the Moon does, and how much true dark is left once both are accounted
+   for. On the hub as tonight at a glance and on the planner for the night
+   being planned; both fill it from js/sky-evening.js.
+   -------------------------------------------------------------------------- */
+.night-times {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.ntime {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(30, 45, 66, 0.55), rgba(15, 26, 38, 0.6));
+}
+
+.ntime-label {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+}
+
+.ntime-value {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+}
+
+/* Dark-sky hours is the number that decides whether the night is worth
+   the drive, so it gets the gold. */
+.ntime.lead {
+    border-color: rgba(255, 204, 51, 0.4);
+    background: linear-gradient(160deg, rgba(255, 204, 51, 0.10), rgba(15, 26, 38, 0.6));
+}
+
+.ntime.lead .ntime-value {
+    color: var(--gold);
+}
+
+@media (max-width: 550px) {
+    .night-times {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .ntime {
+        padding: 8px 10px;
+    }
+
+    .ntime-value {
+        font-size: 0.95rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
    PAGE HEAD
    -------------------------------------------------------------------------- */
 .atlas-head {
     text-align: center;
-    padding: 1.6rem 0 0.4rem;
-}
-
-.kicker {
-    display: block;
-    font-family: var(--font-display);
-    font-size: .75rem;
-    letter-spacing: .4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: .6rem;
+    padding: 1.2rem 0 0.4rem;
 }
 
 .atlas-head h1 {

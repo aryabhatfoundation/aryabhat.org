@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google Analytics 4 (centralized in /js/analytics.js) -->
+    <script src="/js/analytics.js"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evening Planner: Aryabhat</title>
+    <meta name="description"
+        content="Plan an evening under the stars from any city or dark-sky site in India: sunset, full dark and what the Moon does; which planets, deep-sky objects and bright stars are up and until when; and a calendar of the month's darkest nights.">
+    <meta name="author" content="Alok Mandavgane, Aryabhat Foundation">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <!-- The Sky section installs as an app of its own: sky.webmanifest
+         names it, gives it the hub as its front door and the section as
+         its scope. The colour is the one behind every page here. -->
+    <meta name="theme-color" content="#0b1a26">
+    <link rel="manifest" href="sky.webmanifest">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />
+    <!-- Tokens, the shell, buttons, the night's numbers and the atlas furniture: css/sky.css -->
+    <link rel="stylesheet" type="text/css" href="css/sky.css?v=20260905b" media="screen" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- SunCalc: sunset, twilight and the Moon -->
+    <script src="js/vendor/suncalc.min.js"></script>
+
+    <!-- Astronomy Engine — planet & DSO visibility calculations -->
+    <script src="js/vendor/astronomy.browser.min.js"></script>
+
+    <!-- The place and the night the whole section works from. Both must be
+         resolved before the page script reads a latitude off them. -->
+    <script src="js/sky-places.js"></script>
+    <script src="js/sky-night.js?v=20260905b"></script>
+    <!-- The section's registry and shell. /js/layout.js draws nothing on
+         these pages (there is no site header here) but exports the list of
+         the site's sections that the shell's menu shows. -->
+    <script src="/js/layout.js?v=20260905b"></script>
+    <script src="js/sky-nav.js?v=20260905b"></script>
+    <!-- The shape of the evening: sunset, full dark, the Moon, dark hours. -->
+    <script src="js/sky-evening.js?v=20260905b"></script>
+
+    <style>
+        /* ==========================================================
+           planner.html — only what is peculiar to this page: the
+           info bar, the visibility panel and the calendar. The
+           night's four numbers are in css/sky.css (the hub shows
+           them too); tokens, the shell and buttons likewise.
+           ========================================================== */
+
+        body {
+            background: none;
+        }
+
+        /* Sky Info Bar */
+        .sky-info-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-size: 1em;
+            color: var(--ink);
+            margin-top: 12px;
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .sky-info-sep {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        @media (max-width: 550px) {
+            .sky-info-bar {
+                font-size: 0.82em;
+                padding: 8px 10px;
+                gap: 4px;
+            }
+        }
+
+        /* Visibility Panel — Tabs */
+        #visibility-panel {
+            margin-bottom: 16px;
+        }
+
+        .vis-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+        }
+
+        .vis-tab {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(10, 19, 28, 0.7);
+            color: var(--ink-dim);
+            font-family: var(--font-display);
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: .04em;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .vis-tab:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .vis-tab:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .vis-tab.active {
+            background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+            color: var(--gold);
+            border-color: var(--border);
+        }
+
+        .vis-tab-content {
+            display: none;
+            background: linear-gradient(160deg, rgba(30, 45, 66, 0.9), rgba(15, 26, 38, 0.9));
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 12px 14px;
+        }
+
+        .vis-tab-content.active {
+            display: block;
+        }
+
+        .vis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .vis-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 0.85em;
+            border-left: 3px solid transparent;
+        }
+
+        .vis-item.visible {
+            background: rgba(102, 187, 106, 0.08);
+            border-left-color: #66bb6a;
+        }
+
+        /* The count is the point of the tab, so it reads as a value and
+           not as part of the label. */
+        .vis-count {
+            display: inline-block;
+            min-width: 1.5em;
+            margin-left: 4px;
+            padding: 1px 5px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--ink-dim);
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .vis-tab.active .vis-count {
+            background: rgba(255, 204, 51, 0.18);
+            color: var(--gold);
+        }
+
+        /* Everything not up, as one line rather than six unreadable rows. */
+        .vis-absent {
+            margin: 8px 0 0;
+            color: var(--ink-dim);
+            font-size: 0.78em;
+            line-height: 1.5;
+        }
+
+        .vis-caveat {
+            margin: 0 0 8px;
+            color: #8296ab;
+            font-size: 0.72em;
+            line-height: 1.5;
+        }
+
+        .vis-window {
+            margin: 8px 0 0;
+            text-align: center;
+            color: var(--ink-dim);
+            font-size: 0.78em;
+        }
+
+        .vis-item .vis-icon {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .vis-item .vis-hindi {
+            color: var(--gold);
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
+        .vis-item .vis-name {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .vis-item .vis-time {
+            color: var(--ink-dim);
+            font-size: 0.85em;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .vis-item.visible .vis-time {
+            color: #8fc;
+        }
+
+        @media (max-width: 550px) {
+            .vis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vis-item {
+                font-size: 0.8em;
+                padding: 4px 6px;
+            }
+        }
+
+        /* Calendar Styles */
+        #calendar-container {
+            margin: 24px 0 20px;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Weekdays across the top, weeks down the page — the way every
+           calendar anyone has ever used is laid out. A date picker is the
+           one place where recognition beats novelty. */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            font-family: var(--font-display);
+            font-weight: 600;
+            padding: 5px 2px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            color: var(--gold);
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            font-size: .78em;
+        }
+
+        .calendar-day-header.weekend {
+            background-color: rgba(255, 204, 51, 0.10);
+        }
+
+        .calendar-day {
+            padding: 2px;
+            background-color: #000;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            min-height: 58px;
+            position: relative;
+            transition: background-color .15s ease, box-shadow .15s ease;
+        }
+
+        .calendar-day:hover {
+            background-color: #1c2838;
+            box-shadow: inset 0 0 0 1px rgba(255, 204, 51, 0.25);
+        }
+
+        .calendar-day.selected {
+            border: 2px solid var(--gold) !important;
+            box-shadow: 0 0 12px rgba(255, 204, 51, 0.35);
+        }
+
+        .calendar-day.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        .moon-icon {
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+
+        .date-number {
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .phase-name {
+            font-size: 0.6em;
+            text-align: right;
+            color: #aaa;
+        }
+
+        .calendar-day.major-phase {
+            border: 1px solid #555;
+        }
+
+        /* Two marks, two colours: green for a night to bring people to,
+           violet for a night to chase faint things on. */
+        .calendar-day.best-viewing {
+            border: 1px solid #66bb6a;
+        }
+
+        .calendar-day.darkest {
+            border: 1px solid #8a7cc8;
+        }
+
+        .night-mark {
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            font-size: 0.75em;
+            line-height: 1;
+        }
+
+        /* A camp lands on a Saturday whether or not the Moon agrees, so the
+           weekend has to be findable at a glance. */
+        .calendar-day.weekend .date-number {
+            color: var(--gold);
+        }
+
+        .calendar-day.major-phase .phase-name {
+            font-size: 0.75em;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .cal-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px 18px;
+            margin: 10px 0 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.8rem;
+            color: var(--ink-dim);
+        }
+
+        .cal-legend li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .cal-legend b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .lg-icon {
+            font-size: 0.95em;
+        }
+
+        .lg-swatch {
+            width: 34px;
+            height: 12px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            background: linear-gradient(90deg, #000 0%, #323232 100%);
+        }
+
+        .lg-weekend {
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .cal-btn {
+            cursor: pointer;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid rgba(255, 204, 51, 0.45);
+            border-radius: 999px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background .2s ease, color .2s ease, border-color .2s ease;
+        }
+
+        .cal-btn:hover {
+            background: rgba(255, 204, 51, 0.10);
+            color: var(--gold-soft);
+            border-color: var(--gold);
+        }
+
+        .calendar-title {
+            font-family: var(--font-brand);
+            color: var(--ink);
+            font-size: 1.3em;
+            letter-spacing: 0.01em;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 550px) {
+            .calendar-grid {
+                gap: 2px;
+            }
+
+            /* Seven columns on a 360px phone is about 48px a cell, which
+               fits a date and a Moon but not a phase name. The name is the
+               least of the three: the icon says the same thing, and the
+               aria-label still reads it out. */
+            .calendar-day {
+                padding: 2px;
+                min-height: 46px;
+                font-size: 0.8em;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .phase-name {
+                display: none;
+            }
+
+            .calendar-day.major-phase .phase-name {
+                display: none;
+            }
+
+            .date-number {
+                position: static;
+                align-self: flex-start;
+                margin-left: 2px;
+                font-size: 0.95em;
+            }
+
+            .moon-icon {
+                font-size: 1.05em;
+                margin-top: 0;
+                margin-bottom: 2px;
+            }
+
+            .night-mark {
+                top: 0;
+                right: 1px;
+                font-size: 0.62em;
+            }
+
+            .calendar-day-header {
+                font-size: 0.66em;
+                padding: 3px 0;
+                letter-spacing: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="sky-shell">
+            <!-- The section's shell — mark, name, tools, site menu — and the
+                 night bar under it: injected by js/sky-nav.js -->
+        </header>
+
+        <div class="main">
+            <div class="atlas-head">
+                <h1>Plan a <em>night</em></h1>
+                <p class="atlas-lede">Everything here runs off the place and the night at the top. Pick a day on
+                    the calendar and the panels move with it: how dark the night gets and for how long, and
+                    which planets, deep-sky objects and bright stars are up that evening and until when. The
+                    calendar marks two different kinds of good night: 🌑 for the darkest skies, and 🔭 for the
+                    ones worth running a camp on.</p>
+            </div>
+
+            <div class="sky-info-bar">
+                <span id="selected-date-display"></span>
+                <span class="sky-info-sep">·</span>
+                <span id="place-info">📍</span>
+            </div>
+            <!-- The four numbers a camp actually turns on, filled from
+                 js/sky-evening.js. Dark hours leads because it is the one
+                 that decides whether the night is worth the drive. -->
+            <div class="night-times" id="night-times"></div>
+
+            <div id="visibility-panel">
+                <!-- Counts on the tabs: two thirds of the answer used to sit
+                     behind a click with nothing to say it was worth clicking. -->
+                <div class="vis-tabs" role="tablist" aria-label="What is up this evening">
+                    <button class="vis-tab active" type="button" role="tab" aria-selected="true"
+                        aria-controls="tab-planets" onclick="switchVisTab('planets')">Planets <span
+                            class="vis-count" id="count-planets"></span></button>
+                    <button class="vis-tab" type="button" role="tab" aria-selected="false" aria-controls="tab-dso"
+                        onclick="switchVisTab('dso')">Deep Sky <span class="vis-count"
+                            id="count-dso"></span></button>
+                    <button class="vis-tab" type="button" role="tab" aria-selected="false"
+                        aria-controls="tab-stars" onclick="switchVisTab('stars')">Stars <span class="vis-count"
+                            id="count-stars"></span></button>
+                </div>
+                <div class="vis-tab-content active" id="tab-planets">
+                    <div class="vis-grid" id="planets-grid">
+                        <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                    </div>
+                    <p class="vis-absent" id="planets-grid-none" hidden></p>
+                </div>
+                <div class="vis-tab-content" id="tab-dso">
+                    <p class="vis-caveat">Faint objects — best seen under dark skies away from city lights, with
+                        patience and sufficient time</p>
+                    <div class="vis-grid" id="dso-grid">
+                        <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                    </div>
+                    <p class="vis-absent" id="dso-grid-none" hidden></p>
+                </div>
+                <div class="vis-tab-content" id="tab-stars">
+                    <div class="vis-grid" id="stars-grid">
+                        <div class="vis-item"><span class="vis-name">Loading...</span></div>
+                    </div>
+                    <p class="vis-absent" id="stars-grid-none" hidden></p>
+                </div>
+            </div>
+            <!-- "all evening" meant nothing without saying which hours the
+                 panel above is actually scanning. -->
+            <p class="vis-window" id="vis-window"></p>
+            <script>
+                function switchVisTab(tab) {
+                    document.querySelectorAll('.vis-tab').forEach(function (t) {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    });
+                    document.querySelectorAll('.vis-tab-content').forEach(function (c) { c.classList.remove('active'); });
+                    document.getElementById('tab-' + tab).classList.add('active');
+                    var btn = document.querySelector('.vis-tab[onclick*="' + tab + '"]');
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
+                }
+            </script>
+
+            <div id="calendar-container">
+                <div class="calendar-header">
+                    <button class="cal-btn" type="button" onclick="changeMonth(-1)" aria-label="Previous month">&lt;</button>
+                    <span class="calendar-title" id="calendar-title">Month Year</span>
+                    <button class="cal-btn" type="button" onclick="changeMonth(1)" aria-label="Next month">&gt;</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- JS generates grid here -->
+                </div>
+            </div>
+            <!-- Three signals on the grid, none of which explained itself
+                 before: the two marks, and the cell shading. -->
+            <ul class="cal-legend">
+                <li><span class="lg-icon">🌑</span> <b>Darkest skies</b> — no Moon to wash out the faint things</li>
+                <li><span class="lg-icon">🔭</span> <b>Good for a camp</b> — a Moon worth showing people, gone by
+                    mid-evening</li>
+                <li><span class="lg-swatch" aria-hidden="true"></span> Cell brightness is how much of the Moon is
+                    lit</li>
+                <li><span class="lg-weekend" aria-hidden="true">6</span> Weekends in gold</li>
+            </ul>
+
+            <!-- On to the night itself. Both links carry this place and night
+                 (js/sky-nav.js decorates them), so the chart opens on the
+                 evening just planned. -->
+            <div class="cta-row">
+                <a class="button button-primary" href="chart.html">🌌 See the sky this night →</a>
+                <a class="button" href="whatsup.html">🔭 Open What's Up →</a>
+            </div>
+        </div>
+
+        <p class="footer-line">&copy; Aryabhat Foundation &middot;</p>
+    </div>
+
+    <script>
+        // Where we are standing and which evening we mean both live in
+        // js/sky-night.js, shared with the rest of the section. This page
+        // reads them, never sets its own.
+        var place = SkyNight.place;
+        var observer = new Astronomy.Observer(place.lat, place.lng, 500);
+
+        // The evening is SkyNight's; this page keeps a local alias because
+        // the calendar and the panels both read it on every redraw.
+        var selectedDate = SkyNight.date;
+        var currentCalendarDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+
+        var fmtTime = SkyEvening.fmtTime;
+        var isTime = SkyEvening.isTime;
+
+        function updateDateDisplay() {
+            var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('selected-date-display').innerText = selectedDate.toLocaleDateString("en-US", options);
+            document.getElementById('place-info').innerText = '📍 ' + SkyPlaces.label(SkyNight.place);
+        }
+
+        // The night's numbers and what is up, for one evening.
+        function updateNight(date) {
+            var evening = SkyEvening.of(place, date);
+            SkyEvening.renderCells(document.getElementById('night-times'), evening);
+            updateVisibility(date, evening);
+        }
+
+        /* Moving to another month used to select the 1st of it, so peeking
+           at next month and coming back lost the evening you were planning.
+           The visible month moves; the chosen night stays put. */
+        function changeMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        /* Everything on this page that depends on where or when, in one
+           place, so SkyNight only has to say "something moved". */
+        function refreshAll() {
+            place = SkyNight.place;
+            observer = new Astronomy.Observer(place.lat, place.lng, 500);
+            selectedDate = SkyNight.date;
+            currentCalendarDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+            updateDateDisplay();
+            updateNight(selectedDate);
+            renderCalendar();
+        }
+
+        SkyNight.on(refreshAll);
+
+        function renderCalendar() {
+            var grid = document.getElementById('calendar-grid');
+            var title = document.getElementById('calendar-title');
+            grid.innerHTML = "";
+
+            var year = currentCalendarDate.getFullYear();
+            var month = currentCalendarDate.getMonth();
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            title.innerText = monthNames[month] + " " + year;
+
+            var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var firstDayIndex = new Date(year, month, 1).getDay();
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Five rows hold most months; only February-starting-on-a-Sunday
+            // needs four, and a 31-day month starting on Friday needs six.
+            var weeks = Math.ceil((firstDayIndex + daysInMonth) / 7);
+
+            // 1. The weekday header row.
+            for (var hd = 0; hd < 7; hd++) {
+                var dh = document.createElement('div');
+                dh.className = "calendar-day-header" + (hd === 0 || hd === 6 ? " weekend" : "");
+                dh.innerText = days[hd];
+                grid.appendChild(dh);
+            }
+
+            // 2. One row per week, Sunday to Saturday.
+            for (var wk = 0; wk < weeks; wk++) {
+                for (var dow = 0; dow < 7; dow++) {
+                    var d = (wk * 7 + dow) - firstDayIndex + 1;
+
+                    if (d > 0 && d <= daysInMonth) {
+                        // A real <button>: the calendar is the main control on
+                        // this page and has to be reachable by keyboard.
+                        var cell = document.createElement('button');
+                        cell.type = 'button';
+                        cell.className = "calendar-day";
+
+                        var dateObj = new Date(year, month, d, 12, 0, 0);
+
+                        var moonIllum = SunCalc.getMoonIllumination(dateObj);
+                        var phase = moonIllum.phase;
+                        var fraction = moonIllum.fraction;
+                        var icon = SkyEvening.moonIcon(phase);
+                        var phaseName = SkyEvening.moonPhaseName(phase);
+
+                        var brightness = Math.floor(fraction * 50);
+                        cell.style.backgroundColor = "rgb(" + brightness + "," + brightness + "," + brightness + ")";
+
+                        if (phaseName === "New Moon" || phaseName === "Full Moon") {
+                            cell.classList.add('major-phase');
+                        }
+
+                        var mark = SkyEvening.nightMark(phase);
+                        var markHTML = "";
+                        if (mark) {
+                            markHTML = "<span class='night-mark'>" + mark.icon + "</span>";
+                            cell.classList.add(mark.cls);
+                        }
+                        // Saturdays and Sundays, because a school camp happens
+                        // on one whether the Moon cooperates or not.
+                        if (dow === 0 || dow === 6) cell.classList.add('weekend');
+
+                        cell.innerHTML = markHTML + "<span class='date-number'>" + d + "</span><span class='moon-icon'>" + icon + "</span><span class='phase-name'>" + phaseName + "</span>";
+
+                        // Read out as a date and a phase, not as "19 🌒 Waxing".
+                        cell.setAttribute('aria-label',
+                            dateObj.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }) +
+                            ' · ' + phaseName + (mark ? ' · ' + mark.label : ''));
+
+                        var isSelected = selectedDate.getDate() === d &&
+                            selectedDate.getMonth() === month &&
+                            selectedDate.getFullYear() === year;
+                        if (isSelected) cell.classList.add('selected');
+                        cell.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+
+                        // The night belongs to SkyNight; it calls back into
+                        // refreshAll(), which redraws this calendar and the panels.
+                        cell.onclick = (function (yr, mo, dy) {
+                            return function () {
+                                SkyNight.setDate(new Date(yr, mo, dy, 12, 0, 0));
+                            }
+                        })(year, month, d);
+
+                        grid.appendChild(cell);
+                    } else {
+                        // Empty slot
+                        var empty = document.createElement('div');
+                        empty.className = "calendar-day empty";
+                        grid.appendChild(empty);
+                    }
+                }
+            }
+        }
+
+        // ── Evening Sky Visibility ──────────────────────────
+        var planets = [
+            { body: 'Moon',    hindi: 'चन्द्रमा', name: 'Moon' },
+            { body: 'Venus',   hindi: 'शुक्र',   name: 'Venus' },
+            { body: 'Jupiter', hindi: 'बृहस्पति', name: 'Jupiter' },
+            { body: 'Saturn',  hindi: 'शनि',     name: 'Saturn' },
+            { body: 'Mars',    hindi: 'मंगल',     name: 'Mars' },
+            { body: 'Mercury', hindi: 'बुध',      name: 'Mercury' }
+        ];
+
+        var dsoList = [
+            { star: 'Star1', ra: 5.588,  dec: -5.39,  dist: 1344,    name: 'M42',  desc: 'Orion Nebula' },
+            { star: 'Star2', ra: 0.712,  dec: 41.27,  dist: 2537000, name: 'M31',  desc: 'Andromeda Galaxy' },
+            { star: 'Star3', ra: 3.791,  dec: 24.11,  dist: 444,     name: 'M45',  desc: 'Pleiades' },
+            { star: 'Star4', ra: 16.695, dec: 36.46,  dist: 22200,   name: 'M13',  desc: 'Hercules Cluster' },
+            { star: 'Star5', ra: 8.673,  dec: 19.67,  dist: 577,     name: 'M44',  desc: 'Beehive Cluster' },
+            { star: 'Star6', ra: 2.333,  dec: 57.13,  dist: 7500,    name: 'Double Cluster', desc: 'In Perseus' },
+            { star: 'Star7', ra: 18.607, dec: -23.90, dist: 10400,   name: 'M22',  desc: 'Sagittarius Cluster' },
+            { star: 'Star8', ra: 6.148,  dec: 24.33,  dist: 2800,    name: 'M35',  desc: 'Gemini Cluster' }
+        ];
+
+        // Register DSOs with astronomy-engine
+        dsoList.forEach(function (dso) {
+            Astronomy.DefineStar(dso.star, dso.ra, dso.dec, dso.dist);
+        });
+
+        var starList = [
+            { ra: 2.530,  dec: 89.264,  name: 'Polaris',          desc: 'North Star' },
+            { ra: 13.398, dec: 54.926,  name: 'Mizar & Alcor',    desc: 'Arundhati Vashisht' },
+            { ra: 6.752,  dec: -16.716, name: 'Sirius',           desc: 'Brightest star' },
+            { ra: 6.399,  dec: -52.696, name: 'Canopus',          desc: '2nd brightest' },
+            { ra: 14.261, dec: 19.182,  name: 'Arcturus',         desc: 'In Bootes' },
+            { ra: 18.615, dec: 38.784,  name: 'Vega',             desc: 'In Lyra' },
+            { ra: 5.278,  dec: 45.998,  name: 'Capella',          desc: 'In Auriga' },
+            { ra: 5.242,  dec: -8.202,  name: 'Rigel',            desc: 'In Orion' },
+            { ra: 5.919,  dec: 7.407,   name: 'Betelgeuse',       desc: 'Red supergiant' },
+            { ra: 7.655,  dec: 5.225,   name: 'Procyon',          desc: 'In Canis Minor' },
+            { ra: 4.599,  dec: 16.509,  name: 'Aldebaran',        desc: 'Eye of the Bull' },
+            { ra: 13.420, dec: -11.161, name: 'Spica',            desc: 'In Virgo' },
+            { ra: 16.490, dec: -26.432, name: 'Antares',          desc: 'Heart of Scorpion' },
+            { ra: 20.690, dec: 45.280,  name: 'Deneb',            desc: 'In Cygnus' },
+            { ra: 19.846, dec: 8.868,   name: 'Altair',           desc: 'In Aquila' },
+            { ra: 22.961, dec: -29.622, name: 'Fomalhaut',        desc: 'In Piscis Austrinus' }
+        ];
+
+        function getAltitude(body, date) {
+            var equ = Astronomy.Equator(body, date, observer, true, true);
+            var hor = Astronomy.Horizon(date, observer, equ.ra, equ.dec, 'normal');
+            return hor.altitude;
+        }
+
+        // For stars using raw J2000 RA/Dec (no DefineStar needed)
+        function getStarAltitude(ra, dec, date) {
+            return Astronomy.Horizon(date, observer, ra, dec, 'normal').altitude;
+        }
+
+        // Scan for when a star drops below minAlt after being above it
+        function findStarSetTime(ra, dec, start, end, minAlt) {
+            var step = 15 * 60 * 1000; // 15-min steps
+            var wasUp = false;
+            for (var t = start.getTime(); t <= end.getTime(); t += step) {
+                var alt = getStarAltitude(ra, dec, new Date(t));
+                if (alt > minAlt) wasUp = true;
+                else if (wasUp) return new Date(t);
+            }
+            return null; // still up at end
+        }
+
+        // Scan for when a star rises above minAlt
+        function findStarRiseTime(ra, dec, start, end, minAlt) {
+            var step = 15 * 60 * 1000;
+            for (var t = start.getTime(); t <= end.getTime(); t += step) {
+                var alt = getStarAltitude(ra, dec, new Date(t));
+                if (alt > minAlt) return new Date(t);
+            }
+            return null;
+        }
+
+        /* One tab's list: what is up, then a single line standing in for
+           everything that is not. Six greyed-out rows at 45% opacity were
+           both unreadable and mostly noise — the reader wants the four
+           things they can point at, not the two they cannot. */
+        function renderVisGrid(id, items) {
+            var up = items.filter(function (i) { return i.visible; });
+            var down = items.filter(function (i) { return !i.visible; });
+
+            document.getElementById(id).innerHTML = up.length
+                ? up.map(function (i) { return i.html; }).join('')
+                : '<p class="vis-absent">Nothing on this list is up during the session.</p>';
+
+            var note = document.getElementById(id + '-none');
+            if (note) {
+                note.hidden = !down.length;
+                note.textContent = down.length
+                    ? 'Not up this evening: ' + down.map(function (i) { return i.name; }).join(', ')
+                    : '';
+            }
+            return up.length;
+        }
+
+        function updateVisibility(date, evening) {
+            var sunset = evening.sunset;
+            // evening window: sunset to midnight
+            var midnight = new Date(date);
+            midnight.setHours(23, 59, 0, 0);
+
+            // Under midnight sun there is no evening to scan: say so, and
+            // leave the lists empty rather than asking the engine about a
+            // sunset that never happens.
+            if (!sunset) {
+                document.getElementById('vis-window').textContent = 'The Sun does not set here on this date.';
+                ['planets', 'dso', 'stars'].forEach(function (tab) {
+                    document.getElementById('count-' + tab).textContent = renderVisGrid(tab + '-grid', []);
+                });
+                return;
+            }
+            var nightStart = evening.darkStart || sunset;
+
+            document.getElementById('vis-window').textContent =
+                'Scanned between ' + fmtTime(sunset) + ' and ' + fmtTime(midnight)
+                + ' — "all evening" means up for that whole stretch.';
+
+            // ── Planets ──
+            var planetItems = [];
+            planets.forEach(function (p) {
+                var altAtSunset = getAltitude(p.body, sunset);
+                var altAtNight = getAltitude(p.body, nightStart);
+                var setEvt = Astronomy.SearchRiseSet(p.body, observer, -1, sunset, 1);
+                var riseEvt = Astronomy.SearchRiseSet(p.body, observer, +1, sunset, 1);
+
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtSunset > 5 || altAtNight > 5) {
+                    // Above horizon at sunset or night start
+                    isVisible = true;
+                    if (setEvt && setEvt.date < midnight) {
+                        timeText = 'till ' + fmtTime(setEvt.date);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else if (riseEvt && riseEvt.date < midnight) {
+                    // Rises during the evening
+                    isVisible = true;
+                    timeText = 'rises ' + fmtTime(riseEvt.date);
+                }
+
+                planetItems.push({
+                    visible: isVisible, name: p.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-hindi">' + p.hindi + '</span>'
+                        + '<span class="vis-name">' + p.name + '</span>'
+                        + '<span class="vis-time">' + timeText + '</span>'
+                        + '</div>'
+                });
+            });
+
+            // ── Deep Sky Objects ──
+            var dsoItems = [];
+            dsoList.forEach(function (dso) {
+                var altAtNight = getAltitude(dso.star, nightStart);
+                var setEvt = Astronomy.SearchRiseSet(dso.star, observer, -1, sunset, 1);
+                var riseEvt = Astronomy.SearchRiseSet(dso.star, observer, +1, sunset, 1);
+
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtNight > 10) {
+                    isVisible = true;
+                    if (setEvt && setEvt.date > nightStart && setEvt.date < midnight) {
+                        timeText = 'till ' + fmtTime(setEvt.date);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else if (riseEvt && riseEvt.date < midnight) {
+                    var altAfterRise = getAltitude(dso.star, new Date(riseEvt.date.getTime() + 3600000));
+                    if (altAfterRise > 10) {
+                        isVisible = true;
+                        timeText = 'rises ' + fmtTime(riseEvt.date);
+                    }
+                }
+
+                dsoItems.push({
+                    visible: isVisible, name: dso.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-icon">🔭</span>'
+                        + '<span class="vis-name">' + dso.name + '</span>'
+                        + '<span class="vis-time">' + dso.desc + ' · ' + timeText + '</span>'
+                        + '</div>'
+                });
+            });
+
+            // ── Stars ──
+            var starItems = [];
+            starList.forEach(function (s) {
+                var altAtNight = getStarAltitude(s.ra, s.dec, nightStart);
+                var isVisible = false;
+                var timeText = 'not visible';
+
+                if (altAtNight > 5) {
+                    isVisible = true;
+                    var setTime = findStarSetTime(s.ra, s.dec, nightStart, midnight, 5);
+                    if (setTime) {
+                        timeText = 'till ' + fmtTime(setTime);
+                    } else {
+                        timeText = 'all evening';
+                    }
+                } else {
+                    var riseTime = findStarRiseTime(s.ra, s.dec, nightStart, midnight, 5);
+                    if (riseTime) {
+                        isVisible = true;
+                        timeText = 'rises ' + fmtTime(riseTime);
+                    }
+                }
+
+                starItems.push({
+                    visible: isVisible, name: s.name,
+                    html: '<div class="vis-item visible">'
+                        + '<span class="vis-icon">⭐</span>'
+                        + '<span class="vis-name">' + s.name + '</span>'
+                        + '<span class="vis-time">' + s.desc + ' · ' + timeText + '</span>'
+                        + '</div>'
+                });
+            });
+
+            document.getElementById('count-planets').textContent =
+                renderVisGrid('planets-grid', planetItems);
+            document.getElementById('count-dso').textContent =
+                renderVisGrid('dso-grid', dsoItems);
+            document.getElementById('count-stars').textContent =
+                renderVisGrid('stars-grid', starItems);
+        }
+
+        // First paint.
+        updateDateDisplay();
+        updateNight(selectedDate);
+        renderCalendar();
+    </script>
+    <!-- Background Animation — page-scoped replacement for js/background-stars.js -->
+    <script src="/js/cosmos-bg.js"></script>
+</body>
+
+</html>

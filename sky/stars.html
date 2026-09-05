@@ -14,10 +14,14 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <!-- The Sky section installs as an app of its own: sky.webmanifest
+         names it, gives it the hub as its front door and the section as
+         its scope. The colour is the one behind every page here. -->
+    <meta name="theme-color" content="#0b1a26">
+    <link rel="manifest" href="sky.webmanifest">
     <link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />
-    <!-- Tokens, navbar, buttons, sub-nav and the atlas furniture: css/sky.css -->
-    <link rel="stylesheet" type="text/css" href="css/sky.css" media="screen" />
+    <!-- Tokens, the shell, buttons and the atlas furniture: css/sky.css -->
+    <link rel="stylesheet" type="text/css" href="css/sky.css?v=20260905b" media="screen" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -153,28 +157,17 @@
 
 <body>
     <div class="container">
-        <section class="header">
-            <!-- Injected by js/layout.js -->
-        </section>
-
-        <nav class="navbar">
-            <!-- Injected by js/layout.js -->
-        </nav>
+        <header class="sky-shell">
+            <!-- The section's shell — mark, name, tools, site menu: injected
+                 by js/sky-nav.js. No night bar on this page: a star is the
+                 same star from anywhere. -->
+        </header>
 
         <div class="main">
-
-            <nav class="sky-subnav" aria-label="Sky Atlas">
-                <!-- Injected by js/sky-nav.js -->
-            </nav>
-
-            <div class="sky-night-bar" role="group">
-                <!-- Injected by js/sky-night.js -->
-            </div>
 
             <!-- ================= LIST ================= -->
             <section id="list-view">
                 <div class="atlas-head">
-                    <span class="kicker">Sky Atlas</span>
                     <h1>The <em>brightest</em> stars</h1>
                     <p class="atlas-lede">Every star brighter than magnitude 2.5 — the ones you can pick out
                         from a city — together with every star the Sanskrit texts named, however faint. Open
@@ -221,6 +214,16 @@
 
                 <div class="facts-grid" id="facts-grid"></div>
 
+                <!-- The one thing on this page that depends on where you stand:
+
+                     the heights and never-rises notes just above. Said here,
+
+                     beside them, with the place chip inline, rather than as a
+
+                     bar of settings over a page that is the same from anywhere. -->
+
+                <p class="place-note">Heights and visibility are for <span class="sky-place-inline"></span></p>
+
                 <div id="sanskrit-section"></div>
 
                 <div class="cta-row">
@@ -248,7 +251,12 @@
 
     <!-- The place and the night the whole section works from -->
     <script src="js/sky-places.js"></script>
-    <script src="js/sky-night.js"></script>
+    <script src="js/sky-night.js?v=20260905b"></script>
+    <!-- The section's registry and shell. /js/layout.js draws nothing on
+         these pages (there is no site header here) but exports the list of
+         the site's sections that the shell's menu shows. -->
+    <script src="/js/layout.js?v=20260905b"></script>
+    <script src="js/sky-nav.js?v=20260905b"></script>
     <script src="js/constellation-data.js"></script>
     <script src="js/star-data.js"></script>
     <script src="js/sky-charts.js"></script>
@@ -272,11 +280,12 @@
                 'vedic-asterism': 'Vedic asterism'
             };
 
-            /* The month the "best now" chip filters on, and the latitude the
-               visibility notes answer for, both come from the night bar rather
-               than from today and Bhopal. Plan for December from Hanle and the
-               atlas agrees with the map page instead of contradicting it. */
-            var thisMonth = SkyNight.date.getMonth();
+            /* The "best now" chip filters on this month: the atlas has no
+               night to plan, so it does not follow the planner's date. The
+               latitude the visibility notes answer for is the place last
+               chosen anywhere in the section (js/sky-night.js remembers it),
+               and can be changed from the note beside those facts. */
+            var thisMonth = new Date().getMonth();
             SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
 
             // ---------------------------------------------------------
@@ -481,9 +490,9 @@
                 renderFacts(star);
                 renderSanskrit(star);
 
-                // Carries the place and night across, like every other link
-                // in the section — SkyNight.href() keeps the #hash.
-                document.getElementById('con-link').href = SkyNight.href(
+                // Plain unless the atlas ever works from a place and a night
+                // again — js/sky-nav.js decides, and keeps the #hash either way.
+                document.getElementById('con-link').href = SkySection.decorate(
                     con ? 'constellations.html#' + con.id : 'constellations.html');
             }
 
@@ -577,14 +586,11 @@
                     ' On a phone, swipe sideways to move to the next star.';
             }
 
-            /* The atlas answers "from where, on which night", so it has to
-               move when those do: the season chip, every visibility note and
-               whatever detail page is open all re-derive from the night bar. */
+            /* The visibility notes answer "from where", so they move when
+               the place does: the grid and whatever detail page is open
+               re-derive from the place chip in the note. */
             SkyNight.on(function () {
-                thisMonth = SkyNight.date.getMonth();
                 SC.setObserver(SkyNight.place.lat, SkyPlaces.label(SkyNight.place));
-                document.getElementById('chip-season').textContent =
-                    'Best in ' + SC.MONTHS[thisMonth].slice(0, 3);
                 browse.render();
                 var open = browse.current();
                 if (open) openStar(open);
@@ -596,8 +602,6 @@
 
     <!-- Background Animation -->
     <script src="/js/cosmos-bg.js"></script>
-    <script src="/js/layout.js"></script>
-    <script src="js/sky-nav.js"></script>
 </body>
 
 </html>

@@ -1,3 +1,32 @@
+/* layout.js — the site's header and navbar, injected into every page that
+   has a <section class="header"> and a <nav class="navbar">.
+
+   The Sky section (/sky/) has neither: it is an app rather than a page, and
+   draws one slim shell of its own (sky/js/sky-nav.js). Its site menu lists
+   the same sections as the navbar here, from the one list below, which is
+   why the list is exported rather than kept inside the handler. */
+
+// The site's sections, in navbar order.
+//
+// Hrefs are root-absolute: not every page sits at the root any more, and
+// a relative "index.html" from /sky/ would point inside the section.
+//
+// "Sky" is one item covering a whole section — the sky map, the evening
+// show, the constellation atlas and the star list. Those pages share a
+// shell of their own now (sky/js/sky-nav.js), and the top bar just says
+// which section you are in. `prefix` marks an item that owns a directory
+// rather than a single file.
+var SITE_NAV_LINKS = [
+    { href: "/index.html", text: "Home", also: ["/", "/oldindex.html"] },
+    { href: "/quiz/", text: "Astronomy Quiz", prefix: "/quiz/" },
+    { href: "/sky/", text: "Sky", prefix: "/sky/" },
+    { href: "/download.html", text: "Download" },
+    { href: "/photos.html", text: "Photos" },
+    { href: "/contact.html", text: "Contact Us" }
+];
+
+window.SiteNav = { links: SITE_NAV_LINKS };
+
 document.addEventListener("DOMContentLoaded", function () {
     // 1. Inject Header
     // Logo + wordmark drop-shadows follow design.md §1.6:
@@ -21,24 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 2. Inject Navbar
-    //
-    // Hrefs are root-absolute: not every page sits at the root any more, and
-    // a relative "index.html" from /sky/ would point inside the section.
-    //
-    // "Sky" is one item covering a whole section — the sky map, the evening
-    // show, the constellation atlas and the star list. Those four used to be
-    // reachable two different ways with no visible relationship between
-    // them; they share a sub-nav of their own now (sky/js/sky-nav.js), and
-    // the top bar just says which section you are in. `prefix` marks an item
-    // that owns a directory rather than a single file.
-    var navLinks = [
-        { href: "/index.html", text: "Home", also: ["/", "/oldindex.html"] },
-        { href: "/quiz/", text: "Astronomy Quiz", prefix: "/quiz/" },
-        { href: "/sky/", text: "Sky", prefix: "/sky/" },
-        { href: "/download.html", text: "Download" },
-        { href: "/photos.html", text: "Photos" },
-        { href: "/contact.html", text: "Contact Us" }
-    ];
+    var navLinks = SITE_NAV_LINKS;
 
     // "/sky/" and "/sky/index.html" are the same page; normalise so either
     // spelling matches.
